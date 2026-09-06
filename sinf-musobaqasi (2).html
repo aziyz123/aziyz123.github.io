@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bilim Kechasi — Sinf Musobaqasi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Archivo+Black&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+  :root{
+    --stage: #12151C;
+    --stage-2: #1B2029;
+    --stage-3: #262D3A;
+    --arena: #ECEFF3;
+    --arena-2: #DDE2E9;
+    --ink: #12151C;
+    --paper: #F3EFE4;
+    --paper-2: #EAE3D2;
+    --line: rgba(32,41,58,0.16);
+    --gold: #A9813F;
+    --gold-2: #C9A45C;
+    --danger: #D64545;
+    --ok: #4A9A6A;
+    --t1: #E8A33D;
+    --t2: #2E8B8B;
+    --t3: #B23A6B;
+    --t4: #6B8F5C;
+  }
+  *{box-sizing:border-box;}
+  body{ margin:0; font-family:'Inter', sans-serif; }
+
+  /* ================= SETUP SCREEN ================= */
+  #setupScreen{
+    background:
+      radial-gradient(circle at 15% 10%, rgba(169,129,63,0.16) 0%, transparent 45%),
+      radial-gradient(circle at 90% 30%, rgba(46,139,139,0.14) 0%, transparent 40%),
+      radial-gradient(circle at 50% 100%, rgba(178,58,107,0.10) 0%, transparent 50%),
+      var(--stage);
+    color: var(--paper); min-height:100vh; position:relative; overflow-x:hidden;
+  }
+  #setupScreen .wrap{ max-width: 800px; margin:0 auto; padding: 56px 24px 60px; position:relative; z-index:1; }
+
+  .hero-row{ display:flex; align-items:center; gap:22px; margin-bottom: 28px; }
+  .cube-logo{ width:64px; height:64px; perspective: 400px; flex-shrink:0; }
+  .cube-logo .cube{ width:100%; height:100%; position:relative; transform-style:preserve-3d; animation: cubeSpin 9s linear infinite; }
+  .cube-logo .face{
+    position:absolute; width:64px; height:64px;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Archivo Black', sans-serif; font-size:22px; color: var(--stage);
+    background: var(--gold); border: 1px solid rgba(0,0,0,0.15);
+  }
+  .cube-logo .f1{ transform: translateZ(32px); background: var(--gold-2); }
+  .cube-logo .f2{ transform: rotateY(180deg) translateZ(32px); background: var(--t3); }
+  .cube-logo .f3{ transform: rotateY(90deg) translateZ(32px); background: var(--t2); }
+  .cube-logo .f4{ transform: rotateY(-90deg) translateZ(32px); background: var(--t1); }
+  .cube-logo .f5{ transform: rotateX(90deg) translateZ(32px); background: var(--t4); }
+  .cube-logo .f6{ transform: rotateX(-90deg) translateZ(32px); background: var(--gold); }
+  @keyframes cubeSpin{ from{ transform: rotateX(0deg) rotateY(0deg); } to{ transform: rotateX(360deg) rotateY(360deg); } }
+
+  .setup-title{ font-family:'Archivo', sans-serif; font-weight:800; font-size: 32px; line-height:1.15; }
+  .setup-title small{ display:block; font-family:'IBM Plex Mono', monospace; font-size: 12px; font-weight:500; color: var(--gold-2); margin-top:8px; letter-spacing:0.03em; }
+
+  .card{
+    background: linear-gradient(155deg, var(--stage-2) 0%, var(--stage) 100%);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 14px;
+    padding: 26px 28px;
+    margin-bottom: 20px;
+    position:relative;
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.04) inset,
+      0 18px 40px -12px rgba(0,0,0,0.55),
+      0 4px 10px rgba(0,0,0,0.3);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    will-change: transform;
+  }
+  .card:hover{ box-shadow: 0 1px 0 rgba(255,255,255,0.05) inset, 0 26px 54px -12px rgba(0,0,0,0.6), 0 6px 14px rgba(0,0,0,0.35); }
+  .card::before{ content:''; position:absolute; top:0; left:22px; right:22px; height:2px; border-radius:2px; background: linear-gradient(90deg, var(--gold), var(--gold-2), transparent); }
+  .card h2{ font-family:'Archivo', sans-serif; font-size: 13px; font-weight:700; letter-spacing:0.04em; margin:0 0 16px 0; color: var(--gold-2); }
+  label{ display:block; font-size:13px; font-weight:600; margin-bottom:6px; margin-top:14px; color: rgba(243,239,228,0.85); }
+  label:first-of-type{ margin-top:0; }
+  textarea, input[type=text], input[type=number], select{
+    width:100%; font-family:'Inter', sans-serif; font-size:14px; padding: 12px 14px;
+    border: 1px solid rgba(255,255,255,0.1); border-radius:8px;
+    background: rgba(0,0,0,0.25); color: var(--paper);
+  }
+  textarea{ min-height: 220px; line-height:1.5; font-family:'IBM Plex Mono', monospace; font-size:13px; }
+  textarea:focus, input:focus, select:focus{ outline:none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(169,129,63,0.2); }
+  select option{ background: var(--stage-2); color: var(--paper); }
+  .hint{ font-size:11px; color: rgba(243,239,228,0.45); margin-top:6px; line-height:1.5; }
+  .row{ display:flex; gap:16px; flex-wrap:wrap; }
+  .row > div{ flex:1; min-width:160px; }
+  #teamNamesWrap{ display:flex; gap:14px; flex-wrap:wrap; margin-top:14px; }
+  #teamNamesWrap > div{ flex:1; min-width:140px; }
+  button.primary{
+    width:100%; margin-top:22px; padding:18px; border:none; border-radius:10px;
+    background: linear-gradient(135deg, var(--gold-2), var(--gold));
+    color: var(--stage); font-family:'Archivo', sans-serif; font-weight:800; font-size:16px; cursor:pointer;
+    box-shadow: 0 14px 30px -8px rgba(169,129,63,0.5), 0 2px 4px rgba(0,0,0,0.2);
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+  }
+  button.primary:hover{ transform: translateY(-2px); box-shadow: 0 18px 36px -8px rgba(169,129,63,0.6), 0 2px 4px rgba(0,0,0,0.2); }
+  button.primary:active{ transform: translateY(0); }
+  .error-box{ display:none; margin-top:14px; padding:12px 14px; border-radius:8px; background: rgba(214,69,69,0.15); border:1px solid var(--danger); color:#ff9d9d; font-size:13px; }
+  .error-box.active{ display:block; }
+  .parsed-preview{ margin-top:14px; font-family:'IBM Plex Mono', monospace; font-size:12px; color: var(--gold-2); }
+  .example-box{ background: rgba(0,0,0,0.3); border: 1px dashed rgba(255,255,255,0.15); border-radius:8px; padding: 12px 14px; font-family:'IBM Plex Mono', monospace; font-size: 12px; line-height:1.6; white-space: pre-wrap; color: rgba(243,239,228,0.55); margin-top: 8px; }
+  .checkbox-row{ display:flex; align-items:center; gap:10px; margin-top:14px; }
+  .checkbox-row input{ width:auto; }
+
+  .app-footer{
+    margin-top: 34px; padding-top: 22px; border-top: 1px solid rgba(255,255,255,0.08);
+    display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;
+    font-family:'IBM Plex Mono', monospace; font-size: 11px; color: rgba(243,239,228,0.4);
+  }
+  .app-footer a{ color: var(--gold-2); text-decoration:none; }
+  .app-footer a:hover{ text-decoration:underline; }
+
+  /* ---- Online submission card ---- */
+  .online-box{ display:none; margin-top: 16px; }
+  .online-box.active{ display:block; }
+  .qr-row{ display:flex; gap: 22px; align-items:center; flex-wrap:wrap; margin-top: 16px; }
+  #qrcodeBox{ background:#fff; padding: 10px; border-radius: 8px; display:inline-block; line-height:0; }
+  .qr-info{ flex:1; min-width: 200px; }
+  .room-code{ font-family:'Archivo Black', sans-serif; font-size: 28px; color: var(--gold-2); letter-spacing:0.05em; }
+  .room-url{ font-family:'IBM Plex Mono', monospace; font-size: 12px; color: rgba(243,239,228,0.6); word-break: break-all; margin-top: 6px; }
+  .live-count{ font-family:'IBM Plex Mono', monospace; font-size: 13px; color: var(--ok); margin-top: 10px; }
+  button.secondary-btn{
+    padding: 12px 20px; border-radius:8px; border: 1px solid var(--gold); background:transparent; color: var(--gold-2);
+    font-family:'Archivo', sans-serif; font-weight:700; font-size: 13px; cursor:pointer; margin-top: 12px;
+  }
+  button.secondary-btn:hover{ background: rgba(169,129,63,0.15); }
+
+  /* ================= SUBMIT SCREEN (phone) ================= */
+  #submitScreen{ display:none; background: var(--stage); color: var(--paper); min-height:100vh; }
+  #submitScreen .wrap{ max-width: 460px; margin:0 auto; padding: 36px 20px 60px; }
+  #submitScreen .setup-title{ font-size: 24px; margin-bottom:6px; }
+  #submitScreen .room-pill{
+    display:inline-block; font-family:'IBM Plex Mono', monospace; font-size:12px; color: var(--gold-2);
+    background: rgba(169,129,63,0.15); padding: 6px 12px; border-radius: 20px; margin-bottom: 22px;
+  }
+  .variant-row{ display:flex; gap:10px; align-items:center; margin-top:10px; }
+  .variant-row span{ font-family:'IBM Plex Mono', monospace; color: var(--gold); font-weight:700; width:20px; }
+  #submitFeedback{
+    display:none; margin-top: 18px; padding: 14px 16px; border-radius:8px;
+    background: rgba(74,154,106,0.15); border:1px solid var(--ok); color:#8fdb9f; font-size:14px; text-align:center;
+  }
+  #submitFeedback.active{ display:block; }
+  .submit-count{ font-family:'IBM Plex Mono', monospace; font-size:12px; color: rgba(243,239,228,0.45); text-align:center; margin-top:14px; }
+
+  /* ================= GAME SCREEN ================= */
+  #gameScreen{ display:none; background: var(--stage); min-height:100vh; color: var(--paper); }
+  .stage-wrap{ max-width: 1300px; margin:0 auto; padding: 22px 26px 40px; }
+  .top-bar{ display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px; flex-wrap:wrap; gap:8px; }
+  .exit-link{ font-family:'IBM Plex Mono', monospace; font-size: 11px; color: rgba(243,239,228,0.45); cursor:pointer; text-decoration:underline; }
+  .exit-link:hover{ color: rgba(243,239,228,0.8); }
+  .round-tag{ font-family:'IBM Plex Mono', monospace; font-size: 12px; color: var(--gold-2); letter-spacing:0.06em; }
+
+  .scoreboard{ display:flex; margin-bottom: 22px; border: 2px solid var(--stage-2); }
+  .team-block{ flex:1; position:relative; padding: 16px 14px 14px; background: var(--stage-2); border-right: 2px solid var(--stage); text-align:center; transition: background 0.3s ease; }
+  .team-block:last-child{ border-right:none; }
+  .team-block .tb-glow{ position:absolute; top:0; left:0; width:100%; height:4px; background: transparent; }
+  .team-block.active{ background: var(--tcolor); }
+  .team-block.active .tb-glow{ background: #fff; animation: pulseGlow 1.4s ease-in-out infinite; }
+  @keyframes pulseGlow{ 0%,100%{ opacity:0.3; } 50%{ opacity:1; } }
+  .team-block .tb-name{ font-family:'Archivo', sans-serif; font-weight:700; font-size: 14px; color: rgba(243,239,228,0.75); }
+  .team-block.active .tb-name{ color: var(--stage); }
+  .team-block .tb-score{ font-family:'IBM Plex Mono', monospace; font-weight:700; font-size: 34px; color: var(--paper); margin-top:4px; }
+  .team-block.active .tb-score{ color: var(--stage); }
+  .team-block .tb-turn{ font-family:'IBM Plex Mono', monospace; font-size: 9px; color: var(--stage); margin-top:4px; visibility:hidden; font-weight:600; }
+  .team-block.active .tb-turn{ visibility:visible; }
+
+  .turn-banner{
+    text-align:center; font-family:'Archivo', sans-serif; font-weight:700; font-size: 18px;
+    color: var(--gold-2); margin-bottom: 18px;
+  }
+
+  .board-grid{
+    display:grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 12px;
+  }
+  .tile{
+    aspect-ratio: 1;
+    background: var(--stage-2);
+    border: 2px solid var(--stage-3);
+    display:flex; align-items:center; justify-content:center;
+    font-family:'IBM Plex Mono', monospace; font-weight:700; font-size: 30px;
+    color: var(--paper); cursor:pointer; user-select:none;
+    transition: all 0.15s ease;
+  }
+  .tile:hover{ border-color: var(--gold); background: var(--stage-3); }
+  .tile.used{ background: transparent; border-color: rgba(255,255,255,0.08); color: rgba(255,255,255,0.15); cursor:default; }
+  .tile.used:hover{ border-color: rgba(255,255,255,0.08); background:transparent; }
+  .tile .tile-icon{ font-size: 22px; }
+
+  /* Overlay used for both question reveal and surprise cards */
+  #playOverlay{ display:none; position:fixed; inset:0; background: rgba(18,21,28,0.94); align-items:center; justify-content:center; z-index: 50; padding: 20px; }
+  #playOverlay.active{ display:flex; }
+  .play-card{ background: var(--arena); color: var(--ink); padding: 40px 44px 34px; max-width: 780px; width:100%; position:relative; }
+  .play-card-top{ display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 20px; }
+  .card-type-tag{ font-family:'IBM Plex Mono', monospace; font-size:11px; font-weight:600; color: var(--gold); background: rgba(169,129,63,0.12); padding: 5px 10px; }
+  .timer-ring{ font-family:'IBM Plex Mono', monospace; font-weight:700; font-size: 20px; color: var(--ink); background: var(--arena-2); border: 2px solid var(--ink); width: 50px; height:50px; border-radius:50%; display:flex; align-items:center; justify-content:center; }
+  .timer-ring.low{ color: var(--danger); border-color: var(--danger); animation: tickPulse 1s infinite; }
+  @keyframes tickPulse{ 0%,100%{ transform:scale(1);} 50%{ transform:scale(1.08);} }
+
+  .question-text{ font-family:'Archivo', sans-serif; font-weight:700; font-size: 27px; line-height:1.35; margin-bottom: 24px; }
+  .options-grid{ display:grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom:6px; }
+  .option-item{ background: #fff; border-left: 5px solid var(--ink); padding: 14px 16px; font-size: 16px; font-weight:600; display:flex; gap:10px; align-items:baseline; }
+  .option-item .opt-letter{ font-family:'IBM Plex Mono', monospace; color: var(--gold); font-weight:700; }
+  .option-item.correct{ border-left-color: var(--ok); background: rgba(74,154,106,0.12); color: #2d6b46; }
+  .open-answer-box{ display:none; background: rgba(74,154,106,0.12); border-left:5px solid var(--ok); color:#2d6b46; padding: 18px 20px; font-size: 19px; font-weight:700; font-family:'Archivo', sans-serif; margin-bottom:6px; }
+  .open-answer-box.active{ display:block; }
+
+  .controls{ display:flex; gap: 12px; justify-content:center; margin-top: 22px; flex-wrap:wrap; }
+  .controls button{ padding: 14px 22px; border: none; font-family:'Archivo', sans-serif; font-weight:700; font-size: 14px; cursor:pointer; }
+  .btn-reveal{ background: var(--gold); color: var(--stage); }
+  .btn-reveal:hover{ background: var(--gold-2); }
+  .btn-correct{ background: var(--ok); color: #fff; }
+  .btn-correct:hover{ opacity:0.88; }
+  .btn-wrong{ background: var(--danger); color: #fff; }
+  .btn-wrong:hover{ opacity:0.88; }
+  .btn-skip{ background: transparent; color: rgba(18,21,28,0.5); border: 1px solid rgba(18,21,28,0.25) !important; }
+  .btn-skip:hover{ color: var(--ink); border-color: var(--ink) !important; }
+
+  .surprise-icon{ font-size: 50px; margin-bottom: 12px; text-align:center; }
+  .surprise-title{ font-family:'Archivo Black', sans-serif; font-size: 24px; margin-bottom: 8px; text-align:center; }
+  .surprise-desc{ font-size: 15px; color: rgba(18,21,28,0.7); margin-bottom: 22px; line-height:1.5; text-align:center; }
+  .surprise-targets{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+  .surprise-targets button{ padding: 12px 18px; border: 2px solid var(--ink); background:transparent; color:var(--ink); font-family:'Archivo', sans-serif; font-weight:700; font-size:13px; cursor:pointer; }
+  .surprise-targets button:hover{ background: var(--ink); color: var(--paper); }
+
+  #roundEndOverlay{ display:none; }
+  #roundEndOverlay.active{ display:flex; }
+  .end-inner{ text-align:center; padding: 60px 20px 40px; position:relative; z-index:2; }
+  .end-eyebrow{ font-family:'IBM Plex Mono', monospace; font-size:12px; color: var(--gold-2); }
+  .winner-name{ font-family:'Archivo Black', sans-serif; font-size: 46px; color: var(--paper); margin: 12px 0 26px; }
+  .end-inner button{ padding: 15px 30px; background: var(--gold); color: var(--stage); border:none; font-family:'Archivo', sans-serif; font-weight:700; font-size:15px; cursor:pointer; margin: 0 6px; }
+  #confettiCanvas{ position:fixed; inset:0; pointer-events:none; z-index:60; }
+</style>
+</head>
+<body>
+
+<div id="setupScreen">
+  <div class="wrap">
+    <div class="hero-row">
+      <div class="cube-logo">
+        <div class="cube">
+          <div class="face f1">BK</div>
+          <div class="face f2">BK</div>
+          <div class="face f3">BK</div>
+          <div class="face f4">BK</div>
+          <div class="face f5">BK</div>
+          <div class="face f6">BK</div>
+        </div>
+      </div>
+      <div class="setup-title">Bilim Kechasi<small>Raqamli doska musobaqasi — proyektor/doska uchun</small></div>
+    </div>
+
+    <div class="card">
+      <h2>1 · Savollar banki</h2>
+      <label for="qaText">Barcha savollaringizni bir marta joylashtiring</label>
+      <textarea id="qaText" placeholder="Savollarni pastdagi namunaga o'xshab yozing..."></textarea>
+      <div class="hint">Variantli (A/B/C/D + Javob) yoki oddiy (savol + javob) formatni tushunadi. Har bir savolni bo'sh qatordan keyin yozing.</div>
+      <div class="example-box">1. O'zbekiston poytaxti qaysi shahar?
+A) Samarqand
+B) Buxoro
+C) Toshkent
+D) Andijon
+Javob: C
+
+2. Amir Temur qachon tug'ilgan?
+Javob: 1336-yilda</div>
+      <div class="parsed-preview" id="parsedPreview"></div>
+      <div class="error-box" id="setupError"></div>
+    </div>
+
+    <div class="card">
+      <h2>2 · Nechta o'yinga bo'lish</h2>
+      <label for="numGames">Savollar bankini nechta alohida o'yinga bo'lib o'ynamoqchisiz?</label>
+      <input type="number" id="numGames" value="1" min="1" max="10">
+      <div class="hint">Masalan 30 ta savolni 3 ga bo'lsangiz, har bir o'yinda 10 tadan savol bo'ladi. Har o'yin mustaqil — ballar va g'olib har safar noldan boshlanadi.</div>
+    </div>
+
+    <div class="card">
+      <h2>3 · Jamoalar</h2>
+      <label for="teamCount">Nechta jamoa?</label>
+      <select id="teamCount">
+        <option value="2">2 ta jamoa</option>
+        <option value="3">3 ta jamoa</option>
+        <option value="4">4 ta jamoa</option>
+      </select>
+      <div id="teamNamesWrap"></div>
+    </div>
+
+    <div class="card">
+      <h2>4 · O'yin sozlamalari</h2>
+      <div class="row">
+        <div>
+          <label for="correctPoints">To'g'ri javob uchun ball</label>
+          <select id="correctPoints">
+            <option value="20">20 ball</option>
+            <option value="25" selected>25 ball</option>
+            <option value="30">30 ball</option>
+          </select>
+          <div class="hint">Jarima/o'g'irlash — shuning yarmi bo'ladi</div>
+        </div>
+        <div>
+          <label for="timerSeconds">Har savolga vaqt (soniya)</label>
+          <input type="number" id="timerSeconds" value="20" min="0" max="120">
+          <div class="hint">0 = vaqt chegarasiz</div>
+        </div>
+        <div>
+          <label for="surpriseFreq">Syurpriz katakchalar</label>
+          <select id="surpriseFreq">
+            <option value="0">Yo'q</option>
+            <option value="0.12">Kam</option>
+            <option value="0.22" selected>O'rtacha</option>
+            <option value="0.35">Ko'p</option>
+          </select>
+        </div>
+      </div>
+      <div class="hint">Doskada savollar orasiga bonus, jarima, o'g'irlash yoki 2x ball katakchalari aralashtirib joylanadi.</div>
+      <div class="checkbox-row">
+        <input type="checkbox" id="soundEnabled" checked>
+        <span style="font-size:13px;">Ovozli effektlar yoqilsin</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>5 · Onlayn qabul qilish (ixtiyoriy)</h2>
+      <div class="checkbox-row">
+        <input type="checkbox" id="onlineEnabled">
+        <span style="font-size:13px;">Telefon orqali savol qabul qilish yoqilsin</span>
+      </div>
+      <div class="hint">Yoqsangiz, QR kod chiqadi. Uni telefon bilan skanerlab, o'quvchilar (yoki siz) to'g'ridan-to'g'ri savol yubora oladi — internet talab qilinadi.</div>
+      <button type="button" class="secondary-btn" id="openRoomBtn" style="display:none;">Xona ochish</button>
+      <div class="online-box" id="onlineBox">
+        <div class="qr-row">
+          <div id="qrcodeBox"></div>
+          <div class="qr-info">
+            <div class="room-code" id="roomCodeDisplay"></div>
+            <div class="room-url" id="roomUrlDisplay"></div>
+            <div class="live-count" id="liveCount">Kelib tushgan savollar: 0</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <button class="primary" id="startBtn">O'yinni boshlash</button>
+
+    <div class="app-footer">
+      <span>Ushbu ilova <a href="https://t.me/byaziyz" target="_blank" rel="noopener">@byaziyz</a> tomonidan yaratilgan</span>
+      <span>Telegram: <a href="https://t.me/byaziyz" target="_blank" rel="noopener">@byaziyz</a> · 2026-yil 6-sentyabr</span>
+    </div>
+  </div>
+</div>
+
+<div id="submitScreen">
+  <div class="wrap">
+    <div class="setup-title">Savol qo'shish</div>
+    <div class="room-pill" id="submitRoomPill">Xona: ----</div>
+
+    <div class="card">
+      <label for="subQuestion">Savol matni</label>
+      <textarea id="subQuestion" style="min-height:100px;" placeholder="Savolingizni shu yerga yozing..."></textarea>
+
+      <label>Variantlar (ixtiyoriy — to'ldirsangiz variantli savol bo'ladi)</label>
+      <div class="variant-row"><span>A)</span><input type="text" class="sub-opt" id="subOptA"></div>
+      <div class="variant-row"><span>B)</span><input type="text" class="sub-opt" id="subOptB"></div>
+      <div class="variant-row"><span>C)</span><input type="text" class="sub-opt" id="subOptC"></div>
+      <div class="variant-row"><span>D)</span><input type="text" class="sub-opt" id="subOptD"></div>
+
+      <label for="subAnswer">To'g'ri javob</label>
+      <input type="text" id="subAnswer" placeholder="Masalan: C, yoki to'liq javob matni">
+      <div class="hint">Variantli bo'lsa — harfini (A/B/C/D) yoki javob matnini yozing. Variantsiz bo'lsa — to'g'ridan-to'g'ri javobni yozing.</div>
+
+      <button class="primary" id="submitQBtn" style="margin-top:20px;">Yuborish</button>
+      <div id="submitFeedback">✅ Yuborildi! Yana savol qo'shishingiz mumkin.</div>
+      <div class="submit-count" id="submitCount">Siz yuborgan savollar: 0</div>
+    </div>
+  </div>
+</div>
+
+<div id="gameScreen">
+  <canvas id="confettiCanvas"></canvas>
+  <div class="stage-wrap">
+    <div class="top-bar">
+      <span class="exit-link" id="exitLink">← Sozlamalarga qaytish</span>
+      <span class="round-tag" id="roundTag">1-O'YIN / 1</span>
+    </div>
+
+    <div class="scoreboard" id="scoreboard"></div>
+    <div class="turn-banner" id="turnBanner"></div>
+
+    <div class="board-grid" id="boardGrid"></div>
+
+    <div id="roundEndOverlay">
+      <div class="end-inner">
+        <div class="end-eyebrow" id="endEyebrow">O'yin tugadi</div>
+        <div class="winner-name" id="winnerName"></div>
+        <button id="nextRoundBtn">Keyingi o'yinga o'tish</button>
+        <button id="finishBtn" style="background:transparent; border:2px solid var(--gold); color:var(--gold);">Yakunlash</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="playOverlay">
+    <div class="play-card" id="playCard"></div>
+  </div>
+</div>
+
+<script>
+// ================= Firebase =================
+const firebaseConfig = {
+  apiKey: "AIzaSyBJfq4Kc6YZHpbV9WBg__im4bivBcZo1WU",
+  authDomain: "osonvakerak.firebaseapp.com",
+  databaseURL: "https://osonvakerak-default-rtdb.firebaseio.com",
+  projectId: "osonvakerak",
+  storageBucket: "osonvakerak.firebasestorage.app",
+  messagingSenderId: "363556171064",
+  appId: "1:363556171064:web:e21be98e50dff4d031e5cd"
+};
+let fbApp = null, fbDb = null;
+function getDb(){
+  if(!fbDb){
+    fbApp = firebase.initializeApp(firebaseConfig);
+    fbDb = firebase.database();
+  }
+  return fbDb;
+}
+
+function generateRoomCode(){
+  return String(Math.floor(1000 + Math.random() * 9000));
+}
+
+// ================= Phone submit screen =================
+const urlParams = new URLSearchParams(location.search);
+const addRoomCode = urlParams.get('add');
+
+if(addRoomCode){
+  document.getElementById('setupScreen').style.display = 'none';
+  document.getElementById('gameScreen').style.display = 'none';
+  document.getElementById('submitScreen').style.display = 'block';
+  document.getElementById('submitRoomPill').textContent = 'Xona: ' + addRoomCode;
+
+  let submittedCount = 0;
+  document.getElementById('submitQBtn').addEventListener('click', () => {
+    const question = document.getElementById('subQuestion').value.trim();
+    if(question.length < 3){
+      alert('Iltimos, savol matnini yozing.');
+      return;
+    }
+    const opts = ['subOptA','subOptB','subOptC','subOptD']
+      .map(id => document.getElementById(id).value.trim())
+      .filter(Boolean);
+    const answerRaw = document.getElementById('subAnswer').value.trim();
+
+    let payload = null;
+    if(opts.length >= 2 && answerRaw){
+      let correctIndex = -1;
+      const letterMatch = answerRaw.match(/^([A-Da-d])\b/);
+      if(letterMatch){
+        correctIndex = letterMatch[1].toUpperCase().charCodeAt(0) - 65;
+      } else {
+        correctIndex = opts.findIndex(o => o.toLowerCase() === answerRaw.toLowerCase());
+        if(correctIndex === -1) correctIndex = opts.findIndex(o => o.toLowerCase().includes(answerRaw.toLowerCase()));
+      }
+      if(correctIndex === -1 || correctIndex >= opts.length) correctIndex = 0;
+      payload = { type: 'mc', question, options: opts, correctIndex };
+    } else if(answerRaw){
+      payload = { type: 'open', question, answer: answerRaw };
+    } else {
+      alert('Iltimos, to\'g\'ri javobni kiriting.');
+      return;
+    }
+
+    getDb().ref('rooms/' + addRoomCode + '/questions').push(payload)
+      .then(() => {
+        submittedCount++;
+        document.getElementById('submitCount').textContent = 'Siz yuborgan savollar: ' + submittedCount;
+        document.getElementById('subQuestion').value = '';
+        ['subOptA','subOptB','subOptC','subOptD'].forEach(id => document.getElementById(id).value = '');
+        document.getElementById('subAnswer').value = '';
+        const fb = document.getElementById('submitFeedback');
+        fb.classList.add('active');
+        setTimeout(() => fb.classList.remove('active'), 2500);
+      })
+      .catch(err => alert('Yuborishda xato: ' + err.message));
+  });
+}
+
+
+function parseQA(rawText){
+  const blocks = rawText.split(/\n\s*\n+/).map(b => b.trim()).filter(Boolean);
+  const questions = [];
+  const warnings = [];
+
+  blocks.forEach((block, bi) => {
+    const lines = block.split('\n').map(l => l.trim()).filter(Boolean);
+    if(lines.length === 0) return;
+
+    let questionLine = lines[0].replace(/^\d+[\.\)]\s*/, '').trim();
+    const options = [];
+    let answerRaw = null;
+
+    for(let i = 1; i < lines.length; i++){
+      const line = lines[i];
+      const optMatch = line.match(/^([A-Da-d])[\.\)]\s*(.+)$/);
+      const ansMatch = line.match(/^(javob|to'g'ri javob|togri javob|answer|javobi)\s*[:\-–]?\s*(.+)$/i);
+      if(ansMatch){
+        answerRaw = ansMatch[2].trim();
+      } else if(optMatch){
+        options.push(optMatch[2].trim());
+      }
+    }
+
+    if(!questionLine){ warnings.push((bi+1) + '-blok: savol matni topilmadi, o\'tkazib yuborildi.'); return; }
+
+    if(options.length >= 2){
+      let correctIndex = -1;
+      if(answerRaw){
+        const letterMatch = answerRaw.match(/^([A-Da-d])\b/);
+        if(letterMatch){
+          correctIndex = letterMatch[1].toUpperCase().charCodeAt(0) - 65;
+        } else {
+          correctIndex = options.findIndex(o => o.toLowerCase() === answerRaw.toLowerCase());
+          if(correctIndex === -1){
+            correctIndex = options.findIndex(o => o.toLowerCase().includes(answerRaw.toLowerCase()));
+          }
+        }
+      }
+      if(correctIndex === -1 || correctIndex >= options.length){
+        warnings.push((bi+1) + '-blok ("' + questionLine.slice(0,40) + '..."): to\'g\'ri javob aniqlanmadi, birinchi variant belgilandi.');
+        correctIndex = 0;
+      }
+      questions.push({ type: 'mc', question: questionLine, options, correctIndex });
+    } else if(answerRaw){
+      questions.push({ type: 'open', question: questionLine, answer: answerRaw });
+    } else {
+      warnings.push((bi+1) + '-blok ("' + questionLine.slice(0,40) + '..."): javob topilmadi, o\'tkazib yuborildi.');
+    }
+  });
+
+  return { questions, warnings };
+}
+
+// ================= Sound effects =================
+let audioCtx = null;
+function getAudioCtx(){
+  if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+function beep(freq, duration, type, startTime, gainVal){
+  if(!document.getElementById('soundEnabled') || !document.getElementById('soundEnabled').checked) return;
+  try{
+    const ctx = getAudioCtx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = type || 'sine';
+    osc.frequency.value = freq;
+    gain.gain.value = gainVal || 0.08;
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    const t = ctx.currentTime + (startTime || 0);
+    osc.start(t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + duration);
+    osc.stop(t + duration);
+  }catch(e){}
+}
+function soundCorrect(){ beep(523,0.12,'sine',0); beep(784,0.18,'sine',0.1); }
+function soundWrong(){ beep(180,0.3,'sawtooth',0,0.06); }
+function soundTick(){ beep(880,0.05,'square',0,0.03); }
+function soundTimeUp(){ beep(220,0.4,'sawtooth',0,0.08); beep(160,0.4,'sawtooth',0.1,0.08); }
+function soundSurprise(){ beep(440,0.1,'triangle',0); beep(660,0.1,'triangle',0.1); beep(880,0.15,'triangle',0.2); }
+function soundWin(){ [523,659,784,1047].forEach((f,i)=>beep(f,0.25,'sine',i*0.14,0.09)); }
+function soundPick(){ beep(660,0.08,'square',0,0.05); }
+
+// ================= Setup wiring =================
+const qaTextEl = document.getElementById('qaText');
+const parsedPreview = document.getElementById('parsedPreview');
+const setupError = document.getElementById('setupError');
+const teamCountEl = document.getElementById('teamCount');
+const teamNamesWrap = document.getElementById('teamNamesWrap');
+const startBtn = document.getElementById('startBtn');
+const numGamesEl = document.getElementById('numGames');
+
+function updatePreview(){
+  const text = qaTextEl.value.trim();
+  if(!text){ parsedPreview.textContent = ''; return; }
+  const { questions, warnings } = parseQA(text);
+  const numGames = Math.max(1, parseInt(numGamesEl.value) || 1);
+  let msg = questions.length + ' ta savol aniqlandi.';
+  if(numGames > 1) msg += ' (' + numGames + ' o\'yinga bo\'linsa, har birida ~' + Math.floor(questions.length/numGames) + ' tadan)';
+  if(warnings.length) msg += ' — ' + warnings.length + ' ta blokda muammo bor';
+  parsedPreview.textContent = msg;
+}
+qaTextEl.addEventListener('input', updatePreview);
+numGamesEl.addEventListener('input', updatePreview);
+
+function renderTeamNameInputs(){
+  const count = parseInt(teamCountEl.value);
+  teamNamesWrap.innerHTML = '';
+  const defaultNames = ['1-jamoa', '2-jamoa', '3-jamoa', '4-jamoa'];
+  for(let i = 0; i < count; i++){
+    const div = document.createElement('div');
+    div.innerHTML = '<label>Jamoa ' + (i+1) + ' nomi</label><input type="text" class="team-name-input" value="' + defaultNames[i] + '">';
+    teamNamesWrap.appendChild(div);
+  }
+}
+teamCountEl.addEventListener('change', renderTeamNameInputs);
+renderTeamNameInputs();
+
+// ---- 3D tilt interaction on setup cards ----
+document.querySelectorAll('#setupScreen .card').forEach(card => {
+  card.addEventListener('mousemove', (e) => {
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left, y = e.clientY - rect.top;
+    const rotateX = ((y - rect.height/2) / (rect.height/2)) * -3;
+    const rotateY = ((x - rect.width/2) / (rect.width/2)) * 3;
+    card.style.transform = 'perspective(900px) rotateX(' + rotateX + 'deg) rotateY(' + rotateY + 'deg)';
+  });
+  card.addEventListener('mouseleave', () => {
+    card.style.transform = 'perspective(900px) rotateX(0deg) rotateY(0deg)';
+  });
+});
+
+// ---- Online room (teacher side) ----
+let onlineQuestions = [];
+let currentRoomCode = null;
+let roomListenerRef = null;
+
+document.getElementById('onlineEnabled').addEventListener('change', (e) => {
+  document.getElementById('openRoomBtn').style.display = e.target.checked ? 'inline-block' : 'none';
+  if(!e.target.checked){
+    document.getElementById('onlineBox').classList.remove('active');
+    if(roomListenerRef) roomListenerRef.off();
+    onlineQuestions = [];
+    currentRoomCode = null;
+  }
+});
+
+document.getElementById('openRoomBtn').addEventListener('click', () => {
+  currentRoomCode = generateRoomCode();
+  const submitUrl = location.origin + location.pathname + '?add=' + currentRoomCode;
+
+  document.getElementById('roomCodeDisplay').textContent = currentRoomCode;
+  document.getElementById('roomUrlDisplay').textContent = submitUrl;
+  document.getElementById('qrcodeBox').innerHTML = '';
+  new QRCode(document.getElementById('qrcodeBox'), { text: submitUrl, width: 140, height: 140, colorDark:'#12151C', colorLight:'#ffffff' });
+  document.getElementById('onlineBox').classList.add('active');
+
+  if(roomListenerRef) roomListenerRef.off();
+  roomListenerRef = getDb().ref('rooms/' + currentRoomCode + '/questions');
+  roomListenerRef.on('value', (snapshot) => {
+    const val = snapshot.val() || {};
+    onlineQuestions = Object.values(val);
+    document.getElementById('liveCount').textContent = 'Kelib tushgan savollar: ' + onlineQuestions.length;
+  });
+});
+
+function shuffle(arr){
+  for(let i = arr.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i+1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+function chunkArray(arr, k){
+  const n = arr.length;
+  const chunks = [];
+  const base = Math.floor(n / k), rem = n % k;
+  let idx = 0;
+  for(let i=0;i<k;i++){
+    const size = base + (i < rem ? 1 : 0);
+    chunks.push(arr.slice(idx, idx+size));
+    idx += size;
+  }
+  return chunks.filter(c => c.length > 0);
+}
+
+// ================= Session / game state =================
+let session = null; // { questionChunks, teams, timerSeconds, surpriseFreq, currentGameIdx }
+let board = null;   // { tiles, currentTeamIdx, timerInterval, timeLeft, activeTile }
+const TEAM_COLORS = ['var(--t1)','var(--t2)','var(--t3)','var(--t4)'];
+
+startBtn.addEventListener('click', () => {
+  setupError.classList.remove('active');
+  const text = qaTextEl.value.trim();
+  const { questions: typedQuestions } = text.length >= 10 ? parseQA(text) : { questions: [] };
+  const questions = [...typedQuestions, ...onlineQuestions];
+  if(questions.length === 0){
+    setupError.textContent = 'Hech qanday savol aniqlanmadi. Matn kiriting yoki onlayn xonadan savol kutib turing.';
+    setupError.classList.add('active');
+    return;
+  }
+  const numGames = Math.max(1, Math.min(10, parseInt(numGamesEl.value) || 1));
+  if(questions.length < numGames){
+    setupError.textContent = 'Savollar soni o\'yinlar sonidan kam. Kamroq o\'yinga bo\'ling yoki ko\'proq savol kiriting.';
+    setupError.classList.add('active');
+    return;
+  }
+
+  const teamNames = Array.from(document.querySelectorAll('.team-name-input')).map(inp => inp.value.trim() || 'Jamoa');
+  const teams = teamNames.map((name, i) => ({ name, score: 0, colorVar: TEAM_COLORS[i % TEAM_COLORS.length] }));
+
+  const correctPoints = parseInt(document.getElementById('correctPoints').value) || 25;
+  session = {
+    questionChunks: chunkArray(shuffle(questions.slice()), numGames),
+    teams,
+    timerSeconds: Math.max(0, parseInt(document.getElementById('timerSeconds').value) || 0),
+    surpriseFreq: parseFloat(document.getElementById('surpriseFreq').value) || 0,
+    soundEnabled: document.getElementById('soundEnabled').checked,
+    correctPoints: correctPoints,
+    halfPoints: Math.round(correctPoints / 2),
+    currentGameIdx: 0
+  };
+
+  document.getElementById('setupScreen').style.display = 'none';
+  document.getElementById('gameScreen').style.display = 'block';
+  startRound();
+});
+
+function buildTiles(questionsForRound, surpriseFreq){
+  const q = questionsForRound.length;
+  let numSurprises = 0;
+  if(surpriseFreq > 0){
+    const totalEstimate = Math.round(q / (1 - surpriseFreq));
+    numSurprises = Math.max(1, totalEstimate - q);
+  }
+  const SURPRISE_TYPES = ['bonus', 'penalty', 'steal', 'double'];
+  const tiles = questionsForRound.map(qd => ({ kind: 'question', data: qd, used: false }));
+  for(let i = 0; i < numSurprises; i++){
+    tiles.push({ kind: 'surprise', surpriseType: SURPRISE_TYPES[Math.floor(Math.random()*SURPRISE_TYPES.length)], used: false });
+  }
+  shuffle(tiles);
+  tiles.forEach((t, i) => t.number = i + 1);
+  return tiles;
+}
+
+function startRound(){
+  session.teams.forEach(t => t.score = 0);
+  const questionsForRound = session.questionChunks[session.currentGameIdx];
+  board = {
+    tiles: buildTiles(questionsForRound, session.surpriseFreq),
+    currentTeamIdx: 0,
+    doublePointsForTeam: -1,
+    timerInterval: null,
+    timeLeft: 0
+  };
+  document.getElementById('roundTag').textContent = (session.currentGameIdx+1) + '-O\'YIN / ' + session.questionChunks.length;
+  document.getElementById('roundEndOverlay').classList.remove('active');
+  renderScoreboard();
+  renderBoard();
+  renderTurnBanner();
+}
+
+// ================= Rendering =================
+const scoreboardEl = document.getElementById('scoreboard');
+const boardGridEl = document.getElementById('boardGrid');
+const turnBannerEl = document.getElementById('turnBanner');
+const playOverlay = document.getElementById('playOverlay');
+const playCard = document.getElementById('playCard');
+const roundEndOverlay = document.getElementById('roundEndOverlay');
+const winnerNameEl = document.getElementById('winnerName');
+const endEyebrow = document.getElementById('endEyebrow');
+
+function escapeHtml(str){
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+
+function renderScoreboard(){
+  scoreboardEl.innerHTML = '';
+  session.teams.forEach((t, i) => {
+    const div = document.createElement('div');
+    div.className = 'team-block' + (i === board.currentTeamIdx ? ' active' : '');
+    div.style.setProperty('--tcolor', t.colorVar);
+    div.innerHTML =
+      '<div class="tb-glow"></div>' +
+      '<div class="tb-name">' + escapeHtml(t.name) + (i === board.doublePointsForTeam ? ' ⚡' : '') + '</div>' +
+      '<div class="tb-score">' + t.score + '</div>' +
+      '<div class="tb-turn">Navbat</div>';
+    scoreboardEl.appendChild(div);
+  });
+}
+
+function renderTurnBanner(){
+  const team = session.teams[board.currentTeamIdx];
+  turnBannerEl.textContent = escapeHtml(team.name) + ' — raqam tanlang';
+}
+
+function renderBoard(){
+  boardGridEl.innerHTML = '';
+  board.tiles.forEach(tile => {
+    const div = document.createElement('div');
+    div.className = 'tile' + (tile.used ? ' used' : '');
+    div.textContent = tile.used ? '' : tile.number;
+    if(tile.used){
+      const icon = document.createElement('span');
+      icon.className = 'tile-icon';
+      icon.textContent = tile.kind === 'surprise' ? '🎲' : '✓';
+      div.appendChild(icon);
+    } else {
+      div.addEventListener('click', () => selectTile(tile));
+    }
+    boardGridEl.appendChild(div);
+  });
+}
+
+function allTilesUsed(){
+  return board.tiles.every(t => t.used);
+}
+
+function selectTile(tile){
+  soundPick();
+  tile.used = true;
+  renderBoard();
+  if(tile.kind === 'question'){
+    openQuestionCard(tile.data);
+  } else {
+    openSurpriseCard(tile.surpriseType);
+  }
+}
+
+// ---- Question card ----
+let qTimerInterval = null, qTimeLeft = 0;
+function stopQTimer(){ if(qTimerInterval){ clearInterval(qTimerInterval); qTimerInterval = null; } }
+
+function openQuestionCard(q){
+  playOverlay.classList.add('active');
+  const timerHtml = session.timerSeconds > 0
+    ? '<div class="timer-ring" id="timerRing">' + session.timerSeconds + '</div>'
+    : '';
+  let bodyHtml = '';
+  if(q.type === 'mc'){
+    bodyHtml = '<div class="options-grid" id="optGrid">' +
+      q.options.map((opt,i) => '<div class="option-item" data-i="' + i + '"><span class="opt-letter">' + String.fromCharCode(65+i) + ')</span><span>' + escapeHtml(opt) + '</span></div>').join('') +
+      '</div>';
+  } else {
+    bodyHtml = '<div class="open-answer-box" id="openBox"></div>';
+  }
+  playCard.innerHTML =
+    '<div class="play-card-top"><span class="card-type-tag">SAVOL</span>' + timerHtml + '</div>' +
+    '<div class="question-text">' + escapeHtml(q.question) + '</div>' +
+    bodyHtml +
+    '<div class="controls" id="ctrlRow">' +
+      '<button class="btn-reveal" id="revealBtn2">Javobni ko\'rsatish</button>' +
+      '<button class="btn-skip" id="skipBtn2">O\'tkazib yuborish</button>' +
+    '</div>' +
+    '<div class="controls" id="judgeRow2" style="display:none;">' +
+      '<button class="btn-correct" id="correctBtn2">✓ To\'g\'ri javob berdi</button>' +
+      '<button class="btn-wrong" id="wrongBtn2">✗ Noto\'g\'ri / javob bermadi</button>' +
+    '</div>';
+
+  if(session.timerSeconds > 0){
+    qTimeLeft = session.timerSeconds;
+    const ring = document.getElementById('timerRing');
+    qTimerInterval = setInterval(() => {
+      qTimeLeft -= 1;
+      ring.textContent = Math.max(0, qTimeLeft);
+      if(qTimeLeft <= 5 && qTimeLeft > 0){ ring.classList.add('low'); soundTick(); }
+      if(qTimeLeft <= 0){ stopQTimer(); soundTimeUp(); }
+    }, 1000);
+  }
+
+  document.getElementById('revealBtn2').addEventListener('click', () => {
+    stopQTimer();
+    if(q.type === 'mc'){
+      document.querySelectorAll('#optGrid .option-item').forEach(el => {
+        if(parseInt(el.dataset.i) === q.correctIndex) el.classList.add('correct');
+      });
+    } else {
+      const box = document.getElementById('openBox');
+      box.textContent = 'To\'g\'ri javob: ' + q.answer;
+      box.classList.add('active');
+    }
+    document.getElementById('ctrlRow').style.display = 'none';
+    document.getElementById('judgeRow2').style.display = 'flex';
+  });
+  document.getElementById('skipBtn2').addEventListener('click', () => { stopQTimer(); closePlayCard(); });
+  document.getElementById('correctBtn2').addEventListener('click', () => {
+    const pts = board.doublePointsForTeam === board.currentTeamIdx ? session.correctPoints * 2 : session.correctPoints;
+    session.teams[board.currentTeamIdx].score += pts;
+    board.doublePointsForTeam = -1;
+    soundCorrect();
+    closePlayCard();
+  });
+  document.getElementById('wrongBtn2').addEventListener('click', () => {
+    board.doublePointsForTeam = -1;
+    soundWrong();
+    closePlayCard();
+  });
+}
+
+// ---- Surprise card ----
+function openSurpriseCard(type){
+  soundSurprise();
+  const team = session.teams[board.currentTeamIdx];
+  let icon='', title='', desc='', showTargets=false, showAck=true;
+
+  if(type === 'bonus'){
+    icon='🎁'; title='Bonus ball!'; desc = escapeHtml(team.name) + ' jamoasiga +' + session.halfPoints + ' ball qo\'shildi.';
+    team.score += session.halfPoints;
+  } else if(type === 'penalty'){
+    icon='💥'; title='Jarima!'; desc = escapeHtml(team.name) + ' jamoasidan -' + session.halfPoints + ' ball ayirildi.';
+    team.score = Math.max(0, team.score - session.halfPoints);
+  } else if(type === 'double'){
+    icon='⚡'; title='2x ball imkoniyati!'; desc = escapeHtml(team.name) + ' jamoasi keyingi savolga to\'g\'ri javob bersa, 2 barobar ball oladi.';
+    board.doublePointsForTeam = board.currentTeamIdx;
+  } else if(type === 'steal'){
+    icon='🕵️'; title='Ball o\'g\'irlash!';
+    if(session.teams.length < 2){
+      desc = 'Boshqa jamoa yo\'q, o\'tkazib yuborildi.';
+    } else {
+      desc = escapeHtml(team.name) + ' qaysi jamoadan 2 ball o\'g\'irlaydi?';
+      showTargets = true; showAck = false;
+    }
+  }
+
+  playCard.innerHTML =
+    '<div class="surprise-icon">' + icon + '</div>' +
+    '<div class="surprise-title">' + title + '</div>' +
+    '<div class="surprise-desc">' + desc + '</div>' +
+    (showTargets ? '<div class="surprise-targets" id="stealTargets"></div>' : '') +
+    (showAck ? '<div class="controls"><button class="btn-reveal" id="surAck">Davom etish</button></div>' : '');
+
+  playOverlay.classList.add('active');
+  renderScoreboard();
+
+  if(showTargets){
+    const wrap = document.getElementById('stealTargets');
+    session.teams.forEach((t, i) => {
+      if(i === board.currentTeamIdx) return;
+      const btn = document.createElement('button');
+      btn.textContent = t.name;
+      btn.addEventListener('click', () => {
+        const stolen = Math.min(session.halfPoints, t.score);
+        t.score -= stolen;
+        team.score += stolen;
+        closePlayCard();
+      });
+      wrap.appendChild(btn);
+    });
+  }
+  if(showAck){
+    document.getElementById('surAck').addEventListener('click', closePlayCard);
+  }
+}
+
+function closePlayCard(){
+  playOverlay.classList.remove('active');
+  playCard.innerHTML = '';
+  if(allTilesUsed()){
+    showRoundEnd();
+    return;
+  }
+  board.currentTeamIdx = (board.currentTeamIdx + 1) % session.teams.length;
+  renderScoreboard();
+  renderTurnBanner();
+}
+
+// ================= Round end =================
+function showRoundEnd(){
+  const maxScore = Math.max(...session.teams.map(t => t.score));
+  const winners = session.teams.filter(t => t.score === maxScore);
+  const isLast = session.currentGameIdx >= session.questionChunks.length - 1;
+
+  endEyebrow.textContent = (session.currentGameIdx+1) + '-o\'yin tugadi';
+  winnerNameEl.textContent = winners.length > 1
+    ? winners.map(w => w.name).join(' va ') + ' — durrang!'
+    : '🏆 ' + winners[0].name + ' g\'olib!';
+
+  document.getElementById('nextRoundBtn').style.display = isLast ? 'none' : 'inline-block';
+  document.getElementById('finishBtn').textContent = isLast ? 'Yakunlash' : 'Bu yerda to\'xtatish';
+
+  roundEndOverlay.classList.add('active');
+  soundWin();
+  runConfetti();
+}
+
+document.getElementById('nextRoundBtn').addEventListener('click', () => {
+  session.currentGameIdx += 1;
+  startRound();
+});
+document.getElementById('finishBtn').addEventListener('click', () => {
+  document.getElementById('gameScreen').style.display = 'none';
+  document.getElementById('setupScreen').style.display = 'block';
+});
+document.getElementById('exitLink').addEventListener('click', () => {
+  stopQTimer();
+  document.getElementById('gameScreen').style.display = 'none';
+  document.getElementById('setupScreen').style.display = 'block';
+});
+
+// ================= Confetti =================
+let confettiRunning = false;
+function runConfetti(){
+  const canvas = document.getElementById('confettiCanvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  const colors = ['#E8A33D','#2E8B8B','#B23A6B','#6B8F5C','#C9A45C'];
+  const particles = Array.from({length: 140}, () => ({
+    x: Math.random() * canvas.width,
+    y: -20 - Math.random() * canvas.height * 0.5,
+    r: 4 + Math.random() * 5,
+    color: colors[Math.floor(Math.random()*colors.length)],
+    vy: 2 + Math.random() * 3,
+    vx: -1.5 + Math.random() * 3,
+    rot: Math.random() * 360,
+    vrot: -6 + Math.random() * 12
+  }));
+  confettiRunning = true;
+  let frames = 0;
+  function tick(){
+    if(!confettiRunning) return;
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    particles.forEach(p => {
+      p.x += p.vx; p.y += p.vy; p.rot += p.vrot;
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot * Math.PI/180);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.r/2, -p.r/2, p.r, p.r*1.6);
+      ctx.restore();
+    });
+    frames++;
+    if(frames < 260) requestAnimationFrame(tick);
+    else { confettiRunning = false; ctx.clearRect(0,0,canvas.width,canvas.height); }
+  }
+  tick();
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>O'quv Vositalari — @byaziyz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Archivo+Black&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --stage:#12151C; --stage-2:#1B2029; --paper:#F3EFE4;
+    --gold:#A9813F; --gold-2:#C9A45C;
+    --t1:#E8A33D; --t2:#2E8B8B; --t3:#B23A6B; --t4:#6B8F5C;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:'Inter', sans-serif; color: var(--paper);
+    background:
+      radial-gradient(circle at 15% 10%, rgba(169,129,63,0.16) 0%, transparent 45%),
+      radial-gradient(circle at 90% 25%, rgba(46,139,139,0.14) 0%, transparent 40%),
+      radial-gradient(circle at 50% 100%, rgba(178,58,107,0.10) 0%, transparent 50%),
+      var(--stage);
+    min-height:100vh;
+  }
+  .wrap{ max-width: 980px; margin:0 auto; padding: 64px 24px 60px; }
+
+  .hero-row{ display:flex; align-items:center; gap:22px; margin-bottom: 10px; }
+  .cube-logo{ width:60px; height:60px; perspective: 400px; flex-shrink:0; }
+  .cube-logo .cube{ width:100%; height:100%; position:relative; transform-style:preserve-3d; animation: cubeSpin 9s linear infinite; }
+  .cube-logo .face{ position:absolute; width:60px; height:60px; display:flex; align-items:center; justify-content:center; font-family:'Archivo Black', sans-serif; font-size:18px; color: var(--stage); border: 1px solid rgba(0,0,0,0.15); }
+  .cube-logo .f1{ transform: translateZ(30px); background: var(--gold-2); }
+  .cube-logo .f2{ transform: rotateY(180deg) translateZ(30px); background: var(--t3); }
+  .cube-logo .f3{ transform: rotateY(90deg) translateZ(30px); background: var(--t2); }
+  .cube-logo .f4{ transform: rotateY(-90deg) translateZ(30px); background: var(--t1); }
+  .cube-logo .f5{ transform: rotateX(90deg) translateZ(30px); background: var(--t4); }
+  .cube-logo .f6{ transform: rotateX(-90deg) translateZ(30px); background: var(--gold); }
+  @keyframes cubeSpin{ from{ transform: rotateX(0deg) rotateY(0deg); } to{ transform: rotateX(360deg) rotateY(360deg); } }
+
+  h1{ font-family:'Archivo', sans-serif; font-weight:800; font-size: 34px; margin:0; }
+  .sub{ font-family:'IBM Plex Mono', monospace; font-size: 13px; color: var(--gold-2); margin-top:10px; letter-spacing:0.03em; }
+
+  .grid{ display:grid; grid-template-columns: 1fr 1fr; gap: 22px; margin-top: 44px; }
+  @media (max-width: 720px){ .grid{ grid-template-columns: 1fr; } }
+
+  .tool-card{
+    background: linear-gradient(155deg, var(--stage-2) 0%, var(--stage) 100%);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 16px;
+    padding: 30px 28px;
+    text-decoration:none;
+    color: var(--paper);
+    display:block;
+    position:relative;
+    box-shadow: 0 1px 0 rgba(255,255,255,0.04) inset, 0 20px 44px -14px rgba(0,0,0,0.55);
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+  }
+  .tool-card::before{ content:''; position:absolute; top:0; left:24px; right:24px; height:2px; border-radius:2px; }
+  .tool-card.c1::before{ background: linear-gradient(90deg, var(--gold), var(--gold-2), transparent); }
+  .tool-card.c2::before{ background: linear-gradient(90deg, var(--t2), var(--t1), transparent); }
+  .tool-card:hover{ transform: translateY(-6px); box-shadow: 0 28px 56px -14px rgba(0,0,0,0.6); }
+  .tool-icon{ font-size: 34px; margin-bottom: 16px; }
+  .tool-name{ font-family:'Archivo', sans-serif; font-weight:700; font-size: 21px; margin-bottom: 10px; }
+  .tool-desc{ font-size: 14px; line-height:1.55; color: rgba(243,239,228,0.65); margin-bottom: 20px; }
+  .tool-cta{ font-family:'IBM Plex Mono', monospace; font-size: 12px; color: var(--gold-2); }
+  .tool-cta::after{ content:' →'; }
+
+  .footer{
+    margin-top: 60px; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.08);
+    display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;
+    font-family:'IBM Plex Mono', monospace; font-size: 12px; color: rgba(243,239,228,0.45);
+  }
+  .footer a{ color: var(--gold-2); text-decoration:none; }
+  .footer a:hover{ text-decoration:underline; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero-row">
+    <div class="cube-logo">
+      <div class="cube">
+        <div class="face f1">BK</div><div class="face f2">BK</div><div class="face f3">BK</div>
+        <div class="face f4">BK</div><div class="face f5">BK</div><div class="face f6">BK</div>
+      </div>
+    </div>
+    <div>
+      <h1>O'quv Vositalari</h1>
+      <div class="sub">Darslar uchun ochiq, bepul, offline ishlaydigan vositalar</div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <a class="tool-card c1" href="slayd-yaratuvchi.html">
+      <div class="tool-icon">📊</div>
+      <div class="tool-name">Slayd Yaratuvchi</div>
+      <div class="tool-desc">Manba matningizni joylashtiring — PDF, Word yoki oddiy matn — va bir necha soniyada tayyor PowerPoint taqdimotini oling. Bir nechta dizayn uslubi, avtomatik slayd taqsimlash, rasm qo'shish imkoniyati bilan.</div>
+      <div class="tool-cta">Ochish</div>
+    </a>
+
+    <a class="tool-card c2" href="sinf-musobaqasi.html">
+      <div class="tool-icon">🎯</div>
+      <div class="tool-name">Bilim Kechasi</div>
+      <div class="tool-desc">Sinf uchun raqamli doska musobaqasi — jamoalar ball to'playdi, syurpriz kartalar, taymer va ovozli effektlar bilan. Telefon orqali savol qo'shish (QR kod) imkoniyati ham bor.</div>
+      <div class="tool-cta">Ochish</div>
+    </a>
+  </div>
+
+  <div class="footer">
+    <span>Ushbu sayt <a href="https://t.me/byaziyz" target="_blank" rel="noopener">@byaziyz</a> tomonidan yaratilgan</span>
+    <span>Telegram: <a href="https://t.me/byaziyz" target="_blank" rel="noopener">@byaziyz</a> · 2026-yil 6-sentyabr</span>
+  </div>
+</div>
+</body>
+</html>
