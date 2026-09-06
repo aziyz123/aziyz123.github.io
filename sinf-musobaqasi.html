@@ -144,12 +144,20 @@
   }
   .variant-row{ display:flex; gap:10px; align-items:center; margin-top:10px; }
   .variant-row span{ font-family:'IBM Plex Mono', monospace; color: var(--gold); font-weight:700; width:20px; }
-  #submitFeedback{
+  .submit-feedback{
     display:none; margin-top: 18px; padding: 14px 16px; border-radius:8px;
     background: rgba(74,154,106,0.15); border:1px solid var(--ok); color:#8fdb9f; font-size:14px; text-align:center;
   }
-  #submitFeedback.active{ display:block; }
+  .submit-feedback.active{ display:block; }
   .submit-count{ font-family:'IBM Plex Mono', monospace; font-size:12px; color: rgba(243,239,228,0.45); text-align:center; margin-top:14px; }
+
+  .mode-tabs{ display:flex; gap:8px; margin-bottom: 18px; }
+  .mode-tab{
+    flex:1; padding: 12px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.12);
+    background: transparent; color: rgba(243,239,228,0.55);
+    font-family:'Archivo', sans-serif; font-weight:700; font-size: 12.5px; cursor:pointer;
+  }
+  .mode-tab.active{ background: var(--gold); color: var(--stage); border-color: var(--gold); }
 
   /* ================= GAME SCREEN ================= */
   #gameScreen{ display:none; background: var(--stage); min-height:100vh; color: var(--paper); }
@@ -364,7 +372,31 @@ Javob: 1336-yilda</div>
     <div class="setup-title">Savol qo'shish</div>
     <div class="room-pill" id="submitRoomPill">Xona: ----</div>
 
-    <div class="card">
+    <div class="mode-tabs">
+      <button type="button" class="mode-tab active" id="tabBulk">Ko'plab savol (matn orqali)</button>
+      <button type="button" class="mode-tab" id="tabSingle">Bitta savol</button>
+    </div>
+
+    <div class="card" id="bulkCard">
+      <label for="bulkText">Bir nechta savolni birdan joylashtiring</label>
+      <textarea id="bulkText" style="min-height:260px; font-family:'IBM Plex Mono', monospace; font-size:13px;" placeholder="Namunaga qarab yozing..."></textarea>
+      <div class="hint">Har bir savolni bo'sh qatordan keyin yozing. Variantli (A/B/C/D + Javob) yoki oddiy (savol + Javob) format ishlaydi.</div>
+      <div class="example-box">1. O'zbekiston poytaxti qaysi shahar?
+A) Samarqand
+B) Buxoro
+C) Toshkent
+D) Andijon
+Javob: C
+
+2. Amir Temur qachon tug'ilgan?
+Javob: 1336-yilda</div>
+      <div class="parsed-preview" id="bulkPreview"></div>
+      <button class="primary" id="submitBulkBtn" style="margin-top:16px;">Barchasini yuborish</button>
+      <div id="bulkFeedback" class="submit-feedback"></div>
+      <div class="submit-count" id="bulkCount">Siz yuborgan savollar: 0</div>
+    </div>
+
+    <div class="card" id="singleCard" style="display:none;">
       <label for="subQuestion">Savol matni</label>
       <textarea id="subQuestion" style="min-height:100px;" placeholder="Savolingizni shu yerga yozing..."></textarea>
 
@@ -379,7 +411,7 @@ Javob: 1336-yilda</div>
       <div class="hint">Variantli bo'lsa — harfini (A/B/C/D) yoki javob matnini yozing. Variantsiz bo'lsa — to'g'ridan-to'g'ri javobni yozing.</div>
 
       <button class="primary" id="submitQBtn" style="margin-top:20px;">Yuborish</button>
-      <div id="submitFeedback">✅ Yuborildi! Yana savol qo'shishingiz mumkin.</div>
+      <div id="submitFeedback" class="submit-feedback"></div>
       <div class="submit-count" id="submitCount">Siz yuborgan savollar: 0</div>
     </div>
   </div>
@@ -447,6 +479,58 @@ if(addRoomCode){
   document.getElementById('submitScreen').style.display = 'block';
   document.getElementById('submitRoomPill').textContent = 'Xona: ' + addRoomCode;
 
+  // ---- Tab switching ----
+  const tabBulk = document.getElementById('tabBulk');
+  const tabSingle = document.getElementById('tabSingle');
+  const bulkCard = document.getElementById('bulkCard');
+  const singleCard = document.getElementById('singleCard');
+  tabBulk.addEventListener('click', () => {
+    tabBulk.classList.add('active'); tabSingle.classList.remove('active');
+    bulkCard.style.display = 'block'; singleCard.style.display = 'none';
+  });
+  tabSingle.addEventListener('click', () => {
+    tabSingle.classList.add('active'); tabBulk.classList.remove('active');
+    singleCard.style.display = 'block'; bulkCard.style.display = 'none';
+  });
+
+  // ---- Bulk submit (many questions at once) ----
+  let bulkSubmittedCount = 0;
+  const bulkTextEl = document.getElementById('bulkText');
+  bulkTextEl.addEventListener('input', () => {
+    const text = bulkTextEl.value.trim();
+    const preview = document.getElementById('bulkPreview');
+    if(!text){ preview.textContent = ''; return; }
+    const { questions } = parseQA(text);
+    preview.textContent = questions.length + ' ta savol aniqlandi.';
+  });
+
+  document.getElementById('submitBulkBtn').addEventListener('click', () => {
+    const text = bulkTextEl.value.trim();
+    if(text.length < 10){
+      alert('Iltimos, kamida bitta savol kiriting.');
+      return;
+    }
+    const { questions } = parseQA(text);
+    if(questions.length === 0){
+      alert('Hech qanday savol aniqlanmadi. Namunadagi formatga qarab qayta yozing.');
+      return;
+    }
+    const ref = getDb().ref('rooms/' + addRoomCode + '/questions');
+    Promise.all(questions.map(q => ref.push(q)))
+      .then(() => {
+        bulkSubmittedCount += questions.length;
+        document.getElementById('bulkCount').textContent = 'Siz yuborgan savollar: ' + bulkSubmittedCount;
+        bulkTextEl.value = '';
+        document.getElementById('bulkPreview').textContent = '';
+        const fb = document.getElementById('bulkFeedback');
+        fb.textContent = '✅ ' + questions.length + ' ta savol yuborildi!';
+        fb.classList.add('active');
+        setTimeout(() => fb.classList.remove('active'), 3000);
+      })
+      .catch(err => alert('Yuborishda xato: ' + err.message));
+  });
+
+  // ---- Single question submit ----
   let submittedCount = 0;
   document.getElementById('submitQBtn').addEventListener('click', () => {
     const question = document.getElementById('subQuestion').value.trim();
@@ -486,6 +570,7 @@ if(addRoomCode){
         ['subOptA','subOptB','subOptC','subOptD'].forEach(id => document.getElementById(id).value = '');
         document.getElementById('subAnswer').value = '';
         const fb = document.getElementById('submitFeedback');
+        fb.textContent = '✅ Yuborildi! Yana savol qo\'shishingiz mumkin.';
         fb.classList.add('active');
         setTimeout(() => fb.classList.remove('active'), 2500);
       })
