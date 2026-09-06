@@ -39,7 +39,8 @@
   h1{ font-family:'Archivo', sans-serif; font-weight:800; font-size: 34px; margin:0; }
   .sub{ font-family:'IBM Plex Mono', monospace; font-size: 13px; color: var(--gold-2); margin-top:10px; letter-spacing:0.03em; }
 
-  .grid{ display:grid; grid-template-columns: 1fr 1fr; gap: 22px; margin-top: 44px; }
+  .grid{ display:grid; grid-template-columns: 1fr 1fr 1fr; gap: 22px; margin-top: 44px; }
+  @media (max-width: 900px){ .grid{ grid-template-columns: 1fr 1fr; } }
   @media (max-width: 720px){ .grid{ grid-template-columns: 1fr; } }
 
   .tool-card{
@@ -57,6 +58,7 @@
   .tool-card::before{ content:''; position:absolute; top:0; left:24px; right:24px; height:2px; border-radius:2px; }
   .tool-card.c1::before{ background: linear-gradient(90deg, var(--gold), var(--gold-2), transparent); }
   .tool-card.c2::before{ background: linear-gradient(90deg, var(--t2), var(--t1), transparent); }
+  .tool-card.c3::before{ background: linear-gradient(90deg, var(--t3), var(--t4), transparent); }
   .tool-card:hover{ transform: translateY(-6px); box-shadow: 0 28px 56px -14px rgba(0,0,0,0.6); }
   .tool-icon{ font-size: 34px; margin-bottom: 16px; }
   .tool-name{ font-family:'Archivo', sans-serif; font-weight:700; font-size: 21px; margin-bottom: 10px; }
@@ -100,6 +102,13 @@
       <div class="tool-icon">🎯</div>
       <div class="tool-name">Bilim Kechasi</div>
       <div class="tool-desc">Sinf uchun raqamli doska musobaqasi — jamoalar ball to'playdi, syurpriz kartalar, taymer va ovozli effektlar bilan. Telefon orqali savol qo'shish (QR kod) imkoniyati ham bor.</div>
+      <div class="tool-cta">Ochish</div>
+    </a>
+
+    <a class="tool-card c3" href="fayl-uzatish.html">
+      <div class="tool-icon">📲</div>
+      <div class="tool-name">Fayl Uzatish</div>
+      <div class="tool-desc">Telefondagi faylni (PPTX, PDF, rasm va h.k.) QR kod orqali bir zumda kompyuterga o'tkazing — kabel yoki messenjersiz.</div>
       <div class="tool-cta">Ochish</div>
     </a>
   </div>
