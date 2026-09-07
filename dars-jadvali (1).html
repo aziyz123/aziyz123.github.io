@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dars Jadvali</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Archivo+Black&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+  :root{
+    --stage:#12151C; --stage-2:#1B2029; --stage-3:#262D3A;
+    --paper:#F3EFE4; --gold:#A9813F; --gold-2:#C9A45C;
+    --danger:#D64545; --ok:#4A9A6A;
+    --t1:#E8A33D; --t2:#2E8B8B; --t3:#B23A6B; --t4:#6B8F5C;
+    --line: rgba(255,255,255,0.1);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:'Inter', sans-serif; color: var(--paper);
+    background:
+      radial-gradient(circle at 15% 10%, rgba(169,129,63,0.16) 0%, transparent 45%),
+      radial-gradient(circle at 90% 25%, rgba(46,139,139,0.14) 0%, transparent 40%),
+      var(--stage);
+    min-height:100vh;
+  }
+  .wrap{ max-width: 780px; margin:0 auto; padding: 44px 22px 60px; }
+
+  .hero-row{ display:flex; align-items:center; gap:18px; margin-bottom: 8px; }
+  .cube-logo{ width:52px; height:52px; perspective: 400px; flex-shrink:0; }
+  .cube-logo .cube{ width:100%; height:100%; position:relative; transform-style:preserve-3d; animation: cubeSpin 9s linear infinite; }
+  .cube-logo .face{ position:absolute; width:52px; height:52px; display:flex; align-items:center; justify-content:center; font-family:'Archivo Black', sans-serif; font-size:15px; color: var(--stage); border: 1px solid rgba(0,0,0,0.15); }
+  .cube-logo .f1{ transform: translateZ(26px); background: var(--gold-2); }
+  .cube-logo .f2{ transform: rotateY(180deg) translateZ(26px); background: var(--t3); }
+  .cube-logo .f3{ transform: rotateY(90deg) translateZ(26px); background: var(--t2); }
+  .cube-logo .f4{ transform: rotateY(-90deg) translateZ(26px); background: var(--t1); }
+  .cube-logo .f5{ transform: rotateX(90deg) translateZ(26px); background: var(--t4); }
+  .cube-logo .f6{ transform: rotateX(-90deg) translateZ(26px); background: var(--gold); }
+  @keyframes cubeSpin{ from{ transform: rotateX(0deg) rotateY(0deg); } to{ transform: rotateX(360deg) rotateY(360deg); } }
+
+  h1{ font-family:'Archivo', sans-serif; font-weight:800; font-size: 26px; margin:0; }
+  .sub{ font-family:'IBM Plex Mono', monospace; font-size: 12px; color: var(--gold-2); margin-top:8px; }
+
+  .card{
+    background: linear-gradient(155deg, var(--stage-2) 0%, var(--stage) 100%);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 14px; padding: 24px 26px; margin-top: 22px;
+    box-shadow: 0 1px 0 rgba(255,255,255,0.04) inset, 0 18px 40px -12px rgba(0,0,0,0.5);
+  }
+  .card h2{ font-family:'Archivo', sans-serif; font-size: 13px; font-weight:700; color: var(--gold-2); margin:0 0 14px 0; }
+  label{ display:block; font-size:13px; font-weight:600; margin-bottom:6px; margin-top:14px; }
+  label:first-of-type{ margin-top:0; }
+  textarea, input[type=text], input[type=date], select{
+    width:100%; font-family:'Inter', sans-serif; font-size:14px; padding: 12px 14px;
+    border: 1px solid rgba(255,255,255,0.1); border-radius:8px;
+    background: rgba(0,0,0,0.25); color: var(--paper);
+  }
+  textarea{ min-height: 90px; }
+  textarea:focus, input:focus, select:focus{ outline:none; border-color: var(--gold); }
+  .hint{ font-size:11px; color: rgba(243,239,228,0.45); margin-top:6px; line-height:1.5; }
+  .row{ display:flex; gap:14px; flex-wrap:wrap; }
+  .row > div{ flex:1; min-width:150px; }
+
+  button.primary{
+    padding:14px 22px; border:none; border-radius:10px;
+    background: linear-gradient(135deg, var(--gold-2), var(--gold));
+    color: var(--stage); font-family:'Archivo', sans-serif; font-weight:800; font-size:14px; cursor:pointer;
+  }
+  button.primary.full{ width:100%; margin-top:18px; }
+  button.secondary-btn{
+    padding: 12px 18px; border-radius:8px; border: 1px solid var(--gold); background:transparent; color: var(--gold-2);
+    font-family:'Archivo', sans-serif; font-weight:700; font-size: 13px; cursor:pointer;
+  }
+  .error-box{ display:none; margin-top:14px; padding:12px 14px; border-radius:8px; background: rgba(214,69,69,0.15); border:1px solid var(--danger); color:#ff9d9d; font-size:13px; }
+  .error-box.active{ display:block; }
+
+  .qr-row{ display:flex; gap: 18px; align-items:center; flex-wrap:wrap; margin-top: 14px; }
+  #qrcodeBox{ background:#fff; padding: 8px; border-radius: 8px; display:inline-block; line-height:0; }
+  .class-code{ font-family:'Archivo Black', sans-serif; font-size: 22px; color: var(--gold-2); }
+  .class-url{ font-family:'IBM Plex Mono', monospace; font-size: 11px; color: rgba(243,239,228,0.5); word-break: break-all; margin-top:4px; }
+
+  .period-item{
+    background: var(--stage-2); border-radius:10px; padding: 16px 18px; margin-bottom: 12px;
+    border-left: 4px solid var(--gold);
+  }
+  .period-num{ font-family:'IBM Plex Mono', monospace; font-size: 11px; color: var(--gold-2); font-weight:700; }
+  .period-subject{ font-family:'Archivo', sans-serif; font-weight:700; font-size: 17px; margin-top:4px; }
+  .period-topic{ font-size: 14px; color: rgba(243,239,228,0.75); margin-top:4px; font-style:italic; }
+  .period-info{ font-size: 13px; color: rgba(243,239,228,0.6); margin-top:8px; line-height:1.5; white-space:pre-wrap; }
+  .period-link{ display:inline-block; margin-top:10px; font-size:12px; color: var(--gold-2); text-decoration:none; border:1px solid var(--gold); padding:6px 12px; border-radius:6px; }
+  .period-link:hover{ background: var(--gold); color: var(--stage); }
+  .period-remove{ float:right; border:none; background:transparent; color: var(--danger); font-size:11px; cursor:pointer; font-family:'IBM Plex Mono', monospace; }
+  .empty-note{ font-size:13px; color: rgba(243,239,228,0.4); font-style:italic; padding: 10px 0; }
+
+  .date-strip{ display:flex; gap:8px; overflow-x:auto; padding-bottom:6px; margin-top:14px; }
+  .date-chip{
+    flex-shrink:0; padding: 10px 14px; border-radius:8px; background: var(--stage-2);
+    border: 1px solid rgba(255,255,255,0.1); font-family:'IBM Plex Mono', monospace; font-size:12px;
+    cursor:pointer; text-align:center; min-width:64px;
+  }
+  .date-chip.active{ background: var(--gold); color: var(--stage); border-color: var(--gold); font-weight:700; }
+  .date-chip .dow{ font-size:10px; opacity:0.7; }
+
+  .auto-row{ display:flex; gap:8px; align-items:center; margin-top:10px; flex-wrap:wrap; }
+  .auto-row select, .auto-row input{ width:auto; flex:1; min-width:100px; padding:10px 12px; font-size:13px; }
+  .auto-row .auto-remove{ border:none; background:transparent; color: var(--danger); cursor:pointer; font-size:16px; flex:0 0 auto; }
+
+  .app-footer{
+    margin-top: 34px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.08);
+    font-family:'IBM Plex Mono', monospace; font-size: 11px; color: rgba(243,239,228,0.4);
+    display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px;
+  }
+  .app-footer a{ color: var(--gold-2); text-decoration:none; }
+</style>
+</head>
+<body>
+
+<!-- ============ TEACHER VIEW ============ -->
+<div id="hostScreen" class="wrap">
+  <div class="hero-row">
+    <div class="cube-logo"><div class="cube">
+      <div class="face f1">DJ</div><div class="face f2">DJ</div><div class="face f3">DJ</div>
+      <div class="face f4">DJ</div><div class="face f5">DJ</div><div class="face f6">DJ</div>
+    </div></div>
+    <div><h1>Dars Jadvali</h1><div class="sub">Sana bo'yicha mavzular va materiallar</div></div>
+  </div>
+
+  <div class="card" id="codeCard">
+    <h2>Sinf kodi</h2>
+    <div class="hint">Bu kod doimiy bo'ladi — har safar shu kodni kiritib, o'sha sinfning jadvalini davom ettirasiz. O'quvchilar bilan QR kod yoki kodning o'zini baham ko'ring.</div>
+    <div class="row" style="margin-top:14px;">
+      <div><input type="text" id="classCodeInput" placeholder="Masalan: 9A-tarix"></div>
+      <div style="flex:0 0 auto;"><button class="primary" id="openClassBtn">Ochish</button></div>
+    </div>
+    <div class="error-box" id="codeError"></div>
+  </div>
+
+  <div id="classPanel" style="display:none;">
+    <div class="card">
+      <h2>Ishtirok havolasi</h2>
+      <div class="qr-row">
+        <div id="qrcodeBox"></div>
+        <div>
+          <div class="class-code" id="classCodeDisplay"></div>
+          <div class="class-url" id="classUrlDisplay"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Sanani tanlang</h2>
+      <input type="date" id="dateInput">
+      <div class="date-strip" id="dateStrip"></div>
+    </div>
+
+    <div class="card">
+      <h2>Shu kundagi parlar</h2>
+      <div id="periodsList"><div class="empty-note">Hali dars qo'shilmagan.</div></div>
+    </div>
+
+    <div class="card">
+      <h2>Yangi para qo'shish</h2>
+      <label for="periodNum">Para raqami</label>
+      <input type="text" id="periodNum" placeholder="Masalan: 1-para">
+      <label for="periodSubject">Fan nomi</label>
+      <input type="text" id="periodSubject" placeholder="Masalan: O'zbekiston tarixi">
+      <label for="periodTopic">Mavzu nomi</label>
+      <input type="text" id="periodTopic" placeholder="Masalan: Amir Temur yurishlari">
+      <label for="periodInfo">Qo'shimcha ma'lumot (ixtiyoriy)</label>
+      <textarea id="periodInfo" placeholder="Qisqacha tavsif, topshiriq va h.k."></textarea>
+      <label for="periodLink">Havola (ixtiyoriy — slayd, fayl, video)</label>
+      <input type="text" id="periodLink" placeholder="https://...">
+      <button class="primary full" id="addPeriodBtn">Qo'shish</button>
+    </div>
+
+    <div class="card">
+      <h2>🔁 Avtomatik taqsimlash (semestr rejasi)</h2>
+      <div class="hint">Mavzular ro'yxatini joylang — dastur ularni haftama-hafta, siz belgilagan dars kunlariga avtomatik taqsimlaydi (1 hafta = 1 mavzu, shu haftadagi barcha darslar o'sha mavzuga tegishli bo'ladi).</div>
+      <label for="autoSubject">Fan nomi</label>
+      <input type="text" id="autoSubject" placeholder="Masalan: Jahon tarixi">
+      <label for="autoTopics">Mavzular ro'yxati (har biri alohida qatorda)</label>
+      <textarea id="autoTopics" placeholder="1-mavzu nomi&#10;2-mavzu nomi&#10;...&#10;16-mavzu nomi" style="min-height:140px;"></textarea>
+      <label>Haftalik dars kunlari</label>
+      <div id="autoRowsWrap"></div>
+      <button type="button" class="secondary-btn" id="addAutoRowBtn" style="margin-top:6px;">+ Kun qo'shish</button>
+      <label for="autoStartDate">Boshlanish sanasi</label>
+      <input type="date" id="autoStartDate">
+      <div class="hint">Semestr boshlanadigan haftaning istalgan kunini tanlang.</div>
+      <div class="error-box" id="autoError"></div>
+      <button class="primary full" id="autoDistributeBtn">Taqsimlash va joylashtirish</button>
+    </div>
+  </div>
+
+  <div class="app-footer">
+    <span>Ushbu ilova <a href="https://t.me/byaziyz" target="_blank" rel="noopener">@byaziyz</a> tomonidan yaratilgan</span>
+    <span>Telegram: <a href="https://t.me/byaziyz" target="_blank" rel="noopener">@byaziyz</a></span>
+  </div>
+</div>
+
+<!-- ============ STUDENT VIEW ============ -->
+<div id="studentScreen" class="wrap" style="display:none;">
+  <div class="hero-row">
+    <div class="cube-logo"><div class="cube">
+      <div class="face f1">DJ</div><div class="face f2">DJ</div><div class="face f3">DJ</div>
+      <div class="face f4">DJ</div><div class="face f5">DJ</div><div class="face f6">DJ</div>
+    </div></div>
+    <div><h1>Dars Jadvali</h1><div class="sub" id="studentClassLabel">Sinf: ----</div></div>
+  </div>
+
+  <div class="card">
+    <h2>Sanani tanlang</h2>
+    <input type="date" id="studentDateInput">
+    <div class="date-strip" id="studentDateStrip"></div>
+  </div>
+
+  <div class="card">
+    <h2 id="studentDateLabel">Bugungi darslar</h2>
+    <div id="studentPeriodsList"><div class="empty-note">Yuklanmoqda...</div></div>
+  </div>
+
+  <div class="app-footer">
+    <span>Ushbu ilova <a href="https://t.me/byaziyz" target="_blank" rel="noopener">@byaziyz</a> tomonidan yaratilgan</span>
+    <span>Telegram: <a href="https://t.me/byaziyz" target="_blank" rel="noopener">@byaziyz</a></span>
+  </div>
+</div>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyBJfq4Kc6YZHpbV9WBg__im4bivBcZo1WU",
+  authDomain: "osonvakerak.firebaseapp.com",
+  databaseURL: "https://osonvakerak-default-rtdb.firebaseio.com",
+  projectId: "osonvakerak",
+  storageBucket: "osonvakerak.firebasestorage.app",
+  messagingSenderId: "363556171064",
+  appId: "1:363556171064:web:e21be98e50dff4d031e5cd"
+};
+let fbDb = null;
+function getDb(){
+  if(!fbDb){ firebase.initializeApp(firebaseConfig); fbDb = firebase.database(); }
+  return fbDb;
+}
+function escapeHtml(str){ const d = document.createElement('div'); d.textContent = str; return d.innerHTML; }
+function slugify(str){ return str.trim().toLowerCase().replace(/[^a-z0-9\-]+/g,'-').replace(/-+/g,'-').replace(/^-+|-+$/g,''); }
+function todayStr(){ return new Date().toISOString().slice(0,10); }
+function dowShort(dateStr){
+  const days = ['Yak','Dush','Sesh','Chor','Pay','Jum','Shan'];
+  return days[new Date(dateStr + 'T00:00:00').getDay()];
+}
+function formatDateNice(dateStr){
+  const d = new Date(dateStr + 'T00:00:00');
+  return d.getDate() + '.' + (d.getMonth()+1) + '.' + d.getFullYear();
+}
+function buildDateStrip(centerDateStr, containerId, onPick){
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
+  const center = new Date(centerDateStr + 'T00:00:00');
+  for(let i = -3; i <= 3; i++){
+    const d = new Date(center);
+    d.setDate(d.getDate() + i);
+    const ds = d.toISOString().slice(0,10);
+    const chip = document.createElement('div');
+    chip.className = 'date-chip' + (ds === centerDateStr ? ' active' : '');
+    chip.innerHTML = '<div class="dow">' + dowShort(ds) + '</div><div>' + d.getDate() + '</div>';
+    chip.addEventListener('click', () => onPick(ds));
+    container.appendChild(chip);
+  }
+}
+
+const urlParams = new URLSearchParams(location.search);
+const classCodeParam = urlParams.get('class');
+
+if(classCodeParam){
+  runStudentView(classCodeParam);
+} else {
+  runHostView();
+}
+
+// =========================================================
+// HOST VIEW
+// =========================================================
+function runHostView(){
+  const savedCode = localStorage.getItem('darsJadvaliClassCode');
+  if(savedCode) document.getElementById('classCodeInput').value = savedCode;
+
+  document.getElementById('openClassBtn').addEventListener('click', () => {
+    const raw = document.getElementById('classCodeInput').value.trim();
+    const errEl = document.getElementById('codeError');
+    errEl.classList.remove('active');
+    if(!raw){ errEl.textContent = 'Sinf kodini kiriting.'; errEl.classList.add('active'); return; }
+    const code = slugify(raw);
+    if(!code){ errEl.textContent = 'Kod faqat harf/raqamlardan iborat bo\'lsin.'; errEl.classList.add('active'); return; }
+    openClass(code);
+  });
+
+  function openClass(code){
+    localStorage.setItem('darsJadvaliClassCode', code);
+    document.getElementById('classPanel').style.display = 'block';
+    const classUrl = location.origin + location.pathname + '?class=' + code;
+    document.getElementById('classCodeDisplay').textContent = code;
+    document.getElementById('classUrlDisplay').textContent = classUrl;
+    document.getElementById('qrcodeBox').innerHTML = '';
+    new QRCode(document.getElementById('qrcodeBox'), { text: classUrl, width: 120, height: 120, colorDark:'#12151C', colorLight:'#ffffff' });
+
+    let currentDate = todayStr();
+    const dateInput = document.getElementById('dateInput');
+    dateInput.value = currentDate;
+
+    function loadPeriods(dateStr){
+      currentDate = dateStr;
+      dateInput.value = dateStr;
+      buildDateStrip(dateStr, 'dateStrip', (ds) => loadPeriods(ds));
+      getDb().ref('schedules/' + code + '/days/' + dateStr).off();
+      getDb().ref('schedules/' + code + '/days/' + dateStr).on('value', (snap) => {
+        renderPeriods(snap.val() || {}, dateStr);
+      });
+    }
+
+    function renderPeriods(periods, dateStr){
+      const entries = Object.entries(periods);
+      const listEl = document.getElementById('periodsList');
+      if(entries.length === 0){ listEl.innerHTML = '<div class="empty-note">Hali dars qo\'shilmagan.</div>'; return; }
+      listEl.innerHTML = entries.map(([id, p]) => {
+        const linkHtml = p.link ? '<a class="period-link" href="' + escapeHtml(p.link) + '" target="_blank" rel="noopener">Materialni ochish →</a>' : '';
+        const infoHtml = p.info ? '<div class="period-info">' + escapeHtml(p.info) + '</div>' : '';
+        return '<div class="period-item"><button class="period-remove" data-id="' + id + '">O\'chirish</button>' +
+          '<div class="period-num">' + escapeHtml(p.periodNum||'') + '</div>' +
+          '<div class="period-subject">' + escapeHtml(p.subject) + '</div>' +
+          '<div class="period-topic">' + escapeHtml(p.topic) + '</div>' +
+          infoHtml + linkHtml + '</div>';
+      }).join('');
+      listEl.querySelectorAll('button[data-id]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          getDb().ref('schedules/' + code + '/days/' + dateStr + '/' + btn.dataset.id).remove();
+        });
+      });
+    }
+
+    dateInput.addEventListener('change', () => loadPeriods(dateInput.value));
+
+    document.getElementById('addPeriodBtn').addEventListener('click', () => {
+      const periodNum = document.getElementById('periodNum').value.trim();
+      const subject = document.getElementById('periodSubject').value.trim();
+      const topic = document.getElementById('periodTopic').value.trim();
+      const info = document.getElementById('periodInfo').value.trim();
+      const link = document.getElementById('periodLink').value.trim();
+      if(!subject || !topic){ alert('Fan nomi va mavzu nomini kiriting.'); return; }
+      getDb().ref('schedules/' + code + '/days/' + currentDate).push({ periodNum, subject, topic, info, link, createdAt: Date.now() })
+        .then(() => {
+          document.getElementById('periodNum').value = '';
+          document.getElementById('periodSubject').value = '';
+          document.getElementById('periodTopic').value = '';
+          document.getElementById('periodInfo').value = '';
+          document.getElementById('periodLink').value = '';
+        });
+    });
+
+    // ---- Auto-distribute (semester plan) ----
+    function addAutoRow(defaultWeekday, defaultPara, defaultTuri){
+      const wrap = document.getElementById('autoRowsWrap');
+      const row = document.createElement('div');
+      row.className = 'auto-row';
+      row.innerHTML =
+        '<select class="auto-weekday">' +
+        '<option value="1">Dushanba</option><option value="2">Seshanba</option>' +
+        '<option value="3">Chorshanba</option><option value="4">Payshanba</option>' +
+        '<option value="5">Juma</option><option value="6">Shanba</option>' +
+        '<option value="0">Yakshanba</option></select>' +
+        '<input type="text" class="auto-para" placeholder="Para (1-para)">' +
+        '<input type="text" class="auto-turi" placeholder="Turi (Ma\'ruza/Seminar)">' +
+        '<button type="button" class="auto-remove">✕</button>';
+      if(defaultWeekday !== undefined) row.querySelector('.auto-weekday').value = defaultWeekday;
+      if(defaultPara) row.querySelector('.auto-para').value = defaultPara;
+      if(defaultTuri) row.querySelector('.auto-turi').value = defaultTuri;
+      row.querySelector('.auto-remove').addEventListener('click', () => row.remove());
+      wrap.appendChild(row);
+    }
+    document.getElementById('addAutoRowBtn').addEventListener('click', () => addAutoRow());
+    addAutoRow(1, '1-para', "Ma'ruza");
+    addAutoRow(4, '3-para', 'Seminar');
+
+    function mondayOf(dateStr){
+      const d = new Date(dateStr + 'T00:00:00');
+      const day = (d.getDay() + 6) % 7;
+      d.setDate(d.getDate() - day);
+      return d;
+    }
+    function addDays(date, n){ const d = new Date(date); d.setDate(d.getDate() + n); return d; }
+    function toDateStr(d){ return d.toISOString().slice(0,10); }
+
+    document.getElementById('autoDistributeBtn').addEventListener('click', () => {
+      const errEl = document.getElementById('autoError');
+      errEl.classList.remove('active');
+      const subject = document.getElementById('autoSubject').value.trim();
+      const topics = document.getElementById('autoTopics').value.split('\n').map(s => s.trim()).filter(Boolean);
+      const startDateVal = document.getElementById('autoStartDate').value;
+      const rows = Array.from(document.querySelectorAll('.auto-row')).map(r => ({
+        weekday: parseInt(r.querySelector('.auto-weekday').value),
+        para: r.querySelector('.auto-para').value.trim(),
+        turi: r.querySelector('.auto-turi').value.trim()
+      }));
+
+      if(!subject){ errEl.textContent = 'Fan nomini kiriting.'; errEl.classList.add('active'); return; }
+      if(topics.length === 0){ errEl.textContent = 'Kamida bitta mavzu kiriting.'; errEl.classList.add('active'); return; }
+      if(!startDateVal){ errEl.textContent = 'Boshlanish sanasini tanlang.'; errEl.classList.add('active'); return; }
+      if(rows.length === 0){ errEl.textContent = 'Kamida bitta dars kunini qo\'shing.'; errEl.classList.add('active'); return; }
+
+      const baseMonday = mondayOf(startDateVal);
+      const weekdayOffset = (wd) => wd === 0 ? 6 : wd - 1;
+
+      const writes = [];
+      topics.forEach((topic, w) => {
+        const weekMonday = addDays(baseMonday, w * 7);
+        rows.forEach(row => {
+          const dateStr = toDateStr(addDays(weekMonday, weekdayOffset(row.weekday)));
+          const periodLabel = ((row.para ? row.para + ' ' : '') + (row.turi ? '(' + row.turi + ')' : '')).trim();
+          writes.push(getDb().ref('schedules/' + code + '/days/' + dateStr).push({
+            periodNum: periodLabel, subject, topic, info: '', link: '', createdAt: Date.now()
+          }));
+        });
+      });
+
+      Promise.all(writes).then(() => {
+        alert(topics.length + ' ta mavzu, jami ' + writes.length + ' ta dars sanasi bilan muvaffaqiyatli joylashtirildi!');
+        loadPeriods(currentDate);
+      }).catch(err => {
+        errEl.textContent = 'Xato: ' + err.message;
+        errEl.classList.add('active');
+      });
+    });
+
+    loadPeriods(currentDate);
+  }
+
+  if(savedCode) openClass(savedCode);
+}
+
+// =========================================================
+// STUDENT VIEW
+// =========================================================
+function runStudentView(code){
+  document.getElementById('hostScreen').style.display = 'none';
+  document.getElementById('studentScreen').style.display = 'block';
+  document.getElementById('studentClassLabel').textContent = 'Sinf: ' + code;
+
+  let currentDate = todayStr();
+  const dateInput = document.getElementById('studentDateInput');
+  dateInput.value = currentDate;
+
+  function loadPeriods(dateStr){
+    currentDate = dateStr;
+    dateInput.value = dateStr;
+    document.getElementById('studentDateLabel').textContent = formatDateNice(dateStr) + ' kungi darslar';
+    buildDateStrip(dateStr, 'studentDateStrip', (ds) => loadPeriods(ds));
+    getDb().ref('schedules/' + code + '/days/' + dateStr).off();
+    getDb().ref('schedules/' + code + '/days/' + dateStr).on('value', (snap) => {
+      renderPeriods(snap.val() || {});
+    });
+  }
+
+  function renderPeriods(periods){
+    const entries = Object.entries(periods).sort((a,b) => (a[1].createdAt||0) - (b[1].createdAt||0));
+    const listEl = document.getElementById('studentPeriodsList');
+    if(entries.length === 0){ listEl.innerHTML = '<div class="empty-note">Bu kunga dars jadvali kiritilmagan.</div>'; return; }
+    listEl.innerHTML = entries.map(([id, p]) => {
+      const linkHtml = p.link ? '<a class="period-link" href="' + escapeHtml(p.link) + '" target="_blank" rel="noopener">Materialni ochish →</a>' : '';
+      const infoHtml = p.info ? '<div class="period-info">' + escapeHtml(p.info) + '</div>' : '';
+      return '<div class="period-item">' +
+        '<div class="period-num">' + escapeHtml(p.periodNum||'') + '</div>' +
+        '<div class="period-subject">' + escapeHtml(p.subject) + '</div>' +
+        '<div class="period-topic">' + escapeHtml(p.topic) + '</div>' +
+        infoHtml + linkHtml + '</div>';
+    }).join('');
+  }
+
+  dateInput.addEventListener('change', () => loadPeriods(dateInput.value));
+  loadPeriods(currentDate);
+}
+</script>
+</body>
+</html>
