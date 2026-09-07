@@ -148,8 +148,15 @@
   </div>
 
   <div id="hostSetup">
+    <div class="card" id="savedTestsCard" style="display:none;">
+      <h2>📁 Saqlangan testlar</h2>
+      <div id="savedTestsList"><div class="empty-note">Yuklanmoqda...</div></div>
+    </div>
+
     <div class="card">
       <h2>1 · Test savollari</h2>
+      <label for="testNameInput">Test nomi (ixtiyoriy — saqlab qo'yish uchun)</label>
+      <input type="text" id="testNameInput" placeholder="Masalan: Tarix — 3-bob nazorat">
       <label for="examText">Savollarni joylashtiring</label>
       <textarea id="examText" placeholder="Namunaga qarab yozing..."></textarea>
       <div class="hint">Faqat variantli (A/B/C/D + Javob) savollar tavsiya etiladi — avtomatik va aniq baholanadi. Variantsiz savollar ham qabul qilinadi, lekin baholash so'z mosligiga qarab taxminiy bo'ladi.</div>
@@ -195,6 +202,10 @@ Javob: C</div>
     <div class="card">
       <h2>🏆 Yakuniy reyting</h2>
       <div id="leaderboardList"></div>
+      <div style="display:flex; gap:10px; margin-top:16px;">
+        <button class="primary" id="exportPdfBtn" style="margin-top:0;">🖨 PDF (chop etish)</button>
+        <button class="primary" id="exportWordBtn" style="margin-top:0; background:linear-gradient(135deg, var(--t2), var(--t4)); color:#fff;">📄 Word yuklab olish</button>
+      </div>
     </div>
     <button class="primary" id="newExamBtn">Yangi test yaratish</button>
   </div>
@@ -240,12 +251,16 @@ Javob: C</div>
     <div class="big-icon">✅</div>
     <div class="center-title">Test tugadi!</div>
     <div class="center-sub">Natijalaringiz o'qituvchi ekranidagi reytingda chiqadi. Rahmat!</div>
+    <button class="primary" id="retakeBtn1" style="display:none;">🔁 Qayta boshlash</button>
+    <div class="center-sub" id="retakeNote1" style="display:none;">Test yakunlandi, qayta ishlash imkoni yo'q.</div>
   </div>
 
   <div id="violatedScreen" class="wrap narrow">
     <div class="big-icon">⚠️</div>
     <div class="center-title">Test yopildi</div>
     <div class="center-sub">Boshqa oyna yoki ilovaga o'tganingiz sababli test avtomatik yakunlandi.</div>
+    <button class="primary" id="retakeBtn2" style="display:none;">🔁 Qayta boshlash</button>
+    <div class="center-sub" id="retakeNote2" style="display:none;">Test yakunlandi, qayta ishlash imkoni yo'q.</div>
   </div>
 
 </div>
@@ -330,6 +345,31 @@ function runHostView(){
     document.getElementById('examPreview').textContent = questions.length ? questions.length + ' ta savol aniqlandi.' : '';
   });
 
+  // ---- Load saved tests ----
+  getDb().ref('savedTests').limitToLast(20).once('value').then((snap) => {
+    const val = snap.val() || {};
+    const entries = Object.entries(val).reverse();
+    const card = document.getElementById('savedTestsCard');
+    const listEl = document.getElementById('savedTestsList');
+    if(entries.length === 0){ card.style.display = 'none'; return; }
+    card.style.display = 'block';
+    listEl.innerHTML = entries.map(([id, t]) => {
+      const { questions } = parseQA(t.rawText || '');
+      const dateStr = t.createdAt ? new Date(t.createdAt).toLocaleDateString('uz-UZ') : '';
+      return '<div class="participant-row"><span>📄 ' + escapeHtml(t.name) + ' <span style="color:rgba(243,239,228,0.4);">(' + questions.length + ' savol, ' + dateStr + ')</span></span>' +
+        '<button class="p-status waiting" style="cursor:pointer; border:none;" data-id="' + id + '">Yuklash</button></div>';
+    }).join('');
+    listEl.querySelectorAll('button[data-id]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const t = val[btn.dataset.id];
+        document.getElementById('testNameInput').value = t.name;
+        examTextEl.value = t.rawText;
+        examTextEl.dispatchEvent(new Event('input'));
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    });
+  });
+
   let roomCode = null;
   let examQuestions = [];
   let participantsRef = null;
@@ -341,6 +381,11 @@ function runHostView(){
     if(text.length < 10){ errEl.textContent = 'Kamida bitta savol kiriting.'; errEl.classList.add('active'); return; }
     const { questions } = parseQA(text);
     if(questions.length === 0){ errEl.textContent = 'Hech qanday savol aniqlanmadi.'; errEl.classList.add('active'); return; }
+
+    const testName = document.getElementById('testNameInput').value.trim();
+    if(testName){
+      getDb().ref('savedTests').push({ name: testName, rawText: text, createdAt: Date.now() });
+    }
 
     roomCode = generateRoomCode();
     examQuestions = questions;
@@ -395,6 +440,7 @@ function runHostView(){
     });
   });
 
+  let lastLeaderboardEntries = [];
   function showLeaderboard(participants){
     document.getElementById('hostMonitor').style.display = 'none';
     document.getElementById('hostLeaderboard').style.display = 'block';
@@ -405,6 +451,7 @@ function runHostView(){
       const bt = (b.finishedAt||Infinity) - (b.startedAtLocal||0);
       return at - bt;
     });
+    lastLeaderboardEntries = entries;
     const medals = ['🥇','🥈','🥉'];
     document.getElementById('leaderboardList').innerHTML = entries.map((p, i) => {
       const timeStr = p.finishedAt && p.startedAtLocal ? Math.round((p.finishedAt - p.startedAtLocal)/1000) + 's' : '—';
@@ -418,6 +465,39 @@ function runHostView(){
     }).join('');
   }
 
+  function buildResultsTableHtml(){
+    const testName = document.getElementById('testNameInput').value.trim() || 'Test natijalari';
+    const rows = lastLeaderboardEntries.map((p, i) => {
+      const timeStr = p.finishedAt && p.startedAtLocal ? Math.round((p.finishedAt - p.startedAtLocal)/1000) + ' soniya' : '—';
+      const statusStr = p.status === 'violated' ? 'Chiqib ketdi ⚠️' : 'Tugatdi';
+      return '<tr><td>' + (i+1) + '</td><td>' + escapeHtml(p.name) + '</td><td>' + (p.score||0) + ' / ' + examQuestions.length + '</td><td>' + timeStr + '</td><td>' + statusStr + '</td></tr>';
+    }).join('');
+    return '<h2 style="font-family:Arial,sans-serif;">' + escapeHtml(testName) + ' — natijalar</h2>' +
+      '<p style="font-family:Arial,sans-serif; color:#555;">Sana: ' + new Date().toLocaleDateString('uz-UZ') + '</p>' +
+      '<table border="1" cellspacing="0" cellpadding="8" style="border-collapse:collapse; font-family:Arial,sans-serif; width:100%;">' +
+      '<tr style="background:#eee; font-weight:bold;"><td>O\'rin</td><td>Ism</td><td>Ball</td><td>Vaqt</td><td>Holat</td></tr>' +
+      rows + '</table>';
+  }
+
+  document.getElementById('exportPdfBtn').addEventListener('click', () => {
+    const w = window.open('', '_blank');
+    w.document.write('<html><head><meta charset="UTF-8"><title>Natijalar</title></head><body>' + buildResultsTableHtml() + '</body></html>');
+    w.document.close();
+    setTimeout(() => { w.print(); }, 300);
+  });
+
+  document.getElementById('exportWordBtn').addEventListener('click', () => {
+    const html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">' +
+      '<head><meta charset="UTF-8"></head><body>' + buildResultsTableHtml() + '</body></html>';
+    const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = (document.getElementById('testNameInput').value.trim() || 'test-natijalari') + '.doc';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  });
+
   document.getElementById('newExamBtn').addEventListener('click', () => location.reload());
 }
 
@@ -427,7 +507,6 @@ function runHostView(){
 function runStudentView(roomCode){
   document.getElementById('hostScreen').style.display = 'none';
   document.getElementById('studentScreen').style.display = 'block';
-  showView('joinScreen');
 
   function showView(id){
     ['joinScreen','waitScreen','playScreen','doneScreen','violatedScreen'].forEach(v => {
@@ -439,32 +518,80 @@ function runStudentView(roomCode){
   }
 
   const examRef = getDb().ref('rooms/' + roomCode + '/exam');
+  const storageKey = 'examIdentity_' + roomCode;
   let myId = null, myRef = null, questions = [], currentIndex = 0, myScore = 0, testActive = false, startedAtLocal = null;
+
+  function watchExamStatus(){
+    examRef.child('status').on('value', (statusSnap) => {
+      const status = statusSnap.val();
+      if(status === 'started' && !testActive && document.getElementById('waitScreen').classList.contains('active-view')){
+        beginTest();
+      }
+      updateRetakeButtons(status);
+    });
+  }
+
+  function updateRetakeButtons(status){
+    const allowRetake = status === 'started';
+    [['retakeBtn1','retakeNote1'], ['retakeBtn2','retakeNote2']].forEach(([btnId, noteId]) => {
+      document.getElementById(btnId).style.display = allowRetake ? 'inline-block' : 'none';
+      document.getElementById(noteId).style.display = allowRetake ? 'none' : 'block';
+    });
+  }
+
+  function startFresh(name){
+    questions = [];
+    examRef.once('value').then((snap) => {
+      const exam = snap.val();
+      questions = exam.questions || [];
+      myId = 'p_' + Date.now() + '_' + Math.random().toString(36).slice(2,8);
+      myRef = getDb().ref('rooms/' + roomCode + '/exam/participants/' + myId);
+      myRef.set({ name, score: 0, currentIndex: 0, status: 'waiting', joinedAt: Date.now() });
+      localStorage.setItem(storageKey, JSON.stringify({ myId, name }));
+      showView('waitScreen');
+      watchExamStatus();
+    });
+  }
 
   document.getElementById('joinBtn').addEventListener('click', () => {
     const name = document.getElementById('studentName').value.trim();
     const errEl = document.getElementById('joinError');
     if(!name){ errEl.textContent = 'Ismingizni kiriting.'; errEl.classList.add('active'); return; }
-
     examRef.once('value').then((snap) => {
-      const exam = snap.val();
-      if(!exam){ errEl.textContent = 'Bunday test topilmadi.'; errEl.classList.add('active'); return; }
-      questions = exam.questions || [];
-      myId = 'p_' + Date.now() + '_' + Math.random().toString(36).slice(2,8);
-      myRef = getDb().ref('rooms/' + roomCode + '/exam/participants/' + myId);
-      myRef.set({ name, score: 0, currentIndex: 0, status: 'waiting', joinedAt: Date.now() });
-
-      showView('waitScreen');
-      examRef.child('status').on('value', (statusSnap) => {
-        const status = statusSnap.val();
-        if(status === 'started' && !testActive){
-          beginTest();
-        } else if(status === 'finished' && !testActive){
-          showView('doneScreen');
-        }
-      });
+      if(!snap.val()){ errEl.textContent = 'Bunday test topilmadi.'; errEl.classList.add('active'); return; }
+      startFresh(name);
     });
   });
+
+  // ---- Resume identity if this device already joined this room ----
+  const saved = localStorage.getItem(storageKey);
+  if(saved){
+    try{
+      const parsed = JSON.parse(saved);
+      examRef.once('value').then((snap) => {
+        const exam = snap.val();
+        if(!exam){ return; } // room gone, fall back to join screen
+        questions = exam.questions || [];
+        myId = parsed.myId;
+        myRef = getDb().ref('rooms/' + roomCode + '/exam/participants/' + myId);
+        myRef.once('value').then((pSnap) => {
+          const p = pSnap.val();
+          if(!p){ return; } // participant record missing, fall back to join screen
+          if(p.status === 'finished'){ showView('doneScreen'); }
+          else if(p.status === 'violated'){ showView('violatedScreen'); }
+          else if(p.status === 'in_progress' && exam.status === 'started'){
+            currentIndex = p.currentIndex || 0; myScore = p.score || 0; testActive = true; startedAtLocal = p.startedAtLocal || Date.now();
+            showView('playScreen'); renderQuestion();
+          } else {
+            showView('waitScreen');
+          }
+          watchExamStatus();
+        });
+      });
+    }catch(e){ /* fall through to join screen */ }
+  } else {
+    showView('joinScreen');
+  }
 
   function beginTest(){
     testActive = true;
@@ -524,6 +651,15 @@ function runStudentView(roomCode){
     myRef.update({ status: 'finished', score: myScore, finishedAt: Date.now() });
     showView('doneScreen');
   }
+
+  function retake(){
+    examRef.child('status').once('value').then((snap) => {
+      if(snap.val() !== 'started'){ return; } // teacher already finished, no retake allowed
+      beginTest();
+    });
+  }
+  document.getElementById('retakeBtn1').addEventListener('click', retake);
+  document.getElementById('retakeBtn2').addEventListener('click', retake);
 
   // ---- Anti-cheat: tab/app switch detection ----
   document.addEventListener('visibilitychange', () => {
