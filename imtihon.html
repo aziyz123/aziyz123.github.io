@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Imtihon — Onlayn Test</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Archivo+Black&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+  :root{
+    --stage:#12151C; --stage-2:#1B2029; --stage-3:#262D3A;
+    --arena:#ECEFF3;
+    --paper:#F3EFE4; --gold:#A9813F; --gold-2:#C9A45C;
+    --danger:#D64545; --ok:#4A9A6A;
+    --t1:#E8A33D; --t2:#2E8B8B; --t3:#B23A6B; --t4:#6B8F5C;
+    --line: rgba(255,255,255,0.1);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:'Inter', sans-serif; color: var(--paper);
+    background:
+      radial-gradient(circle at 15% 10%, rgba(169,129,63,0.16) 0%, transparent 45%),
+      radial-gradient(circle at 90% 25%, rgba(46,139,139,0.14) 0%, transparent 40%),
+      var(--stage);
+    min-height:100vh;
+  }
+  .wrap{ max-width: 760px; margin:0 auto; padding: 44px 22px 60px; }
+  .wrap.narrow{ max-width: 460px; }
+
+  .hero-row{ display:flex; align-items:center; gap:18px; margin-bottom: 8px; }
+  .cube-logo{ width:52px; height:52px; perspective: 400px; flex-shrink:0; }
+  .cube-logo .cube{ width:100%; height:100%; position:relative; transform-style:preserve-3d; animation: cubeSpin 9s linear infinite; }
+  .cube-logo .face{ position:absolute; width:52px; height:52px; display:flex; align-items:center; justify-content:center; font-family:'Archivo Black', sans-serif; font-size:16px; color: var(--stage); border: 1px solid rgba(0,0,0,0.15); }
+  .cube-logo .f1{ transform: translateZ(26px); background: var(--gold-2); }
+  .cube-logo .f2{ transform: rotateY(180deg) translateZ(26px); background: var(--t3); }
+  .cube-logo .f3{ transform: rotateY(90deg) translateZ(26px); background: var(--t2); }
+  .cube-logo .f4{ transform: rotateY(-90deg) translateZ(26px); background: var(--t1); }
+  .cube-logo .f5{ transform: rotateX(90deg) translateZ(26px); background: var(--t4); }
+  .cube-logo .f6{ transform: rotateX(-90deg) translateZ(26px); background: var(--gold); }
+  @keyframes cubeSpin{ from{ transform: rotateX(0deg) rotateY(0deg); } to{ transform: rotateX(360deg) rotateY(360deg); } }
+
+  h1{ font-family:'Archivo', sans-serif; font-weight:800; font-size: 26px; margin:0; }
+  .sub{ font-family:'IBM Plex Mono', monospace; font-size: 12px; color: var(--gold-2); margin-top:8px; }
+
+  .card{
+    background: linear-gradient(155deg, var(--stage-2) 0%, var(--stage) 100%);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 14px; padding: 24px 26px; margin-top: 22px;
+    box-shadow: 0 1px 0 rgba(255,255,255,0.04) inset, 0 18px 40px -12px rgba(0,0,0,0.5);
+  }
+  .card h2{ font-family:'Archivo', sans-serif; font-size: 13px; font-weight:700; color: var(--gold-2); margin:0 0 14px 0; }
+  label{ display:block; font-size:13px; font-weight:600; margin-bottom:6px; margin-top:14px; }
+  label:first-of-type{ margin-top:0; }
+  textarea, input[type=text], input[type=number]{
+    width:100%; font-family:'Inter', sans-serif; font-size:14px; padding: 12px 14px;
+    border: 1px solid rgba(255,255,255,0.1); border-radius:8px;
+    background: rgba(0,0,0,0.25); color: var(--paper);
+  }
+  textarea{ min-height: 200px; font-family:'IBM Plex Mono', monospace; font-size:13px; line-height:1.5; }
+  textarea:focus, input:focus{ outline:none; border-color: var(--gold); }
+  .hint{ font-size:11px; color: rgba(243,239,228,0.45); margin-top:6px; line-height:1.5; }
+  .example-box{ background: rgba(0,0,0,0.3); border: 1px dashed rgba(255,255,255,0.15); border-radius:8px; padding: 12px 14px; font-family:'IBM Plex Mono', monospace; font-size: 12px; line-height:1.6; white-space: pre-wrap; color: rgba(243,239,228,0.55); margin-top: 8px; }
+
+  button.primary{
+    width:100%; padding:16px; border:none; border-radius:10px; margin-top:20px;
+    background: linear-gradient(135deg, var(--gold-2), var(--gold));
+    color: var(--stage); font-family:'Archivo', sans-serif; font-weight:800; font-size:15px; cursor:pointer;
+    box-shadow: 0 14px 30px -8px rgba(169,129,63,0.5);
+  }
+  button.primary:disabled{ opacity:0.4; cursor:not-allowed; }
+  .error-box{ display:none; margin-top:14px; padding:12px 14px; border-radius:8px; background: rgba(214,69,69,0.15); border:1px solid var(--danger); color:#ff9d9d; font-size:13px; }
+  .error-box.active{ display:block; }
+  .parsed-preview{ margin-top:10px; font-family:'IBM Plex Mono', monospace; font-size:12px; color: var(--gold-2); }
+
+  .qr-row{ display:flex; gap: 20px; align-items:center; flex-wrap:wrap; margin-top: 6px; }
+  #qrcodeBox{ background:#fff; padding: 10px; border-radius: 8px; display:inline-block; line-height:0; }
+  .room-code{ font-family:'Archivo Black', sans-serif; font-size: 30px; color: var(--gold-2); }
+
+  .participant-row{
+    display:flex; justify-content:space-between; align-items:center;
+    padding: 10px 0; border-bottom: 1px dashed var(--line); font-size: 14px;
+  }
+  .participant-row:last-child{ border-bottom:none; }
+  .p-status{ font-family:'IBM Plex Mono', monospace; font-size: 11px; padding: 3px 8px; border-radius:6px; }
+  .p-status.waiting{ background: rgba(255,255,255,0.08); color: rgba(243,239,228,0.5); }
+  .p-status.in_progress{ background: rgba(169,129,63,0.18); color: var(--gold-2); }
+  .p-status.finished{ background: rgba(74,154,106,0.18); color: var(--ok); }
+  .p-status.violated{ background: rgba(214,69,69,0.18); color: #ff9d9d; }
+  .empty-note{ font-size:13px; color: rgba(243,239,228,0.4); font-style:italic; }
+
+  .leaderboard-row{
+    display:flex; align-items:center; gap:14px; padding: 14px 16px;
+    background: var(--stage-2); border-radius:10px; margin-bottom:10px;
+  }
+  .leaderboard-row.top1{ background: linear-gradient(135deg, rgba(169,129,63,0.3), var(--stage-2)); border:1px solid var(--gold); }
+  .lb-rank{ font-family:'Archivo Black', sans-serif; font-size: 20px; width:34px; text-align:center; color: var(--gold-2); }
+  .lb-name{ flex:1; font-weight:700; }
+  .lb-score{ font-family:'IBM Plex Mono', monospace; font-weight:700; color: var(--paper); }
+  .lb-time{ font-family:'IBM Plex Mono', monospace; font-size:11px; color: rgba(243,239,228,0.45); width:60px; text-align:right; }
+  .lb-flag{ font-size:14px; }
+
+  /* ---- Student play screen ---- */
+  #joinScreen, #waitScreen, #playScreen, #doneScreen, #violatedScreen{ display:none; }
+  .active-view{ display:block !important; }
+
+  .qtag{ font-family:'IBM Plex Mono', monospace; font-size:12px; color: var(--gold-2); }
+  .qtext{ font-family:'Archivo', sans-serif; font-weight:700; font-size: 22px; margin: 14px 0 22px; line-height:1.4; }
+  .opt-btn{
+    width:100%; text-align:left; padding: 16px 18px; margin-bottom:12px; border-radius:10px;
+    background: var(--stage-2); border: 2px solid rgba(255,255,255,0.1); color: var(--paper);
+    font-family:'Inter', sans-serif; font-size:15px; font-weight:600; cursor:pointer;
+  }
+  .opt-btn:active{ border-color: var(--gold); background: var(--stage-3); }
+  .opt-btn:disabled{ opacity:0.5; }
+  .opt-letter{ font-family:'IBM Plex Mono', monospace; color: var(--gold); margin-right:8px; }
+
+  .pulse-dot{ display:inline-block; width:8px; height:8px; border-radius:50%; background: var(--gold-2); animation: pd 1.2s infinite; margin-right:8px; }
+  @keyframes pd{ 0%,100%{ opacity:0.3; } 50%{ opacity:1; } }
+
+  .big-icon{ font-size: 50px; text-align:center; margin-bottom: 14px; }
+  .center-title{ text-align:center; font-family:'Archivo', sans-serif; font-weight:800; font-size: 22px; }
+  .center-sub{ text-align:center; font-size: 14px; color: rgba(243,239,228,0.6); margin-top:10px; line-height:1.5; }
+
+  #violatedScreen{ background: var(--danger); }
+  #violatedScreen .wrap{ padding-top: 100px; }
+
+  .app-footer{
+    margin-top: 34px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.08);
+    font-family:'IBM Plex Mono', monospace; font-size: 11px; color: rgba(243,239,228,0.4);
+    display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px;
+  }
+  .app-footer a{ color: var(--gold-2); text-decoration:none; }
+</style>
+</head>
+<body>
+
+<!-- ============ TEACHER / HOST VIEW ============ -->
+<div id="hostScreen" class="wrap">
+  <div class="hero-row">
+    <div class="cube-logo"><div class="cube">
+      <div class="face f1">IM</div><div class="face f2">IM</div><div class="face f3">IM</div>
+      <div class="face f4">IM</div><div class="face f5">IM</div><div class="face f6">IM</div>
+    </div></div>
+    <div><h1>Imtihon</h1><div class="sub">Onlayn test — jonli reyting bilan</div></div>
+  </div>
+
+  <div id="hostSetup">
+    <div class="card">
+      <h2>1 · Test savollari</h2>
+      <label for="examText">Savollarni joylashtiring</label>
+      <textarea id="examText" placeholder="Namunaga qarab yozing..."></textarea>
+      <div class="hint">Faqat variantli (A/B/C/D + Javob) savollar tavsiya etiladi — avtomatik va aniq baholanadi. Variantsiz savollar ham qabul qilinadi, lekin baholash so'z mosligiga qarab taxminiy bo'ladi.</div>
+      <div class="example-box">1. O'zbekiston poytaxti qaysi shahar?
+A) Samarqand
+B) Buxoro
+C) Toshkent
+D) Andijon
+Javob: C</div>
+      <div class="parsed-preview" id="examPreview"></div>
+      <div class="error-box" id="hostError"></div>
+    </div>
+    <button class="primary" id="createExamBtn">Test yaratish</button>
+  </div>
+
+  <div id="hostLobby" style="display:none;">
+    <div class="card">
+      <h2>Ishtirokchilar shu QR kodni skanerlaydi</h2>
+      <div class="qr-row">
+        <div id="qrcodeBox"></div>
+        <div>
+          <div class="room-code" id="roomCodeDisplay"></div>
+          <div class="hint" id="roomUrlDisplay"></div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Ishtirokchilar (<span id="pCount">0</span>)</h2>
+      <div id="participantList"><div class="empty-note">Hali hech kim qo'shilmadi...</div></div>
+    </div>
+    <button class="primary" id="startExamBtn">Testni boshlash</button>
+  </div>
+
+  <div id="hostMonitor" style="display:none;">
+    <div class="card">
+      <h2>Jarayon (<span id="pCount2">0</span> ishtirokchi)</h2>
+      <div id="participantList2"></div>
+    </div>
+    <button class="primary" id="finishExamBtn">Yakunlash va reytingni ko'rsatish</button>
+  </div>
+
+  <div id="hostLeaderboard" style="display:none;">
+    <div class="card">
+      <h2>🏆 Yakuniy reyting</h2>
+      <div id="leaderboardList"></div>
+    </div>
+    <button class="primary" id="newExamBtn">Yangi test yaratish</button>
+  </div>
+
+  <div class="app-footer">
+    <span>Ushbu ilova <a href="https://t.me/byaziyz" target="_blank" rel="noopener">@byaziyz</a> tomonidan yaratilgan</span>
+    <span>Telegram: <a href="https://t.me/byaziyz" target="_blank" rel="noopener">@byaziyz</a></span>
+  </div>
+</div>
+
+<!-- ============ STUDENT VIEW ============ -->
+<div id="studentScreen" style="display:none;">
+
+  <div id="joinScreen" class="wrap narrow">
+    <div class="hero-row">
+      <div class="cube-logo"><div class="cube">
+        <div class="face f1">IM</div><div class="face f2">IM</div><div class="face f3">IM</div>
+        <div class="face f4">IM</div><div class="face f5">IM</div><div class="face f6">IM</div>
+      </div></div>
+      <div><h1>Imtihonga qo'shilish</h1></div>
+    </div>
+    <div class="card">
+      <label for="studentName">Ismingiz</label>
+      <input type="text" id="studentName" placeholder="Ism Familiya">
+      <div class="error-box" id="joinError"></div>
+    </div>
+    <button class="primary" id="joinBtn">Qo'shilish</button>
+  </div>
+
+  <div id="waitScreen" class="wrap narrow">
+    <div class="big-icon">⏳</div>
+    <div class="center-title"><span class="pulse-dot"></span>Boshlanishini kutmoqda...</div>
+    <div class="center-sub">O'qituvchi testni boshlaguncha shu sahifada qoling. Boshqa ilova yoki oynaga o'tmang.</div>
+  </div>
+
+  <div id="playScreen" class="wrap narrow">
+    <div class="qtag" id="qProgress">Savol 1 / 10</div>
+    <div class="qtext" id="qText"></div>
+    <div id="qOptions"></div>
+  </div>
+
+  <div id="doneScreen" class="wrap narrow">
+    <div class="big-icon">✅</div>
+    <div class="center-title">Test tugadi!</div>
+    <div class="center-sub">Natijalaringiz o'qituvchi ekranidagi reytingda chiqadi. Rahmat!</div>
+  </div>
+
+  <div id="violatedScreen" class="wrap narrow">
+    <div class="big-icon">⚠️</div>
+    <div class="center-title">Test yopildi</div>
+    <div class="center-sub">Boshqa oyna yoki ilovaga o'tganingiz sababli test avtomatik yakunlandi.</div>
+  </div>
+
+</div>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyBJfq4Kc6YZHpbV9WBg__im4bivBcZo1WU",
+  authDomain: "osonvakerak.firebaseapp.com",
+  databaseURL: "https://osonvakerak-default-rtdb.firebaseio.com",
+  projectId: "osonvakerak",
+  storageBucket: "osonvakerak.firebasestorage.app",
+  messagingSenderId: "363556171064",
+  appId: "1:363556171064:web:e21be98e50dff4d031e5cd"
+};
+let fbDb = null;
+function getDb(){
+  if(!fbDb){ firebase.initializeApp(firebaseConfig); fbDb = firebase.database(); }
+  return fbDb;
+}
+function generateRoomCode(){ return String(Math.floor(1000 + Math.random() * 9000)); }
+function escapeHtml(str){ const d = document.createElement('div'); d.textContent = str; return d.innerHTML; }
+
+// ================= Parsing (shared) =================
+function parseQA(rawText){
+  const blocks = rawText.split(/\n\s*\n+/).map(b => b.trim()).filter(Boolean);
+  const questions = [];
+  const warnings = [];
+  blocks.forEach((block, bi) => {
+    const lines = block.split('\n').map(l => l.trim()).filter(Boolean);
+    if(lines.length === 0) return;
+    let questionLine = lines[0].replace(/^\d+[\.\)]\s*/, '').trim();
+    const options = [];
+    let answerRaw = null;
+    for(let i = 1; i < lines.length; i++){
+      const line = lines[i];
+      const optMatch = line.match(/^([A-Da-d])[\.\)]\s*(.+)$/);
+      const ansMatch = line.match(/^(javob|to'g'ri javob|togri javob|answer|javobi)\s*[:\-–]?\s*(.+)$/i);
+      if(ansMatch){ answerRaw = ansMatch[2].trim(); }
+      else if(optMatch){ options.push(optMatch[2].trim()); }
+    }
+    if(!questionLine){ warnings.push((bi+1) + '-blok: savol topilmadi.'); return; }
+    if(options.length >= 2){
+      let correctIndex = -1;
+      if(answerRaw){
+        const letterMatch = answerRaw.match(/^([A-Da-d])\b/);
+        if(letterMatch){ correctIndex = letterMatch[1].toUpperCase().charCodeAt(0) - 65; }
+        else {
+          correctIndex = options.findIndex(o => o.toLowerCase() === answerRaw.toLowerCase());
+          if(correctIndex === -1) correctIndex = options.findIndex(o => o.toLowerCase().includes(answerRaw.toLowerCase()));
+        }
+      }
+      if(correctIndex === -1 || correctIndex >= options.length) correctIndex = 0;
+      questions.push({ type: 'mc', question: questionLine, options, correctIndex });
+    } else if(answerRaw){
+      questions.push({ type: 'open', question: questionLine, answer: answerRaw });
+    } else {
+      warnings.push((bi+1) + '-blok: javob topilmadi.');
+    }
+  });
+  return { questions, warnings };
+}
+
+const urlParams = new URLSearchParams(location.search);
+const examRoom = urlParams.get('exam');
+
+if(examRoom){
+  runStudentView(examRoom);
+} else {
+  runHostView();
+}
+
+// =========================================================
+// HOST VIEW
+// =========================================================
+function runHostView(){
+  document.getElementById('studentScreen').style.display = 'none';
+  document.getElementById('hostScreen').style.display = 'block';
+
+  const examTextEl = document.getElementById('examText');
+  examTextEl.addEventListener('input', () => {
+    const { questions } = parseQA(examTextEl.value.trim());
+    document.getElementById('examPreview').textContent = questions.length ? questions.length + ' ta savol aniqlandi.' : '';
+  });
+
+  let roomCode = null;
+  let examQuestions = [];
+  let participantsRef = null;
+
+  document.getElementById('createExamBtn').addEventListener('click', () => {
+    const errEl = document.getElementById('hostError');
+    errEl.classList.remove('active');
+    const text = examTextEl.value.trim();
+    if(text.length < 10){ errEl.textContent = 'Kamida bitta savol kiriting.'; errEl.classList.add('active'); return; }
+    const { questions } = parseQA(text);
+    if(questions.length === 0){ errEl.textContent = 'Hech qanday savol aniqlanmadi.'; errEl.classList.add('active'); return; }
+
+    roomCode = generateRoomCode();
+    examQuestions = questions;
+    const examUrl = location.origin + location.pathname + '?exam=' + roomCode;
+
+    getDb().ref('rooms/' + roomCode + '/exam').set({
+      questions: questions,
+      status: 'waiting',
+      createdAt: Date.now()
+    }).then(() => {
+      document.getElementById('hostSetup').style.display = 'none';
+      document.getElementById('hostLobby').style.display = 'block';
+      document.getElementById('roomCodeDisplay').textContent = roomCode;
+      document.getElementById('roomUrlDisplay').textContent = examUrl;
+      document.getElementById('qrcodeBox').innerHTML = '';
+      new QRCode(document.getElementById('qrcodeBox'), { text: examUrl, width: 150, height: 150, colorDark:'#12151C', colorLight:'#ffffff' });
+
+      participantsRef = getDb().ref('rooms/' + roomCode + '/exam/participants');
+      participantsRef.on('value', (snap) => {
+        renderParticipants(snap.val() || {}, examQuestions.length);
+      });
+    });
+  });
+
+  function renderParticipants(participants, totalQ){
+    const entries = Object.entries(participants);
+    document.getElementById('pCount').textContent = entries.length;
+    document.getElementById('pCount2').textContent = entries.length;
+
+    const listHtml = entries.length === 0
+      ? '<div class="empty-note">Hali hech kim qo\'shilmadi...</div>'
+      : entries.map(([id, p]) => {
+          const statusLabel = { waiting:'Kutmoqda', in_progress:'Ishlamoqda', finished:'Tugatdi', violated:'Chiqib ketdi' }[p.status] || p.status;
+          const progress = p.status === 'in_progress' ? (' (' + (p.currentIndex||0) + '/' + totalQ + ')') : '';
+          return '<div class="participant-row"><span>' + escapeHtml(p.name) + progress + '</span><span class="p-status ' + p.status + '">' + statusLabel + '</span></div>';
+        }).join('');
+    document.getElementById('participantList').innerHTML = listHtml;
+    document.getElementById('participantList2').innerHTML = listHtml;
+  }
+
+  document.getElementById('startExamBtn').addEventListener('click', () => {
+    getDb().ref('rooms/' + roomCode + '/exam').update({ status: 'started', startedAt: Date.now() });
+    document.getElementById('hostLobby').style.display = 'none';
+    document.getElementById('hostMonitor').style.display = 'block';
+  });
+
+  document.getElementById('finishExamBtn').addEventListener('click', () => {
+    getDb().ref('rooms/' + roomCode + '/exam').update({ status: 'finished' });
+    getDb().ref('rooms/' + roomCode + '/exam/participants').once('value').then((snap) => {
+      const participants = snap.val() || {};
+      showLeaderboard(participants);
+    });
+  });
+
+  function showLeaderboard(participants){
+    document.getElementById('hostMonitor').style.display = 'none';
+    document.getElementById('hostLeaderboard').style.display = 'block';
+    const entries = Object.values(participants);
+    entries.sort((a, b) => {
+      if((b.score||0) !== (a.score||0)) return (b.score||0) - (a.score||0);
+      const at = (a.finishedAt||Infinity) - (a.startedAtLocal||0);
+      const bt = (b.finishedAt||Infinity) - (b.startedAtLocal||0);
+      return at - bt;
+    });
+    const medals = ['🥇','🥈','🥉'];
+    document.getElementById('leaderboardList').innerHTML = entries.map((p, i) => {
+      const timeStr = p.finishedAt && p.startedAtLocal ? Math.round((p.finishedAt - p.startedAtLocal)/1000) + 's' : '—';
+      const flag = p.status === 'violated' ? '<span class="lb-flag">⚠️</span>' : '';
+      return '<div class="leaderboard-row' + (i===0?' top1':'') + '">' +
+        '<div class="lb-rank">' + (medals[i] || (i+1)) + '</div>' +
+        '<div class="lb-name">' + escapeHtml(p.name) + ' ' + flag + '</div>' +
+        '<div class="lb-time">' + timeStr + '</div>' +
+        '<div class="lb-score">' + (p.score||0) + ' / ' + examQuestions.length + '</div>' +
+        '</div>';
+    }).join('');
+  }
+
+  document.getElementById('newExamBtn').addEventListener('click', () => location.reload());
+}
+
+// =========================================================
+// STUDENT VIEW
+// =========================================================
+function runStudentView(roomCode){
+  document.getElementById('hostScreen').style.display = 'none';
+  document.getElementById('studentScreen').style.display = 'block';
+  showView('joinScreen');
+
+  function showView(id){
+    ['joinScreen','waitScreen','playScreen','doneScreen','violatedScreen'].forEach(v => {
+      document.getElementById(v).classList.remove('active-view');
+      document.getElementById(v).style.display = 'none';
+    });
+    document.getElementById(id).style.display = 'block';
+    document.getElementById(id).classList.add('active-view');
+  }
+
+  const examRef = getDb().ref('rooms/' + roomCode + '/exam');
+  let myId = null, myRef = null, questions = [], currentIndex = 0, myScore = 0, testActive = false, startedAtLocal = null;
+
+  document.getElementById('joinBtn').addEventListener('click', () => {
+    const name = document.getElementById('studentName').value.trim();
+    const errEl = document.getElementById('joinError');
+    if(!name){ errEl.textContent = 'Ismingizni kiriting.'; errEl.classList.add('active'); return; }
+
+    examRef.once('value').then((snap) => {
+      const exam = snap.val();
+      if(!exam){ errEl.textContent = 'Bunday test topilmadi.'; errEl.classList.add('active'); return; }
+      questions = exam.questions || [];
+      myId = 'p_' + Date.now() + '_' + Math.random().toString(36).slice(2,8);
+      myRef = getDb().ref('rooms/' + roomCode + '/exam/participants/' + myId);
+      myRef.set({ name, score: 0, currentIndex: 0, status: 'waiting', joinedAt: Date.now() });
+
+      showView('waitScreen');
+      examRef.child('status').on('value', (statusSnap) => {
+        const status = statusSnap.val();
+        if(status === 'started' && !testActive){
+          beginTest();
+        } else if(status === 'finished' && !testActive){
+          showView('doneScreen');
+        }
+      });
+    });
+  });
+
+  function beginTest(){
+    testActive = true;
+    startedAtLocal = Date.now();
+    currentIndex = 0;
+    myScore = 0;
+    myRef.update({ status: 'in_progress', startedAtLocal });
+    showView('playScreen');
+    renderQuestion();
+  }
+
+  function renderQuestion(){
+    if(currentIndex >= questions.length){ finishTest(); return; }
+    const q = questions[currentIndex];
+    document.getElementById('qProgress').textContent = 'Savol ' + (currentIndex+1) + ' / ' + questions.length;
+    document.getElementById('qText').textContent = q.question;
+    const optsWrap = document.getElementById('qOptions');
+    optsWrap.innerHTML = '';
+
+    if(q.type === 'mc'){
+      q.options.forEach((opt, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'opt-btn';
+        btn.innerHTML = '<span class="opt-letter">' + String.fromCharCode(65+i) + ')</span>' + escapeHtml(opt);
+        btn.addEventListener('click', () => {
+          Array.from(optsWrap.children).forEach(b => b.disabled = true);
+          if(i === q.correctIndex) myScore++;
+          nextQuestion();
+        });
+        optsWrap.appendChild(btn);
+      });
+    } else {
+      const input = document.createElement('input');
+      input.type = 'text'; input.placeholder = 'Javobingiz...';
+      const btn = document.createElement('button');
+      btn.className = 'primary'; btn.textContent = 'Javob berish'; btn.style.marginTop = '14px';
+      btn.addEventListener('click', () => {
+        const val = input.value.trim().toLowerCase();
+        const correct = (q.answer||'').trim().toLowerCase();
+        if(val && (val === correct || val.includes(correct) || correct.includes(val))) myScore++;
+        btn.disabled = true; input.disabled = true;
+        nextQuestion();
+      });
+      optsWrap.appendChild(input);
+      optsWrap.appendChild(btn);
+    }
+  }
+
+  function nextQuestion(){
+    currentIndex++;
+    myRef.update({ currentIndex, score: myScore });
+    setTimeout(renderQuestion, 350);
+  }
+
+  function finishTest(){
+    testActive = false;
+    myRef.update({ status: 'finished', score: myScore, finishedAt: Date.now() });
+    showView('doneScreen');
+  }
+
+  // ---- Anti-cheat: tab/app switch detection ----
+  document.addEventListener('visibilitychange', () => {
+    if(document.hidden && testActive){
+      testActive = false;
+      myRef.update({ status: 'violated', score: myScore, finishedAt: Date.now() });
+      showView('violatedScreen');
+    }
+  });
+}
+</script>
+</body>
+</html>
