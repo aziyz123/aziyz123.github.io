@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://aziyz123.github.io/sitemap.xml
