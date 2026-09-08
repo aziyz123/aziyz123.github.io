@@ -3,7 +3,22 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>O'quv Vositalari — @byaziyz</title>
+<title>O'quv Vositalari — Slayd, Test, Imtihon va Sinf O'yinlari | @byaziyz</title>
+<meta name="description" content="O'qituvchilar va o'quvchilar uchun bepul onlayn vositalar: matndan avtomatik slayd (PowerPoint) yaratish, sinf uchun QR-o'yin (Bilim Kechasi), jonli onlayn imtihon, fayl uzatish va dars jadvali. Ro'yxatdan o'tish shart emas.">
+<meta name="keywords" content="slayd yaratish, powerpoint yaratish, onlayn test, imtihon tuzish, sinf o'yini, dars jadvali, o'qituvchi uchun vositalar, bilim kechasi, QR test, bepul ta'lim vositalari">
+<meta name="author" content="@byaziyz">
+<link rel="canonical" href="https://aziyz123.github.io/">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="O'quv Vositalari — Slayd, Test, Imtihon va Sinf O'yinlari">
+<meta property="og:description" content="O'qituvchilar va o'quvchilar uchun bepul onlayn vositalar: slayd yaratish, sinf o'yini, onlayn imtihon, fayl uzatish va dars jadvali.">
+<meta property="og:url" content="https://aziyz123.github.io/">
+<meta property="og:locale" content="uz_UZ">
+
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="O'quv Vositalari — Slayd, Test, Imtihon va Sinf O'yinlari">
+<meta name="twitter:description" content="O'qituvchilar va o'quvchilar uchun bepul onlayn vositalar — ro'yxatdan o'tish shart emas.">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -86,19 +101,39 @@
   /* mini mockups drawn in pure CSS */
   .mock-slide{ background:#EDE9DD; border-radius:8px; padding:12px; }
   .mock-slide .bar{ height:6px; border-radius:3px; background:#C9A45C; width:60%; margin-bottom:8px; }
-  .mock-slide .ln{ height:5px; border-radius:3px; background:#00000022; margin-bottom:6px; }
-  .mock-slide .ln:nth-child(3){ width:90%; } .mock-slide .ln:nth-child(4){ width:75%; } .mock-slide .ln:nth-child(5){ width:82%; }
+  .mock-slide .ln{ height:5px; border-radius:3px; background:#00000022; margin-bottom:6px; overflow:hidden; position:relative; }
+  .mock-slide .ln::after{ content:''; position:absolute; inset:0; background:#00000038; transform-origin:left; animation: lnGrow 3.2s ease-in-out infinite; }
+  .mock-slide .ln:nth-child(3)::after{ width:90%; animation-delay:0s; } .mock-slide .ln:nth-child(4)::after{ width:75%; animation-delay:0.25s; } .mock-slide .ln:nth-child(5)::after{ width:82%; animation-delay:0.5s; }
+  @keyframes lnGrow{ 0%{ transform:scaleX(0); } 35%,70%{ transform:scaleX(1); } 100%{ transform:scaleX(1); } }
 
   .mock-score{ display:flex; gap:6px; align-items:flex-end; height:70px; padding:6px; }
-  .mock-score div{ flex:1; border-radius:5px 5px 0 0; }
-  .mock-score .b1{ height:55%; background: var(--t1); } .mock-score .b2{ height:88%; background: var(--gold-2); } .mock-score .b3{ height:40%; background: var(--t2); }
+  .mock-score div{ flex:1; border-radius:5px 5px 0 0; transform-origin:bottom; animation: barPulse 2.4s ease-in-out infinite; }
+  .mock-score .b1{ height:55%; background: var(--t1); animation-delay:0s; } .mock-score .b2{ height:88%; background: var(--gold-2); animation-delay:0.2s; } .mock-score .b3{ height:40%; background: var(--t2); animation-delay:0.4s; }
+  @keyframes barPulse{ 0%,100%{ transform:scaleY(1); } 50%{ transform:scaleY(1.14); } }
 
   .mock-rank{ display:flex; flex-direction:column; gap:6px; }
   .mock-rank .row{ display:flex; align-items:center; gap:8px; background:rgba(255,255,255,0.05); border-radius:6px; padding:6px 8px; }
-  .mock-rank .row.top{ background: rgba(212,175,106,0.22); }
+  .mock-rank .row.top{ background: rgba(212,175,106,0.22); animation: rowGlow 2.2s ease-in-out infinite; }
+  @keyframes rowGlow{ 0%,100%{ box-shadow: 0 0 0 rgba(212,175,106,0); } 50%{ box-shadow: 0 0 16px rgba(212,175,106,0.35); } }
   .mock-rank .dot{ width:16px; height:16px; border-radius:50%; background: var(--gold-2); flex-shrink:0; font-size:9px; display:flex; align-items:center; justify-content:center; color:var(--stage); font-weight:700; font-family:'Archivo',sans-serif; }
   .mock-rank .row:not(.top) .dot{ background: rgba(255,255,255,0.15); color: var(--paper-dim); }
   .mock-rank .ln{ height:6px; border-radius:3px; background: rgba(255,255,255,0.18); flex:1; }
+
+  .transfer-mock{ display:flex; align-items:center; gap:10px; width:100%; }
+  .tm-phone{ width:18px; height:32px; border:2px solid var(--t1); border-radius:4px; flex-shrink:0; }
+  .tm-computer{ width:28px; height:20px; border:2px solid var(--t1); border-radius:3px; flex-shrink:0; position:relative; }
+  .tm-computer::after{ content:''; position:absolute; left:50%; bottom:-6px; width:14px; height:2px; background:var(--t1); transform:translateX(-50%); }
+  .tm-line{ flex:1; height:2px; background: rgba(232,163,61,0.22); position:relative; }
+  .tm-dot{ position:absolute; top:-3px; left:0; width:8px; height:8px; border-radius:50%; background: var(--t1); animation: dotMove 2.4s ease-in-out infinite; }
+  @keyframes dotMove{ 0%{ left:0%; opacity:0; } 12%{ opacity:1; } 88%{ opacity:1; } 100%{ left:calc(100% - 8px); opacity:0; } }
+
+  .cal-mock{ display:grid; grid-template-columns:repeat(7,1fr); gap:4px; width:100%; }
+  .cal-mock div{ height:12px; border-radius:3px; background:rgba(255,255,255,0.1); animation: calWave 3.5s ease-in-out infinite; }
+  .cal-mock div:nth-child(1){ animation-delay:0s; } .cal-mock div:nth-child(2){ animation-delay:0.15s; }
+  .cal-mock div:nth-child(3){ animation-delay:0.3s; } .cal-mock div:nth-child(4){ animation-delay:0.45s; }
+  .cal-mock div:nth-child(5){ animation-delay:0.6s; } .cal-mock div:nth-child(6){ animation-delay:0.75s; }
+  .cal-mock div:nth-child(7){ animation-delay:0.9s; }
+  @keyframes calWave{ 0%,80%,100%{ background:rgba(255,255,255,0.1); } 40%{ background:var(--gold-2); } }
 
   @media (max-width: 980px){ .float-stack{ display:none; } }
 
@@ -134,10 +169,16 @@
     transition: transform 0.55s cubic-bezier(.2,.7,.2,1), opacity 0.55s ease, border-color 0.25s ease;
   }
   .tile.in-view{ opacity:1; transform: translateY(0); }
-  .tile:hover{ border-color: rgba(243,239,228,0.25); }
+  .tile{ transition: transform 0.55s cubic-bezier(.2,.7,.2,1), opacity 0.55s ease, border-color 0.25s ease; }
+  .tile:hover{ border-color: rgba(243,239,228,0.28); }
   .tile:hover .preview{ transform: scale(1.03); }
-  .tile .preview{ height: 118px; padding:16px; display:flex; align-items:center; background: var(--stage-3); transition: transform 0.4s ease; }
-  .tile .body{ padding: 22px 24px 26px; flex:1; display:flex; flex-direction:column; }
+  .tile::after{
+    content:''; position:absolute; inset:0; pointer-events:none; opacity:0; transition:opacity 0.3s ease; z-index:1;
+    background: radial-gradient(280px circle at var(--mx,50%) var(--my,50%), rgba(255,255,255,0.07), transparent 65%);
+  }
+  .tile:hover::after{ opacity:1; }
+  .tile .preview{ height: 118px; padding:16px; display:flex; align-items:center; background: var(--stage-3); transition: transform 0.4s ease; position:relative; z-index:2; }
+  .tile .body{ padding: 22px 24px 26px; flex:1; display:flex; flex-direction:column; position:relative; z-index:2; }
   .tile h3{ font-family:'Archivo', sans-serif; font-weight:700; font-size: 19px; margin:0 0 8px; }
   .tile p{ font-size: 13.5px; color: var(--paper-dim); line-height:1.55; margin:0; max-width: 40ch; }
   .tile .arrow{ margin-top:auto; padding-top:14px; font-family:'IBM Plex Mono', monospace; font-size:11px; color: var(--gold-2); }
@@ -200,7 +241,7 @@
   </div>
 
   <div class="hero-inner">
-    <div class="kicker">O'qituvchi <b>@byaziyz</b> tomonidan yaratilgan</div>
+    <div class="kicker"><b>@byaziyz</b> tomonidan yaratilgan</div>
     <h1>Darsni <em>jonlantiradigan</em> beshta vosita.</h1>
     <p>Slayd, musobaqa, imtihon, fayl almashish va dars rejasi — barchasi bepul, internet orqali, hech qanday o'rnatishsiz. Proyektorda oching, QR ko'rsating, boshlang.</p>
     <div class="hero-cta">
@@ -258,7 +299,11 @@
 
     <a class="tile small" href="fayl-uzatish.html">
       <div class="preview">
-        <svg viewBox="0 0 100 40" width="100%" height="40" fill="none"><rect x="4" y="6" width="18" height="28" rx="3" style="stroke:var(--t1)" stroke-width="2"/><path d="M30 20h50M74 12l8 8-8 8" style="stroke:var(--t1)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><rect x="84" y="10" width="14" height="20" rx="2" style="stroke:var(--t1)" stroke-width="2"/></svg>
+        <div class="transfer-mock">
+          <div class="tm-phone"></div>
+          <div class="tm-line"><div class="tm-dot"></div></div>
+          <div class="tm-computer"></div>
+        </div>
       </div>
       <div class="body">
         <h3>Fayl Uzatish</h3>
@@ -269,14 +314,8 @@
 
     <a class="tile small" href="dars-jadvali.html">
       <div class="preview">
-        <div style="display:grid; grid-template-columns:repeat(7,1fr); gap:4px; width:100%;">
-          <div style="height:12px; border-radius:3px; background:rgba(255,255,255,0.1);"></div>
-          <div style="height:12px; border-radius:3px; background:rgba(255,255,255,0.1);"></div>
-          <div style="height:12px; border-radius:3px; background:var(--gold-2);"></div>
-          <div style="height:12px; border-radius:3px; background:rgba(255,255,255,0.1);"></div>
-          <div style="height:12px; border-radius:3px; background:rgba(255,255,255,0.1);"></div>
-          <div style="height:12px; border-radius:3px; background:rgba(255,255,255,0.1);"></div>
-          <div style="height:12px; border-radius:3px; background:rgba(255,255,255,0.1);"></div>
+        <div class="cal-mock">
+          <div></div><div></div><div></div><div></div><div></div><div></div><div></div>
         </div>
       </div>
       <div class="body">
@@ -303,6 +342,21 @@
     });
   }, { threshold: 0.15 });
   document.querySelectorAll('.tile').forEach(t => io.observe(t));
+
+  if(window.matchMedia('(hover: hover)').matches){
+    document.querySelectorAll('.tile').forEach(tile => {
+      tile.addEventListener('mousemove', (e) => {
+        const r = tile.getBoundingClientRect();
+        const x = e.clientX - r.left, y = e.clientY - r.top;
+        tile.style.setProperty('--mx', x + 'px');
+        tile.style.setProperty('--my', y + 'px');
+        const rx = ((y - r.height/2) / r.height) * -5;
+        const ry = ((x - r.width/2) / r.width) * 5;
+        tile.style.transform = 'perspective(800px) rotateX(' + rx + 'deg) rotateY(' + ry + 'deg)';
+      });
+      tile.addEventListener('mouseleave', () => { tile.style.transform = ''; });
+    });
+  }
 
   if(window.matchMedia('(hover: hover)').matches){
     const hero = document.querySelector('.hero');
