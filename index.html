@@ -8,8 +8,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --stage:#0F1116; --stage-2:#171B24; --stage-3:#20263296;
-    --paper:#F3EFE4;
+    --stage:#0F1116; --stage-2:#171B24; --stage-3:#1D232F;
+    --paper:#F3EFE4; --paper-dim: rgba(243,239,228,0.55);
     --gold:#A9813F; --gold-2:#D4AF6A;
     --t1:#E8A33D; --t2:#2E8B8B; --t3:#B23A6B; --t4:#6B8F5C;
     --line: rgba(243,239,228,0.10);
@@ -18,132 +18,142 @@
   html{ scroll-behavior:smooth; }
   body{
     margin:0; font-family:'Inter', sans-serif; color: var(--paper);
-    background: var(--stage);
-    -webkit-font-smoothing:antialiased;
+    background: var(--stage); -webkit-font-smoothing:antialiased; overflow-x:hidden;
   }
   ::selection{ background: var(--gold); color: var(--stage); }
+  a{ color:inherit; }
 
-  /* Grain texture overlay — subtle, gives the flat gradient real material quality */
   .grain{
     position:fixed; inset:0; pointer-events:none; z-index:5; opacity:0.05; mix-blend-mode:overlay;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
+
+  /* ============ TOP BAR ============ */
+  .topbar{ position:fixed; top:0; left:0; right:0; z-index:40; display:flex; justify-content:space-between; align-items:center; padding: 22px 28px; }
+  .topbar .brand{ display:flex; align-items:center; gap:10px; font-family:'Archivo', sans-serif; font-weight:700; font-size:14px; }
+  .brand-mark{ width:26px; height:26px; border-radius:7px; background: linear-gradient(135deg, var(--gold-2), var(--t3)); flex-shrink:0; }
+  .topbar nav a{ font-family:'IBM Plex Mono', monospace; font-size:12px; color: var(--paper-dim); text-decoration:none; margin-left:22px; }
+  .topbar nav a:hover{ color: var(--paper); }
 
   /* ============ HERO ============ */
   .hero{
     min-height: 100svh; position:relative; overflow:hidden;
     display:flex; align-items:center;
     background:
-      radial-gradient(circle at 78% 18%, rgba(169,129,63,0.22) 0%, transparent 42%),
-      radial-gradient(circle at 15% 82%, rgba(46,139,139,0.16) 0%, transparent 45%),
-      radial-gradient(circle at 60% 95%, rgba(178,58,107,0.10) 0%, transparent 50%),
+      radial-gradient(ellipse 900px 500px at 75% -10%, rgba(169,129,63,0.30) 0%, transparent 60%),
+      radial-gradient(ellipse 700px 500px at 0% 100%, rgba(46,139,139,0.20) 0%, transparent 55%),
+      radial-gradient(ellipse 600px 400px at 90% 90%, rgba(178,58,107,0.16) 0%, transparent 55%),
       var(--stage);
   }
-  .hero-inner{ max-width: 1180px; margin: 0 auto; padding: 0 28px; width:100%; position:relative; z-index:2; }
-  .kicker{
-    font-family:'IBM Plex Mono', monospace; font-size: 13px; color: rgba(243,239,228,0.5);
-    margin-bottom: 22px;
-  }
+  .hero-inner{ max-width: 1180px; margin: 0 auto; padding: 90px 28px 40px; width:100%; position:relative; z-index:3; }
+  .kicker{ font-family:'IBM Plex Mono', monospace; font-size: 13px; color: var(--paper-dim); margin-bottom: 22px; }
   .kicker b{ color: var(--gold-2); font-weight:600; }
   .hero h1{
-    font-family:'Archivo', sans-serif; font-weight:800; letter-spacing:-0.02em;
-    font-size: clamp(38px, 6.4vw, 78px); line-height: 1.03; margin:0; max-width: 14ch;
+    font-family:'Archivo', sans-serif; font-weight:800; letter-spacing:-0.025em;
+    font-size: clamp(40px, 6.8vw, 84px); line-height: 1.01; margin:0; max-width: 15ch;
   }
   .hero h1 em{
     font-style:normal;
-    background: linear-gradient(100deg, var(--gold-2), var(--t1) 60%, var(--gold-2));
+    background: linear-gradient(100deg, var(--gold-2), var(--t1) 55%, var(--gold-2));
     -webkit-background-clip:text; background-clip:text; color:transparent;
   }
-  .hero p{
-    font-size: clamp(15px, 1.6vw, 18px); color: rgba(243,239,228,0.62); max-width: 46ch;
-    line-height:1.65; margin-top: 26px;
-  }
-  .hero-cta{ display:flex; gap:16px; margin-top:38px; flex-wrap:wrap; align-items:center; }
+  .hero p{ font-size: clamp(15px, 1.6vw, 18px); color: var(--paper-dim); max-width: 44ch; line-height:1.65; margin-top: 26px; }
+  .hero-cta{ display:flex; gap:16px; margin-top:36px; flex-wrap:wrap; align-items:center; }
   .hero-cta a.btn{
-    display:inline-block; padding: 15px 26px; border-radius:999px;
+    display:inline-block; padding: 16px 30px; border-radius:999px;
     background: var(--paper); color: var(--stage);
     font-family:'Archivo', sans-serif; font-weight:700; font-size:14.5px; text-decoration:none;
-    transition: transform 0.2s ease;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 16px 34px -12px rgba(212,175,106,0.35);
   }
   .hero-cta a.btn:hover{ transform: translateY(-2px); }
-  .hero-cta .btn-count{ font-family:'IBM Plex Mono', monospace; font-size:13px; color: rgba(243,239,228,0.45); }
 
-  /* 3D cube, positioned as an asymmetric hero object */
-  .hero-cube-wrap{
-    position:absolute; right: -40px; top: 50%; transform: translateY(-50%);
-    width: min(46vw, 480px); height: min(46vw, 480px); perspective: 1200px;
-    z-index:1; opacity:0.9;
+  /* ---- Floating product-preview cards (the "wow" visual) ---- */
+  .float-stack{ position:absolute; inset:0; z-index:2; pointer-events:none; }
+  .fcard{
+    position:absolute; width: 220px; border-radius: 14px; padding: 14px;
+    background: rgba(255,255,255,0.04); backdrop-filter: blur(6px);
+    border: 1px solid rgba(255,255,255,0.10);
+    box-shadow: 0 30px 60px -20px rgba(0,0,0,0.6);
+    transition: transform 0.4s ease;
   }
-  .hero-cube-wrap .cube{
-    width:100%; height:100%; position:relative; transform-style:preserve-3d;
-    animation: cubeSpin 16s linear infinite;
-  }
-  .hero-cube-wrap .face{
-    position:absolute; width:100%; height:100%;
-    display:flex; align-items:center; justify-content:center;
-    font-family:'Archivo', sans-serif; font-weight:800; font-size: clamp(28px,5vw,54px); color: var(--stage);
-    border: 1px solid rgba(0,0,0,0.15);
-  }
-  .hero-cube-wrap .f1{ transform: translateZ(calc(min(23vw,240px))); background: var(--gold-2); }
-  .hero-cube-wrap .f2{ transform: rotateY(180deg) translateZ(calc(min(23vw,240px))); background: var(--t3); }
-  .hero-cube-wrap .f3{ transform: rotateY(90deg) translateZ(calc(min(23vw,240px))); background: var(--t2); }
-  .hero-cube-wrap .f4{ transform: rotateY(-90deg) translateZ(calc(min(23vw,240px))); background: var(--t1); }
-  .hero-cube-wrap .f5{ transform: rotateX(90deg) translateZ(calc(min(23vw,240px))); background: var(--t4); }
-  .hero-cube-wrap .f6{ transform: rotateX(-90deg) translateZ(calc(min(23vw,240px))); background: var(--gold); }
-  @keyframes cubeSpin{ from{ transform: rotateX(0deg) rotateY(0deg); } to{ transform: rotateX(360deg) rotateY(360deg); } }
+  .fcard .fc-label{ font-family:'IBM Plex Mono', monospace; font-size:9.5px; color: var(--paper-dim); margin-bottom:8px; letter-spacing:0.03em; }
+
+  .fc1{ top: 8%; right: 6%; }
+  .fc2{ top: 46%; right: -2%; width:190px; }
+  .fc3{ bottom: 6%; right: 20%; width:200px; }
+
+  /* mini mockups drawn in pure CSS */
+  .mock-slide{ background:#EDE9DD; border-radius:8px; padding:12px; }
+  .mock-slide .bar{ height:6px; border-radius:3px; background:#C9A45C; width:60%; margin-bottom:8px; }
+  .mock-slide .ln{ height:5px; border-radius:3px; background:#00000022; margin-bottom:6px; }
+  .mock-slide .ln:nth-child(3){ width:90%; } .mock-slide .ln:nth-child(4){ width:75%; } .mock-slide .ln:nth-child(5){ width:82%; }
+
+  .mock-score{ display:flex; gap:6px; align-items:flex-end; height:70px; padding:6px; }
+  .mock-score div{ flex:1; border-radius:5px 5px 0 0; }
+  .mock-score .b1{ height:55%; background: var(--t1); } .mock-score .b2{ height:88%; background: var(--gold-2); } .mock-score .b3{ height:40%; background: var(--t2); }
+
+  .mock-rank{ display:flex; flex-direction:column; gap:6px; }
+  .mock-rank .row{ display:flex; align-items:center; gap:8px; background:rgba(255,255,255,0.05); border-radius:6px; padding:6px 8px; }
+  .mock-rank .row.top{ background: rgba(212,175,106,0.22); }
+  .mock-rank .dot{ width:16px; height:16px; border-radius:50%; background: var(--gold-2); flex-shrink:0; font-size:9px; display:flex; align-items:center; justify-content:center; color:var(--stage); font-weight:700; font-family:'Archivo',sans-serif; }
+  .mock-rank .row:not(.top) .dot{ background: rgba(255,255,255,0.15); color: var(--paper-dim); }
+  .mock-rank .ln{ height:6px; border-radius:3px; background: rgba(255,255,255,0.18); flex:1; }
+
+  @media (max-width: 980px){ .float-stack{ display:none; } }
 
   .scroll-cue{
-    position:absolute; bottom: 30px; left: 28px; z-index:2;
+    position:absolute; bottom: 26px; left: 28px; z-index:3;
     font-family:'IBM Plex Mono', monospace; font-size: 11px; color: rgba(243,239,228,0.35);
     display:flex; align-items:center; gap:10px;
   }
   .scroll-cue .line{ width:26px; height:1px; background: rgba(243,239,228,0.35); }
 
-  @media (max-width: 780px){
-    .hero-cube-wrap{ opacity:0.35; right:-60px; }
+  /* ============ STATS STRIP ============ */
+  .stats{
+    max-width:1180px; margin:0 auto; padding: 0 28px 70px;
+    display:grid; grid-template-columns: repeat(4,1fr); gap:20px; position:relative; z-index:3;
   }
+  .stat b{ display:block; font-family:'Archivo', sans-serif; font-weight:800; font-size: clamp(30px,4vw,46px); color: var(--paper); }
+  .stat span{ font-family:'IBM Plex Mono', monospace; font-size:12px; color: var(--paper-dim); }
+  @media (max-width:700px){ .stats{ grid-template-columns: repeat(2,1fr); } }
 
   /* ============ TOOLS SECTION ============ */
-  .tools-section{ max-width: 1180px; margin:0 auto; padding: 110px 28px 90px; position:relative; z-index:2; }
+  .tools-section{ max-width: 1180px; margin:0 auto; padding: 40px 28px 100px; position:relative; z-index:2; }
   .section-head{ display:flex; justify-content:space-between; align-items:flex-end; gap:20px; margin-bottom: 40px; flex-wrap:wrap; }
   .section-head h2{ font-family:'Archivo', sans-serif; font-weight:700; font-size: clamp(24px,3vw,32px); margin:0; }
-  .section-head p{ color: rgba(243,239,228,0.5); font-size:14px; max-width:38ch; margin:0; }
+  .section-head p{ color: var(--paper-dim); font-size:14px; max-width:38ch; margin:0; }
 
-  .bento{
-    display:grid;
-    grid-template-columns: repeat(6, 1fr);
-    grid-auto-rows: minmax(150px, auto);
-    gap: 16px;
-  }
+  .bento{ display:grid; grid-template-columns: repeat(6, 1fr); grid-auto-rows: minmax(120px, auto); gap: 16px; }
   .tile{
-    position:relative; border-radius: 18px; padding: 30px 30px;
+    position:relative; border-radius: 18px;
     text-decoration:none; color: var(--paper);
-    background: var(--stage-2);
-    border: 1px solid var(--line);
-    display:flex; flex-direction:column; justify-content:flex-end;
-    overflow:hidden;
+    background: var(--stage-2); border: 1px solid var(--line);
+    display:flex; flex-direction:column; overflow:hidden;
     opacity:0; transform: translateY(18px);
-    transition: transform 0.55s cubic-bezier(.2,.7,.2,1), opacity 0.55s ease, border-color 0.25s ease, background 0.25s ease;
+    transition: transform 0.55s cubic-bezier(.2,.7,.2,1), opacity 0.55s ease, border-color 0.25s ease;
   }
   .tile.in-view{ opacity:1; transform: translateY(0); }
-  .tile:hover{ border-color: rgba(243,239,228,0.22); background:#1C212C; }
-  .tile .glow{
-    position:absolute; width:220px; height:220px; border-radius:50%; filter: blur(60px);
-    opacity:0.35; top:-60px; right:-60px; pointer-events:none;
-  }
-  .tile .mark{ width:40px; height:40px; margin-bottom: 20px; }
-  .tile h3{ font-family:'Archivo', sans-serif; font-weight:700; font-size: 20px; margin:0 0 8px; }
-  .tile p{ font-size: 13.5px; color: rgba(243,239,228,0.55); line-height:1.55; margin:0; max-width: 40ch; }
+  .tile:hover{ border-color: rgba(243,239,228,0.25); }
+  .tile:hover .preview{ transform: scale(1.03); }
+  .tile .preview{ height: 118px; padding:16px; display:flex; align-items:center; background: var(--stage-3); transition: transform 0.4s ease; }
+  .tile .body{ padding: 22px 24px 26px; flex:1; display:flex; flex-direction:column; }
+  .tile h3{ font-family:'Archivo', sans-serif; font-weight:700; font-size: 19px; margin:0 0 8px; }
+  .tile p{ font-size: 13.5px; color: var(--paper-dim); line-height:1.55; margin:0; max-width: 40ch; }
+  .tile .arrow{ margin-top:auto; padding-top:14px; font-family:'IBM Plex Mono', monospace; font-size:11px; color: var(--gold-2); }
 
-  .tile.featured{ grid-column: span 4; grid-row: span 2; padding: 40px; }
-  .tile.featured h3{ font-size: 27px; }
-  .tile.featured p{ font-size:14.5px; max-width: 46ch; }
-  .tile.small{ grid-column: span 2; grid-row: span 1; min-height: 190px; }
+  .tile.featured{ grid-column: span 3; grid-row: span 2; }
+  .tile.featured .preview{ height:180px; }
+  .tile.featured h3{ font-size: 24px; }
+  .tile.wide{ grid-column: span 3; grid-row: span 1; flex-direction:row; }
+  .tile.wide .preview{ width:150px; height:auto; flex-shrink:0; }
+  .tile.small{ grid-column: span 2; grid-row: span 1; }
 
   @media (max-width: 900px){
     .bento{ grid-template-columns: repeat(2, 1fr); }
-    .tile.featured{ grid-column: span 2; grid-row: span 1; }
-    .tile.small{ grid-column: span 2; grid-row: span 1; }
+    .tile.featured, .tile.small{ grid-column: span 2; grid-row: span 1; }
+    .tile.wide{ grid-column: span 2; flex-direction:column; }
+    .tile.wide .preview{ width:auto; height:118px; }
   }
 
   /* ============ FOOTER ============ */
@@ -152,8 +162,8 @@
     border-top: 1px solid var(--line);
     display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px;
   }
-  .site-footer .brand{ font-family:'Archivo', sans-serif; font-weight:700; font-size:14px; }
-  .site-footer .meta{ font-family:'IBM Plex Mono', monospace; font-size:12px; color: rgba(243,239,228,0.4); text-align:right; }
+  .site-footer .brand2{ font-family:'Archivo', sans-serif; font-weight:700; font-size:14px; }
+  .site-footer .meta{ font-family:'IBM Plex Mono', monospace; font-size:12px; color: var(--paper-dim); text-align:right; }
   .site-footer a{ color: var(--gold-2); text-decoration:none; }
   .site-footer a:hover{ text-decoration:underline; }
 </style>
@@ -161,24 +171,51 @@
 <body>
 <div class="grain"></div>
 
+<div class="topbar">
+  <div class="brand"><div class="brand-mark"></div>O'quv Vositalari</div>
+  <nav>
+    <a href="#tools">Vositalar</a>
+    <a href="https://t.me/byaziyz" target="_blank" rel="noopener">Telegram</a>
+  </nav>
+</div>
+
 <section class="hero">
-  <div class="hero-cube-wrap">
-    <div class="cube">
-      <div class="face f1">BK</div><div class="face f2">BK</div><div class="face f3">BK</div>
-      <div class="face f4">BK</div><div class="face f5">BK</div><div class="face f6">BK</div>
+  <div class="float-stack">
+    <div class="fcard fc1" data-rot="6">
+      <div class="fc-label">SLAYD YARATUVCHI</div>
+      <div class="mock-slide"><div class="bar"></div><div class="ln"></div><div class="ln"></div><div class="ln"></div><div class="ln"></div></div>
+    </div>
+    <div class="fcard fc2" data-rot="-4">
+      <div class="fc-label">BILIM KECHASI · JAMOA BALLI</div>
+      <div class="mock-score"><div class="b1"></div><div class="b2"></div><div class="b3"></div></div>
+    </div>
+    <div class="fcard fc3" data-rot="3">
+      <div class="fc-label">IMTIHON · REYTING</div>
+      <div class="mock-rank">
+        <div class="row top"><div class="dot">1</div><div class="ln"></div></div>
+        <div class="row"><div class="dot">2</div><div class="ln"></div></div>
+        <div class="row"><div class="dot">3</div><div class="ln"></div></div>
+      </div>
     </div>
   </div>
+
   <div class="hero-inner">
-    <div class="kicker">O'qituvchi <b>@byaziyz</b> tomonidan qurilgan</div>
+    <div class="kicker">O'qituvchi <b>@byaziyz</b> tomonidan yaratilgan</div>
     <h1>Darsni <em>jonlantiradigan</em> beshta vosita.</h1>
     <p>Slayd, musobaqa, imtihon, fayl almashish va dars rejasi — barchasi bepul, internet orqali, hech qanday o'rnatishsiz. Proyektorda oching, QR ko'rsating, boshlang.</p>
     <div class="hero-cta">
       <a class="btn" href="#tools">Vositalarni ko'rish</a>
-      <span class="btn-count">5 ta vosita · doim bepul</span>
     </div>
   </div>
   <div class="scroll-cue"><span class="line"></span> Pastga tushing</div>
 </section>
+
+<div class="stats">
+  <div class="stat"><b>5</b><span>vosita</span></div>
+  <div class="stat"><b>0 so'm</b><span>doim bepul</span></div>
+  <div class="stat"><b>0</b><span>o'rnatish kerak</span></div>
+  <div class="stat"><b>QR</b><span>bir bosishda kirish</span></div>
+</div>
 
 <section class="tools-section" id="tools">
   <div class="section-head">
@@ -188,44 +225,71 @@
 
   <div class="bento" id="bento">
     <a class="tile featured" href="slayd-yaratuvchi.html">
-      <div class="glow" style="background:var(--gold-2);"></div>
-      <svg class="mark" viewBox="0 0 40 40" fill="none"><rect x="4" y="6" width="26" height="18" rx="2" style="stroke:var(--gold-2)" stroke-width="2"/><rect x="10" y="28" width="26" height="18" rx="2" style="stroke:var(--gold-2); fill:var(--stage)" stroke-width="2"/></svg>
-      <h3>Slayd Yaratuvchi</h3>
-      <p>Manba matningizni (PDF, Word yoki oddiy matn) joylashtiring — bir necha soniyada tayyor, dizayni pishiq PowerPoint taqdimotini oling.</p>
+      <div class="preview mock-slide" style="background:var(--stage-3);">
+        <div style="width:100%;">
+          <div class="bar" style="width:45%;"></div>
+          <div class="ln"></div><div class="ln"></div><div class="ln" style="width:70%;"></div>
+        </div>
+      </div>
+      <div class="body">
+        <h3>Slayd Yaratuvchi</h3>
+        <p>Manba matningizni (PDF, Word yoki oddiy matn) joylashtiring — bir necha soniyada tayyor, dizayni pishiq PowerPoint taqdimotini oling.</p>
+        <div class="arrow">Ochish →</div>
+      </div>
     </a>
 
-    <a class="tile small" href="sinf-musobaqasi.html">
-      <div class="glow" style="background:var(--t2);"></div>
-      <svg class="mark" viewBox="0 0 40 40" fill="none"><path d="M12 30V18M20 30V10M28 30V22" style="stroke:var(--t2)" stroke-width="2.5" stroke-linecap="round"/></svg>
-      <h3>Bilim Kechasi</h3>
-      <p>Jamoalar uchun raqamli doska musobaqasi — syurpriz kartalar, taymer, QR orqali savol qo'shish.</p>
+    <a class="tile wide" href="sinf-musobaqasi.html">
+      <div class="preview"><div class="mock-score" style="height:80px;"><div class="b1"></div><div class="b2"></div><div class="b3"></div></div></div>
+      <div class="body">
+        <h3>Bilim Kechasi</h3>
+        <p>Jamoalar uchun raqamli doska musobaqasi — syurpriz kartalar, taymer, QR orqali savol qo'shish.</p>
+        <div class="arrow">Ochish →</div>
+      </div>
     </a>
 
-    <a class="tile small" href="imtihon.html">
-      <div class="glow" style="background:var(--t3);"></div>
-      <svg class="mark" viewBox="0 0 40 40" fill="none"><rect x="8" y="6" width="24" height="30" rx="2" style="stroke:var(--t3)" stroke-width="2"/><path d="M14 16h12M14 22h12M14 28h8" style="stroke:var(--t3)" stroke-width="2" stroke-linecap="round"/></svg>
-      <h3>Imtihon</h3>
-      <p>Jonli onlayn test — javoblar yashirin, oyna almashtirsa yopiladi, oxirida reyting chiqadi.</p>
+    <a class="tile wide" href="imtihon.html">
+      <div class="preview"><div class="mock-rank" style="width:100%;"><div class="row top"><div class="dot">1</div><div class="ln"></div></div><div class="row"><div class="dot">2</div><div class="ln"></div></div></div></div>
+      <div class="body">
+        <h3>Imtihon</h3>
+        <p>Jonli onlayn test — javoblar yashirin, oyna almashtirsa yopiladi, oxirida reyting chiqadi.</p>
+        <div class="arrow">Ochish →</div>
+      </div>
     </a>
 
     <a class="tile small" href="fayl-uzatish.html">
-      <div class="glow" style="background:var(--t1);"></div>
-      <svg class="mark" viewBox="0 0 40 40" fill="none"><rect x="6" y="10" width="14" height="22" rx="2" style="stroke:var(--t1)" stroke-width="2"/><path d="M24 20h10M30 15l5 5-5 5" style="stroke:var(--t1)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      <h3>Fayl Uzatish</h3>
-      <p>Telefondagi faylni QR kod orqali bir zumda kompyuterga o'tkazing.</p>
+      <div class="preview">
+        <svg viewBox="0 0 100 40" width="100%" height="40" fill="none"><rect x="4" y="6" width="18" height="28" rx="3" style="stroke:var(--t1)" stroke-width="2"/><path d="M30 20h50M74 12l8 8-8 8" style="stroke:var(--t1)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><rect x="84" y="10" width="14" height="20" rx="2" style="stroke:var(--t1)" stroke-width="2"/></svg>
+      </div>
+      <div class="body">
+        <h3>Fayl Uzatish</h3>
+        <p>Telefondagi faylni QR kod orqali bir zumda kompyuterga o'tkazing.</p>
+        <div class="arrow">Ochish →</div>
+      </div>
     </a>
 
     <a class="tile small" href="dars-jadvali.html">
-      <div class="glow" style="background:var(--t4);"></div>
-      <svg class="mark" viewBox="0 0 40 40" fill="none"><rect x="6" y="9" width="28" height="24" rx="2" style="stroke:var(--t4)" stroke-width="2"/><path d="M6 16h28M13 6v6M27 6v6" style="stroke:var(--t4)" stroke-width="2" stroke-linecap="round"/></svg>
-      <h3>Dars Jadvali</h3>
-      <p>Semestr mavzularini sanalarga avtomatik taqsimlaydi — o'quvchi kalendar orqali ko'radi.</p>
+      <div class="preview">
+        <div style="display:grid; grid-template-columns:repeat(7,1fr); gap:4px; width:100%;">
+          <div style="height:12px; border-radius:3px; background:rgba(255,255,255,0.1);"></div>
+          <div style="height:12px; border-radius:3px; background:rgba(255,255,255,0.1);"></div>
+          <div style="height:12px; border-radius:3px; background:var(--gold-2);"></div>
+          <div style="height:12px; border-radius:3px; background:rgba(255,255,255,0.1);"></div>
+          <div style="height:12px; border-radius:3px; background:rgba(255,255,255,0.1);"></div>
+          <div style="height:12px; border-radius:3px; background:rgba(255,255,255,0.1);"></div>
+          <div style="height:12px; border-radius:3px; background:rgba(255,255,255,0.1);"></div>
+        </div>
+      </div>
+      <div class="body">
+        <h3>Dars Jadvali</h3>
+        <p>Semestr mavzularini sanalarga avtomatik taqsimlaydi — o'quvchi kalendar orqali ko'radi.</p>
+        <div class="arrow">Ochish →</div>
+      </div>
     </a>
   </div>
 </section>
 
 <footer class="site-footer">
-  <div class="brand">O'quv Vositalari</div>
+  <div class="brand2">O'quv Vositalari</div>
   <div class="meta">Yaratdi: <a href="https://t.me/byaziyz" target="_blank" rel="noopener">@byaziyz</a>　　2026</div>
 </footer>
 
@@ -240,14 +304,20 @@
   }, { threshold: 0.15 });
   document.querySelectorAll('.tile').forEach(t => io.observe(t));
 
-  // Subtle mouse-parallax on the hero cube (desktop only)
-  const cubeWrap = document.querySelector('.hero-cube-wrap');
   if(window.matchMedia('(hover: hover)').matches){
-    document.querySelector('.hero').addEventListener('mousemove', (e) => {
-      const x = (e.clientX / window.innerWidth - 0.5) * 20;
-      const y = (e.clientY / window.innerHeight - 0.5) * 20;
-      cubeWrap.style.transform = 'translateY(calc(-50% + ' + y + 'px)) translateX(' + x + 'px)';
+    const hero = document.querySelector('.hero');
+    const cards = document.querySelectorAll('.fcard');
+    cards.forEach(c => { c.style.transform = 'rotate(' + c.dataset.rot + 'deg)'; });
+    hero.addEventListener('mousemove', (e) => {
+      const x = (e.clientX / window.innerWidth - 0.5);
+      const y = (e.clientY / window.innerHeight - 0.5);
+      cards.forEach((c, i) => {
+        const depth = (i + 1) * 8;
+        c.style.transform = 'rotate(' + c.dataset.rot + 'deg) translate(' + (x*depth) + 'px,' + (y*depth) + 'px)';
+      });
     });
+  } else {
+    document.querySelectorAll('.fcard').forEach(c => { c.style.transform = 'rotate(' + c.dataset.rot + 'deg)'; });
   }
 </script>
 </body>
