@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aqlli Takrorlash</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Archivo+Black&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<style>
+  :root{
+    --stage:#0F1116; --stage-2:#171B24; --stage-3:#1D232F;
+    --paper:#F3EFE4; --gold:#A9813F; --gold-2:#D4AF6A;
+    --danger:#D64545; --ok:#4A9A6A; --warn:#D4A72C; --new:#6B7684;
+    --line: rgba(243,239,228,0.12);
+  }
+  *{box-sizing:border-box;}
+  body{ margin:0; font-family:'Inter',sans-serif; color:var(--paper); background:var(--stage); }
+  .wrap{ max-width:760px; margin:0 auto; padding:40px 22px 60px; }
+  .brand{ display:flex; align-items:center; gap:12px; margin-bottom:8px; }
+  .brand-mark{ width:30px; height:30px; border-radius:8px; background:linear-gradient(135deg,var(--gold-2),var(--warn)); flex-shrink:0; }
+  h1{ font-family:'Archivo',sans-serif; font-weight:800; font-size:26px; margin:0; }
+  .sub{ font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--gold-2); margin:8px 0 26px; }
+
+  .card{ background:var(--stage-2); border:1px solid var(--line); border-radius:14px; padding:22px 24px; margin-bottom:18px; }
+  .card h2{ font-family:'Archivo',sans-serif; font-size:13px; font-weight:700; color:var(--gold-2); margin:0 0 14px; text-transform:uppercase; letter-spacing:0.03em; }
+  label{ display:block; font-size:12.5px; font-weight:600; margin-bottom:6px; margin-top:14px; }
+  label:first-of-type{ margin-top:0; }
+  textarea, input[type=text]{ width:100%; font-family:'Inter',sans-serif; font-size:14px; padding:11px 13px; border:1px solid var(--line); border-radius:8px; background:rgba(0,0,0,0.25); color:var(--paper); }
+  textarea{ min-height:180px; font-family:'IBM Plex Mono',monospace; font-size:13px; }
+  input:focus, textarea:focus{ outline:none; border-color:var(--gold); }
+  .hint{ font-size:11px; color:rgba(243,239,228,0.45); margin-top:6px; line-height:1.5; }
+  .example-box{ background:rgba(0,0,0,0.3); border:1px dashed var(--line); border-radius:8px; padding:12px 14px; font-family:'IBM Plex Mono',monospace; font-size:12px; line-height:1.6; white-space:pre-wrap; color:rgba(243,239,228,0.55); margin-top:8px; }
+  .parsed-preview{ margin-top:10px; font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--gold-2); }
+  .error-box{ display:none; margin-top:12px; padding:11px 13px; border-radius:8px; background:rgba(214,69,69,0.15); border:1px solid var(--danger); color:#ff9d9d; font-size:12.5px; }
+  .error-box.active{ display:block; }
+  .file-status{ font-family:'IBM Plex Mono',monospace; font-size:11px; margin-top:8px; }
+  .file-status.ok{ color:var(--ok); }
+  .file-status.err{ color:var(--danger); }
+
+  button{ font-family:'Archivo',sans-serif; font-weight:700; cursor:pointer; border:none; border-radius:9px; }
+  .btn-primary{ width:100%; padding:14px; background:linear-gradient(135deg,var(--gold-2),var(--gold)); color:var(--stage); font-size:14px; margin-top:16px; }
+  .btn-secondary{ padding:11px 16px; background:transparent; border:1px solid var(--gold); color:var(--gold-2); font-size:12.5px; border-radius:9px; }
+  .btn-secondary.full{ width:100%; margin-top:10px; }
+  .btn-danger-outline{ padding:6px 10px; font-size:10.5px; background:transparent; border:1px solid var(--danger); color:var(--danger); border-radius:6px; }
+
+  /* Deck list */
+  .deck-row{ display:flex; justify-content:space-between; align-items:center; padding:14px 0; border-bottom:1px dashed var(--line); }
+  .deck-row:last-child{ border-bottom:none; }
+  .deck-name{ font-family:'Archivo',sans-serif; font-weight:700; font-size:15px; }
+  .deck-stats{ display:flex; gap:8px; margin-top:6px; font-family:'IBM Plex Mono',monospace; font-size:11px; }
+  .pill{ padding:2px 8px; border-radius:20px; }
+  .pill.red{ background:rgba(214,69,69,0.18); color:#ff9d9d; }
+  .pill.yellow{ background:rgba(212,167,44,0.18); color:#f0d878; }
+  .pill.green{ background:rgba(74,154,106,0.18); color:#8fdb9f; }
+  .pill.gray{ background:rgba(255,255,255,0.08); color:rgba(243,239,228,0.5); }
+  .deck-actions{ display:flex; gap:8px; align-items:center; }
+  .empty-note{ font-size:13px; color:rgba(243,239,228,0.4); font-style:italic; }
+
+  /* Practice screen */
+  #practiceScreen{ display:none; }
+  .practice-topbar{ display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
+  .practice-topbar .back-link{ font-family:'IBM Plex Mono',monospace; font-size:11px; color:rgba(243,239,228,0.45); cursor:pointer; text-decoration:underline; }
+  .progress-line{ font-family:'IBM Plex Mono',monospace; font-size:12px; color:rgba(243,239,228,0.5); text-align:center; margin-bottom:16px; }
+
+  .q-card{ background:var(--stage-2); border:1px solid var(--line); border-radius:16px; padding:32px 30px; }
+  .q-status-tag{ font-family:'IBM Plex Mono',monospace; font-size:10.5px; padding:4px 10px; border-radius:20px; display:inline-block; margin-bottom:14px; }
+  .q-text{ font-family:'Archivo',sans-serif; font-weight:700; font-size:21px; line-height:1.4; margin-bottom:22px; }
+  .opt-btn{ width:100%; text-align:left; padding:14px 16px; margin-bottom:10px; border-radius:10px; background:var(--stage-3); border:2px solid var(--line); color:var(--paper); font-size:14.5px; font-weight:600; cursor:pointer; }
+  .opt-btn .opt-letter{ font-family:'IBM Plex Mono',monospace; color:var(--gold-2); margin-right:8px; }
+  .opt-btn.correct-answer{ border-color:var(--ok); background:rgba(74,154,106,0.15); }
+  .opt-btn.wrong-answer{ border-color:var(--danger); background:rgba(214,69,69,0.15); }
+  .opt-btn:disabled{ cursor:default; }
+  .open-ans-row{ display:flex; gap:10px; }
+  .open-ans-row input{ flex:1; }
+  .feedback-box{ display:none; margin-top:16px; padding:14px 16px; border-radius:10px; font-size:14px; font-weight:600; }
+  .feedback-box.active{ display:block; }
+  .feedback-box.correct{ background:rgba(74,154,106,0.15); border:1px solid var(--ok); color:#8fdb9f; }
+  .feedback-box.wrong{ background:rgba(214,69,69,0.15); border:1px solid var(--danger); color:#ff9d9d; }
+  .next-btn-row{ margin-top:18px; display:none; }
+  .next-btn-row.active{ display:block; }
+
+  /* Session end */
+  #sessionEndScreen{ display:none; text-align:center; padding:50px 20px; }
+  #sessionEndScreen .big-icon{ font-size:50px; margin-bottom:14px; }
+  #sessionEndScreen h2{ font-family:'Archivo',sans-serif; font-size:24px; margin:0 0 20px; }
+  .end-stats{ display:flex; justify-content:center; gap:14px; margin-bottom:26px; flex-wrap:wrap; }
+  .end-stat{ background:var(--stage-2); border-radius:12px; padding:16px 20px; min-width:90px; }
+  .end-stat b{ display:block; font-family:'Archivo Black',sans-serif; font-size:26px; }
+  .end-stat span{ font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:rgba(243,239,228,0.5); }
+</style>
+</head>
+<body>
+
+<div class="wrap" id="homeScreen">
+  <div class="brand"><div class="brand-mark"></div><h1>Aqlli Takrorlash</h1></div>
+  <div class="sub">Xato qilgan savollaringizni tizim eslab qoladi va aynan ularni qayta-qayta mashq qildiradi</div>
+
+  <div class="card">
+    <h2>To'plamlaringiz</h2>
+    <div id="deckList"><div class="empty-note">Hali to'plam yo'q. Pastda birinchisini yarating.</div></div>
+  </div>
+
+  <div class="card">
+    <h2>Yangi to'plam yaratish</h2>
+    <label for="deckNameInput">To'plam nomi</label>
+    <input type="text" id="deckNameInput" placeholder="Masalan: Tarix — 3-bob atamalari">
+
+    <label for="deckFileInput">Fayldan yuklash (PDF, DOCX yoki TXT) — ixtiyoriy</label>
+    <input type="file" id="deckFileInput" accept=".pdf,.docx,.txt">
+    <div class="file-status" id="deckFileStatus"></div>
+
+    <div class="hint" style="text-align:center; margin:14px 0;">— yoki qo'lda joylashtiring —</div>
+
+    <label for="deckText">Savollar</label>
+    <textarea id="deckText" placeholder="Namunaga qarab yozing..."></textarea>
+    <div class="hint">Variantli (A/B/C/D + Javob) yoki oddiy (savol + Javob) format ishlaydi.</div>
+    <div class="example-box">1. O'zbekiston poytaxti qaysi shahar?
+A) Samarqand
+B) Buxoro
+C) Toshkent
+D) Andijon
+Javob: C
+
+2. Amir Temur qachon tug'ilgan?
+Javob: 1336-yilda</div>
+    <div class="parsed-preview" id="deckPreview"></div>
+    <div class="error-box" id="deckError"></div>
+    <button class="btn-primary" id="createDeckBtn">To'plam yaratish</button>
+  </div>
+</div>
+
+<div class="wrap" id="practiceScreen">
+  <div class="practice-topbar">
+    <span class="back-link" id="backLink">← To'plamlarga qaytish</span>
+    <span class="back-link" id="modeLabel"></span>
+  </div>
+  <div class="progress-line" id="progressLine"></div>
+
+  <div class="q-card">
+    <div class="q-status-tag" id="qStatusTag"></div>
+    <div class="q-text" id="qText"></div>
+    <div id="qOptions"></div>
+    <div class="feedback-box" id="feedbackBox"></div>
+    <div class="next-btn-row" id="nextBtnRow">
+      <button class="btn-primary" id="nextQBtn">Keyingi savol →</button>
+    </div>
+  </div>
+</div>
+
+<div class="wrap" id="sessionEndScreen">
+  <div class="big-icon">✅</div>
+  <h2>Mashq tugadi!</h2>
+  <div class="end-stats" id="endStats"></div>
+  <button class="btn-primary" id="practiceWeakBtn" style="max-width:320px;">🎯 Zaif va tasdiqlanmagan savollarni mashq qilish</button>
+  <button class="btn-secondary full" id="backToHomeBtn" style="max-width:320px; margin:10px auto 0;">To'plamlarga qaytish</button>
+</div>
+
+<script>
+// ================= Parsing =================
+function parseQA(rawText){
+  const blocks = rawText.split(/\n\s*\n+/).map(b => b.trim()).filter(Boolean);
+  const questions = [];
+  blocks.forEach((block) => {
+    const lines = block.split('\n').map(l => l.trim()).filter(Boolean);
+    if(lines.length === 0) return;
+    let questionLine = lines[0].replace(/^\d+[\.\)]\s*/, '').trim();
+    const options = [];
+    let answerRaw = null;
+    for(let i = 1; i < lines.length; i++){
+      const line = lines[i];
+      const optMatch = line.match(/^([A-Da-d])[\.\)]\s*(.+)$/);
+      const ansMatch = line.match(/^(javob|to'g'ri javob|togri javob|answer|javobi)\s*[:\-–]?\s*(.+)$/i);
+      if(ansMatch){ answerRaw = ansMatch[2].trim(); }
+      else if(optMatch){ options.push(optMatch[2].trim()); }
+    }
+    if(!questionLine) return;
+    if(options.length >= 2){
+      let correctIndex = -1;
+      if(answerRaw){
+        const letterMatch = answerRaw.match(/^([A-Da-d])\b/);
+        if(letterMatch){ correctIndex = letterMatch[1].toUpperCase().charCodeAt(0) - 65; }
+        else {
+          correctIndex = options.findIndex(o => o.toLowerCase() === answerRaw.toLowerCase());
+          if(correctIndex === -1) correctIndex = options.findIndex(o => o.toLowerCase().includes(answerRaw.toLowerCase()));
+        }
+      }
+      if(correctIndex === -1 || correctIndex >= options.length) correctIndex = 0;
+      questions.push({ type: 'mc', question: questionLine, options, correctIndex });
+    } else if(answerRaw){
+      questions.push({ type: 'open', question: questionLine, answer: answerRaw });
+    }
+  });
+  return questions;
+}
+
+function escapeHtml(str){ const d = document.createElement('div'); d.textContent = str; return d.innerHTML; }
+function uid(){ return 'q_' + Date.now() + '_' + Math.random().toString(36).slice(2,8); }
+
+// ================= File-based question input =================
+if(window.pdfjsLib){
+  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+}
+async function extractTextFromFile(file){
+  const ext = file.name.split('.').pop().toLowerCase();
+  if(ext === 'pdf'){
+    const arrayBuffer = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    let text = '';
+    for(let i=1; i<=pdf.numPages; i++){
+      const page = await pdf.getPage(i);
+      const content = await page.getTextContent();
+      text += content.items.map(it => it.str).join(' ') + '\n\n';
+    }
+    return text;
+  } else if(ext === 'docx'){
+    const arrayBuffer = await file.arrayBuffer();
+    const result = await mammoth.extractRawText({ arrayBuffer });
+    return result.value;
+  } else if(ext === 'txt'){
+    return await file.text();
+  } else {
+    throw new Error('Qo\'llab-quvvatlanmaydigan fayl turi: .' + ext);
+  }
+}
+document.getElementById('deckFileInput').addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  const statusEl = document.getElementById('deckFileStatus');
+  if(!file) return;
+  statusEl.className = 'file-status';
+  statusEl.textContent = 'Fayl o\'qilmoqda...';
+  try{
+    const text = await extractTextFromFile(file);
+    const cleaned = text.replace(/\s+\n/g,'\n').replace(/\n{3,}/g,'\n\n').trim();
+    if(cleaned.length < 10) throw new Error('Fayldan matn topilmadi.');
+    document.getElementById('deckText').value = cleaned;
+    document.getElementById('deckText').dispatchEvent(new Event('input'));
+    statusEl.className = 'file-status ok';
+    statusEl.textContent = '✓ ' + file.name + ' o\'qildi';
+  }catch(err){
+    statusEl.className = 'file-status err';
+    statusEl.textContent = '✗ ' + err.message;
+  }
+});
+
+// ================= Storage =================
+const STORAGE_KEY = 'aqlliTakrorlashDecks';
+function loadDecks(){
+  try{ return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }catch(e){ return {}; }
+}
+function saveDecks(decks){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(decks));
+}
+let decks = loadDecks();
+
+// ================= Classification =================
+function classifyQuestion(q){
+  const history = q.history || [];
+  if(history.length === 0) return 'new';
+  const window = history.slice(-3);
+  const wrongCount = window.filter(h => h === false).length;
+  if(wrongCount >= 1) return 'red';
+  // wrongCount === 0 — every recent attempt was correct
+  if(history.length >= 3) return 'green';
+  return 'yellow'; // correct so far, but not enough attempts yet to confirm mastery
+}
+function statusMeta(status){
+  return {
+    red: { label: '🔴 Zaif', pillClass:'red', tagBg:'rgba(214,69,69,0.18)', tagColor:'#ff9d9d' },
+    yellow: { label: "🟡 Tasdiqlanmoqda", pillClass:'yellow', tagBg:'rgba(212,167,44,0.18)', tagColor:'#f0d878' },
+    green: { label: '🟢 Mustahkam', pillClass:'green', tagBg:'rgba(74,154,106,0.18)', tagColor:'#8fdb9f' },
+    new: { label: '⚪ Yangi', pillClass:'gray', tagBg:'rgba(255,255,255,0.08)', tagColor:'rgba(243,239,228,0.6)' }
+  }[status];
+}
+
+// ================= Home screen: deck list =================
+function renderDeckList(){
+  const container = document.getElementById('deckList');
+  const names = Object.keys(decks);
+  if(names.length === 0){ container.innerHTML = '<div class="empty-note">Hali to\'plam yo\'q. Pastda birinchisini yarating.</div>'; return; }
+  container.innerHTML = names.map(name => {
+    const deck = decks[name];
+    const counts = { red:0, yellow:0, green:0, new:0 };
+    deck.questions.forEach(q => counts[classifyQuestion(q)]++);
+    return '<div class="deck-row">' +
+      '<div><div class="deck-name">' + escapeHtml(name) + '</div>' +
+      '<div class="deck-stats">' +
+        '<span class="pill red">' + counts.red + ' zaif</span>' +
+        '<span class="pill yellow">' + counts.yellow + ' tasdiqlanmoqda</span>' +
+        '<span class="pill green">' + counts.green + ' mustahkam</span>' +
+        '<span class="pill gray">' + counts.new + ' yangi</span>' +
+      '</div></div>' +
+      '<div class="deck-actions">' +
+        '<button class="btn-secondary" data-name="' + escapeHtml(name) + '" data-action="practice">Mashq qilish</button>' +
+        '<button class="btn-danger-outline" data-name="' + escapeHtml(name) + '" data-action="delete">✕</button>' +
+      '</div></div>';
+  }).join('');
+  container.querySelectorAll('[data-action="practice"]').forEach(b => {
+    b.addEventListener('click', () => startPractice(b.dataset.name, 'all'));
+  });
+  container.querySelectorAll('[data-action="delete"]').forEach(b => {
+    b.addEventListener('click', () => {
+      if(confirm('"' + b.dataset.name + '" to\'plamini o\'chirasizmi?')){
+        delete decks[b.dataset.name];
+        saveDecks(decks);
+        renderDeckList();
+      }
+    });
+  });
+}
+
+// ================= Create deck =================
+const deckTextEl = document.getElementById('deckText');
+deckTextEl.addEventListener('input', () => {
+  const qs = parseQA(deckTextEl.value.trim());
+  document.getElementById('deckPreview').textContent = qs.length ? qs.length + ' ta savol aniqlandi.' : '';
+});
+
+document.getElementById('createDeckBtn').addEventListener('click', () => {
+  const errEl = document.getElementById('deckError');
+  errEl.classList.remove('active');
+  const name = document.getElementById('deckNameInput').value.trim();
+  const text = deckTextEl.value.trim();
+  if(!name){ errEl.textContent = 'To\'plam nomini kiriting.'; errEl.classList.add('active'); return; }
+  if(decks[name]){ errEl.textContent = 'Shu nomli to\'plam allaqachon mavjud.'; errEl.classList.add('active'); return; }
+  const parsed = parseQA(text);
+  if(parsed.length === 0){ errEl.textContent = 'Hech qanday savol aniqlanmadi.'; errEl.classList.add('active'); return; }
+  const questions = parsed.map(q => Object.assign({ id: uid(), history: [] }, q));
+  decks[name] = { questions, createdAt: Date.now() };
+  saveDecks(decks);
+  document.getElementById('deckNameInput').value = '';
+  deckTextEl.value = '';
+  document.getElementById('deckPreview').textContent = '';
+  renderDeckList();
+});
+
+// ================= Practice session =================
+let session = null; // { deckName, pool: [questionRefs], idx, results: {correct, total}, mode }
+
+function startPractice(deckName, mode){
+  const deck = decks[deckName];
+  if(!deck) return;
+  let pool = deck.questions.slice();
+  if(mode === 'weak'){
+    pool = pool.filter(q => ['red','yellow'].includes(classifyQuestion(q)));
+  }
+  if(pool.length === 0){
+    alert(mode === 'weak' ? 'Zaif yoki tasdiqlanmagan savol qolmadi — barchasi mustahkam! 🎉' : 'Bu to\'plamda savol yo\'q.');
+    return;
+  }
+  shuffle(pool);
+  session = { deckName, pool, idx: 0, correctCount: 0, mode };
+  document.getElementById('homeScreen').style.display = 'none';
+  document.getElementById('sessionEndScreen').style.display = 'none';
+  document.getElementById('practiceScreen').style.display = 'block';
+  document.getElementById('modeLabel').textContent = mode === 'weak' ? 'Zaiflar mashqi' : 'To\'liq mashq';
+  renderQuestion();
+}
+function shuffle(arr){ for(let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; } return arr; }
+
+document.getElementById('backLink').addEventListener('click', goHome);
+function goHome(){
+  document.getElementById('practiceScreen').style.display = 'none';
+  document.getElementById('sessionEndScreen').style.display = 'none';
+  document.getElementById('homeScreen').style.display = 'block';
+  renderDeckList();
+}
+
+function renderQuestion(){
+  if(session.idx >= session.pool.length){ endSession(); return; }
+  const q = session.pool[session.idx];
+  document.getElementById('progressLine').textContent = 'Savol ' + (session.idx+1) + ' / ' + session.pool.length;
+
+  const meta = statusMeta(classifyQuestion(q));
+  const tag = document.getElementById('qStatusTag');
+  tag.textContent = meta.label;
+  tag.style.background = meta.tagBg; tag.style.color = meta.tagColor;
+
+  document.getElementById('qText').textContent = q.question;
+  const optsWrap = document.getElementById('qOptions');
+  optsWrap.innerHTML = '';
+  document.getElementById('feedbackBox').className = 'feedback-box';
+  document.getElementById('nextBtnRow').className = 'next-btn-row';
+
+  if(q.type === 'mc'){
+    // Shuffle option order on every render, so position can't be memorized
+    const idxArr = q.options.map((_, i) => i);
+    shuffle(idxArr);
+    const displayOptions = idxArr.map(i => q.options[i]);
+    const displayCorrectIndex = idxArr.indexOf(q.correctIndex);
+
+    displayOptions.forEach((opt, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'opt-btn';
+      btn.innerHTML = '<span class="opt-letter">' + String.fromCharCode(65+i) + ')</span>' + escapeHtml(opt);
+      btn.addEventListener('click', () => answerMC(q, i, displayCorrectIndex, optsWrap));
+      optsWrap.appendChild(btn);
+    });
+  } else {
+    const row = document.createElement('div');
+    row.className = 'open-ans-row';
+    const input = document.createElement('input');
+    input.type = 'text'; input.placeholder = 'Javobingiz...';
+    const btn = document.createElement('button');
+    btn.className = 'btn-primary'; btn.style.marginTop = '0'; btn.style.width='auto'; btn.textContent = 'Tekshirish';
+    btn.addEventListener('click', () => answerOpen(q, input.value, input, btn));
+    row.appendChild(input); row.appendChild(btn);
+    optsWrap.appendChild(row);
+  }
+}
+
+function recordResult(q, correct){
+  q.history = q.history || [];
+  q.history.push(correct);
+  if(q.history.length > 20) q.history = q.history.slice(-20);
+  if(correct) session.correctCount++;
+  saveDecks(decks);
+}
+
+function answerMC(q, chosenIndex, correctIndexForRender, optsWrap){
+  const buttons = Array.from(optsWrap.children);
+  buttons.forEach(b => b.disabled = true);
+  const correct = chosenIndex === correctIndexForRender;
+  buttons[correctIndexForRender].classList.add('correct-answer');
+  if(!correct) buttons[chosenIndex].classList.add('wrong-answer');
+  showFeedback(correct, null);
+  recordResult(q, correct);
+}
+function answerOpen(q, val, input, btn){
+  input.disabled = true; btn.disabled = true;
+  const v = val.trim().toLowerCase();
+  const correctAns = (q.answer||'').trim().toLowerCase();
+  const correct = v.length > 0 && (v === correctAns || v.includes(correctAns) || correctAns.includes(v));
+  showFeedback(correct, q.answer);
+  recordResult(q, correct);
+}
+function showFeedback(correct, correctAnswerText){
+  const box = document.getElementById('feedbackBox');
+  box.className = 'feedback-box active ' + (correct ? 'correct' : 'wrong');
+  box.textContent = correct ? '✓ To\'g\'ri!' : ('✗ Noto\'g\'ri.' + (correctAnswerText ? ' To\'g\'ri javob: ' + correctAnswerText : ''));
+  document.getElementById('nextBtnRow').className = 'next-btn-row active';
+}
+document.getElementById('nextQBtn').addEventListener('click', () => {
+  session.idx++;
+  renderQuestion();
+});
+
+function endSession(){
+  document.getElementById('practiceScreen').style.display = 'none';
+  document.getElementById('sessionEndScreen').style.display = 'block';
+  const deck = decks[session.deckName];
+  const counts = { red:0, yellow:0, green:0, new:0 };
+  deck.questions.forEach(q => counts[classifyQuestion(q)]++);
+  document.getElementById('endStats').innerHTML =
+    '<div class="end-stat"><b style="color:#ff9d9d;">' + counts.red + '</b><span>ZAIF</span></div>' +
+    '<div class="end-stat"><b style="color:#f0d878;">' + counts.yellow + '</b><span>TASDIQLANMOQDA</span></div>' +
+    '<div class="end-stat"><b style="color:#8fdb9f;">' + counts.green + '</b><span>MUSTAHKAM</span></div>';
+  document.getElementById('practiceWeakBtn').onclick = () => startPractice(session.deckName, 'weak');
+}
+document.getElementById('backToHomeBtn').addEventListener('click', goHome);
+
+renderDeckList();
+</script>
+</body>
+</html>
