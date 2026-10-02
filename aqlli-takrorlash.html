@@ -39,6 +39,15 @@
   .file-status.ok{ color:var(--ok); }
   .file-status.err{ color:var(--danger); }
 
+  #previewArea canvas, #previewArea img{
+    width:100%; border-radius:8px; display:block; margin-bottom:10px;
+    border:1px solid var(--line);
+  }
+  .preview-nav{ display:flex; gap:10px; align-items:center; margin-bottom:10px; font-family:'IBM Plex Mono',monospace; font-size:12px; }
+  .preview-nav button{ padding:8px 14px; background:var(--stage-3); border:1px solid var(--line); color:var(--paper); border-radius:7px; font-family:'Archivo',sans-serif; font-weight:700; font-size:12px; cursor:pointer; }
+  .preview-nav button:hover{ border-color:var(--gold); }
+  label.btn-secondary{ display:flex; align-items:center; justify-content:center; border:1px solid var(--gold); color:var(--gold-2); border-radius:9px; padding:11px 16px; font-size:12.5px; }
+
   button{ font-family:'Archivo',sans-serif; font-weight:700; cursor:pointer; border:none; border-radius:9px; }
   .btn-primary{ width:100%; padding:14px; background:linear-gradient(135deg,var(--gold-2),var(--gold)); color:var(--stage); font-size:14px; margin-top:16px; }
   .btn-secondary{ padding:11px 16px; background:transparent; border:1px solid var(--gold); color:var(--gold-2); font-size:12.5px; border-radius:9px; }
@@ -100,6 +109,18 @@
   <div class="card">
     <h2>To'plamlaringiz</h2>
     <div id="deckList"><div class="empty-note">Hali to'plam yo'q. Pastda birinchisini yarating.</div></div>
+    <div style="display:flex; gap:10px; margin-top:14px; flex-wrap:wrap;">
+      <button class="btn-secondary" id="exportAllBtn" style="flex:1;">⬇ Eksport (JSON)</button>
+      <label class="btn-secondary" id="importLabel" style="flex:1; text-align:center; cursor:pointer; margin-top:0;">⬆ Import (JSON)<input type="file" id="importInput" accept=".json" style="display:none;"></label>
+    </div>
+    <div class="hint">Eksport — barcha to'plamlaringizni JSON fayl sifatida yuklab oladi. Import — boshqa qurilmadan olingan JSON faylni yuklaydi (mavjud to'plamlar saqlanib qoladi).</div>
+  </div>
+
+  <div class="card">
+    <h2>📄 PDF/Rasm ko'rish (ixtiyoriy)</h2>
+    <div class="hint">Test savollari jadval yoki rasm ko'rinishida bo'lsa — PDF yoki rasmni shu yerda oching, ko'rib turib savol va javoblarni pastda qo'lda kiriting.</div>
+    <input type="file" id="previewFileInput" accept=".pdf,.png,.jpg,.jpeg,.webp">
+    <div id="previewArea" style="margin-top:12px;"></div>
   </div>
 
   <div class="card">
@@ -459,6 +480,84 @@ function endSession(){
   document.getElementById('practiceWeakBtn').onclick = () => startPractice(session.deckName, 'weak');
 }
 document.getElementById('backToHomeBtn').addEventListener('click', goHome);
+
+// ================= Export / Import =================
+document.getElementById('exportAllBtn').addEventListener('click', () => {
+  if(Object.keys(decks).length === 0){ alert('Eksport qilish uchun kamida bitta to\'plam kerak.'); return; }
+  const blob = new Blob([JSON.stringify(decks, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'aqlli-takrorlash-' + new Date().toISOString().slice(0,10) + '.json';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+});
+
+document.getElementById('importInput').addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try{
+      const parsed = JSON.parse(reader.result);
+      if(typeof parsed !== 'object' || Array.isArray(parsed)) throw new Error('Format noto\'g\'ri.');
+      let added = 0, skipped = 0;
+      Object.entries(parsed).forEach(([name, deck]) => {
+        if(!deck.questions || !Array.isArray(deck.questions)){ skipped++; return; }
+        if(decks[name]){
+          const existingIds = new Set(decks[name].questions.map(q => q.id));
+          deck.questions.forEach(q => { if(!existingIds.has(q.id)) decks[name].questions.push(q); });
+          skipped++;
+        } else { decks[name] = deck; added++; }
+      });
+      saveDecks(decks);
+      renderDeckList();
+      alert(added + ' ta yangi to\'plam qo\'shildi.' + (skipped > 0 ? ' ' + skipped + ' ta allaqachon mavjud edi.' : ''));
+    }catch(err){ alert('Fayl o\'qishda xato: ' + err.message); }
+    e.target.value = '';
+  };
+  reader.readAsText(file);
+});
+
+// ================= PDF / Image Preview =================
+let pdfDoc = null, pdfCurrPage = 1;
+document.getElementById('previewFileInput').addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if(!file) return;
+  const area = document.getElementById('previewArea');
+  const ext = file.name.split('.').pop().toLowerCase();
+  if(['png','jpg','jpeg','webp'].includes(ext)){
+    area.innerHTML = '<img src="' + URL.createObjectURL(file) + '" alt="Ko\'rinish">';
+    return;
+  }
+  if(ext === 'pdf' && window.pdfjsLib){
+    area.innerHTML = '<div class="file-status">PDF o\'qilmoqda...</div>';
+    try{
+      const ab = await file.arrayBuffer();
+      pdfDoc = await pdfjsLib.getDocument({ data: ab }).promise;
+      pdfCurrPage = 1;
+      await renderPdfPage();
+    }catch(err){ area.innerHTML = '<div class="file-status err">Xato: ' + err.message + '</div>'; }
+    return;
+  }
+  area.innerHTML = '<div class="file-status err">Faqat PDF, PNG, JPG qo\'llab-quvvatlanadi.</div>';
+});
+
+async function renderPdfPage(){
+  if(!pdfDoc) return;
+  const area = document.getElementById('previewArea');
+  const page = await pdfDoc.getPage(pdfCurrPage);
+  const viewport = page.getViewport({ scale: 1.8 });
+  const canvas = document.createElement('canvas');
+  canvas.width = viewport.width; canvas.height = viewport.height;
+  await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
+  const nav = pdfDoc.numPages > 1
+    ? '<div class="preview-nav"><button id="pdfPrev">← Oldingi</button><span>' + pdfCurrPage + ' / ' + pdfDoc.numPages + '</span><button id="pdfNext">Keyingi →</button></div>' : '';
+  area.innerHTML = nav;
+  area.appendChild(canvas);
+  if(pdfDoc.numPages > 1){
+    document.getElementById('pdfPrev').onclick = async () => { if(pdfCurrPage > 1){ pdfCurrPage--; await renderPdfPage(); } };
+    document.getElementById('pdfNext').onclick = async () => { if(pdfCurrPage < pdfDoc.numPages){ pdfCurrPage++; await renderPdfPage(); } };
+  }
+}
 
 renderDeckList();
 </script>
