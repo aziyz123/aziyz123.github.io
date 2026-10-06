@@ -3,6 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0F1116">
+<meta name="msapplication-TileColor" content="#0F1116">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="O'quv Vositalari">
+<link rel="apple-touch-icon" href="/icons/icon-192.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="/icons/icon-512.png">
 <title>O'quv Vositalari — Slayd, Test, Imtihon va Sinf O'yinlari | @byaziyz</title>
 <meta name="description" content="O'qituvchilar va o'quvchilar uchun bepul onlayn vositalar: matndan avtomatik slayd (PowerPoint) yaratish, sinf uchun QR-o'yin (Bilim Kechasi), jonli onlayn imtihon, fayl uzatish va dars jadvali. Ro'yxatdan o'tish shart emas.">
 <meta name="keywords" content="slayd yaratish, powerpoint yaratish, onlayn test, imtihon tuzish, sinf o'yini, dars jadvali, o'qituvchi uchun vositalar, bilim kechasi, QR test, bepul ta'lim vositalari">
@@ -40,7 +49,7 @@
 
   .grain{
     position:fixed; inset:0; pointer-events:none; z-index:5; opacity:0.05; mix-blend-mode:overlay;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-image: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\");
   }
 
   /* ============ TOP BAR ============ */
@@ -327,9 +336,10 @@
     <a class="tile small" href="yurishlar-xaritasi.html">
       <div class="preview">
         <svg viewBox="0 0 100 50" width="100%" height="50" fill="none">
-          <polygon points="20,35 35,15 55,20 60,38 30,45" fill="var(--gold-2)" fill-opacity="0.3" stroke="var(--gold-2)" stroke-width="1"/>
-          <circle cx="35" cy="15" r="3" fill="var(--danger)"/>
-          <circle cx="60" cy="38" r="3" fill="var(--t3)"/>
+          <polygon points="20,35 35,15 55,20 60,38 30,45" fill="var(--gold-2)" fill-opacity="0.3" stroke="var(--gold-2)" stroke-width="1.5"/>
+          <circle cx="35" cy="15" r="2.5" fill="var(--t1)"/>
+          <circle cx="55" cy="20" r="2.5" fill="var(--t1)"/>
+          <circle cx="60" cy="38" r="2.5" fill="var(--t1)"/>
         </svg>
       </div>
       <div class="body">
@@ -338,13 +348,12 @@
         <div class="arrow">Ochish →</div>
       </div>
     </a>
-    <a class="tile wide" href="aqlli-takrorlash.html">
-      <div class="preview">
-        <div class="mock-rank" style="width:100%;">
-          <div class="row" style="background:rgba(214,69,69,0.2);"><div class="dot" style="background:var(--danger); color:#fff;">🔴</div><div class="ln"></div></div>
-          <div class="row" style="background:rgba(212,167,44,0.2);"><div class="dot" style="background:#D4A72C; color:var(--stage);">🟡</div><div class="ln"></div></div>
-          <div class="row" style="background:rgba(74,154,106,0.2);"><div class="dot" style="background:var(--ok); color:#fff;">🟢</div><div class="ln"></div></div>
-        </div>
+
+    <a class="tile small" href="aqlli-takrorlash.html">
+      <div class="preview" style="justify-content:center; gap:8px;">
+        <div style="width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:rgba(178,58,107,0.2);"><div class="dot" style="background:var(--t3); color:#fff;">🔴</div></div>
+        <div style="width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:rgba(232,163,61,0.2);"><div class="dot" style="background:var(--t1); color:#fff;">🟡</div></div>
+        <div style="width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:rgba(74,154,106,0.2);"><div class="dot" style="background:var(--ok); color:#fff;">🟢</div></div>
       </div>
       <div class="body">
         <h3>Aqlli Takrorlash</h3>
@@ -402,5 +411,16 @@
     document.querySelectorAll('.fcard').forEach(c => { c.style.transform = 'rotate(' + c.dataset.rot + 'deg)'; });
   }
 </script>
+
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js')
+        .then(reg => console.log('Service Worker muvaffaqiyatli:', reg.scope))
+        .catch(err => console.log('Service Worker xatosi:', err));
+    });
+  }
+</script>
+
 </body>
 </html>
