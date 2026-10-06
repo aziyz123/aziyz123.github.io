@@ -4,8 +4,8 @@
   "description": "O'qituvchilar va o'quvchilar uchun bepul onlayn vositalar: slayd yaratish, sinf o'yini, onlayn imtihon, fayl uzatish va dars jadvali.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#291C0E",
-  "theme_color": "#291C0E",
+  "background_color": "#0F1116",
+  "theme_color": "#0F1116",
   "orientation": "portrait-primary",
   "lang": "uz",
   "icons": [
