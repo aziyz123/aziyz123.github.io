@@ -9,6 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Archivo+Black&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-storage-compat.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <style>
@@ -76,7 +77,7 @@
       <div class="face f1">FU</div><div class="face f2">FU</div><div class="face f3">FU</div>
       <div class="face f4">FU</div><div class="face f5">FU</div><div class="face f6">FU</div>
     </div></div>
-    <div><h1>Fayl Uzatish</h1><div class="sub">WebRTC · P2P · 9 MB limit yo'q</div></div>
+    <div><h1>Fayl Uzatish</h1><div class="sub">Har qanday internet · 50 MB gacha</div></div>
   </div>
   <div class="mode-tabs">
     <div class="mode-tab active" id="tabComputer" onclick="showMode('computer')">💻 Kompyuter</div>
@@ -91,8 +92,8 @@
           <div id="qrcodeBox"></div>
           <div><div class="room-code" id="roomCodeDisplay"></div><div class="hint">Telefon bilan shu QR kodni skanerlang</div></div>
         </div>
-        <div class="steps"><b>Qanday ishlaydi (WebRTC):</b><br>1. Telefonda shu sahifani oching → «Telefon»<br>2. QR skanerlang<br>3. Fayl tanlang — to'g'ridan-to'g'ri keladi (9 MB limit yo'q)</div>
-        <div class="status-line" id="statusLine">Ulanish kutilmoqda...</div>
+        <div class="steps"><b>Qanday ishlaydi:</b><br>1. Telefonda shu sahifani oching → «Telefon»<br>2. QR skanerlang<br>3. Fayl tanlang — internet orqali keladi (bir xil Wi‑Fi shart emas)</div>
+        <div class="status-line" id="statusLine">Fayl kutilmoqda...</div>
         <div class="progress-bar-bg" id="recvProgressBg"><div class="progress-bar-fill" id="recvProgressFill"></div></div>
         <div class="file-result" id="fileResult">
           <div class="file-name" id="fileName"></div>
@@ -132,9 +133,8 @@
   </div>
   <div class="card">
     <h2>Faylni tanlang</h2>
-    <div class="status-line" id="connStatus">Kompyuterga ulanilmoqda...</div>
-    <input type="file" id="fileInput" accept="image/*,.pdf,.pptx,.ppt,.doc,.docx,.xls,.xlsx,.zip,.txt,.mp4,.mp3" style="display:none; margin-top:14px;">
-    <div class="hint" id="sendHint" style="display:none;">Rasm, PDF, PPTX, video va boshqalar. <b style="color:var(--gold-2)">9 MB limit yo'q</b> — to'g'ridan-to'g'ri uzatiladi.</div>
+    <input type="file" id="fileInput" accept="image/*,.pdf,.pptx,.ppt,.doc,.docx,.xls,.xlsx,.zip,.txt,.mp4,.mp3">
+    <div class="hint">Rasm, PDF, PPTX, video va boshqalar. Maksimal: <b style="color:var(--gold-2)">50 MB</b>. Bir xil Wi‑Fi shart emas.</div>
     <div class="progress-bar-bg" id="progressBarBg"><div class="progress-bar-fill" id="progressBarFill"></div></div>
     <div class="status-line" id="sendStatus"></div>
   </div>
@@ -151,8 +151,6 @@
   <div class="viewer-toolbar"><span class="title" id="pptxViewerTitle">PowerPoint</span><div><button id="pptxCloseBtn">Yopish</button></div></div>
   <div class="viewer-body"><div class="viewer-hint"><p style="font-size:18px; margin-bottom:12px;">📄 PowerPoint fayli</p><p>Yuklab olib, PowerPoint yoki Google Slides da oching.</p><button class="primary" id="pptxDownloadBtn" style="max-width:280px; margin:24px auto 0; display:block;">Yuklab olish</button></div></div>
 </div>
-<script src="fayl-w1a.js"></script>
-<script src="fayl-w1b.js"></script>
-<script src="fayl-w2.js"></script>
+<script src="fayl-storage.js"></script>
 </body>
 </html>
