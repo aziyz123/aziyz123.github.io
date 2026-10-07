@@ -4,5 +4,193 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Aqlli Takrorlash</title>
-<!-- content truncated for tool call - will use alternative -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Archivo+Black&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<style>
+  :root{
+    --stage:#0F1116; --stage-2:#171B24; --stage-3:#1D232F;
+    --paper:#F3EFE4; --gold:#A9813F; --gold-2:#D4AF6A;
+    --danger:#D64545; --ok:#4A9A6A; --warn:#D4A72C; --new:#6B7684;
+    --line: rgba(243,239,228,0.12);
+  }
+  *{box-sizing:border-box;}
+  body{ margin:0; font-family:'Inter',sans-serif; color:var(--paper); background:var(--stage); }
+  .wrap{ max-width:760px; margin:0 auto; padding:40px 22px 60px; }
+  .brand{ display:flex; align-items:center; gap:12px; margin-bottom:8px; }
+  .brand-mark{ width:30px; height:30px; border-radius:8px; background:linear-gradient(135deg,var(--gold-2),var(--warn)); flex-shrink:0; }
+  h1{ font-family:'Archivo',sans-serif; font-weight:800; font-size:26px; margin:0; }
+  .sub{ font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--gold-2); margin:8px 0 26px; }
+
+  .card{ background:var(--stage-2); border:1px solid var(--line); border-radius:14px; padding:22px 24px; margin-bottom:18px; }
+  .card h2{ font-family:'Archivo',sans-serif; font-size:13px; font-weight:700; color:var(--gold-2); margin:0 0 14px; text-transform:uppercase; letter-spacing:0.03em; }
+  label{ display:block; font-size:12.5px; font-weight:600; margin-bottom:6px; margin-top:14px; }
+  label:first-of-type{ margin-top:0; }
+  textarea, input[type=text]{ width:100%; font-family:'Inter',sans-serif; font-size:14px; padding:11px 13px; border:1px solid var(--line); border-radius:8px; background:rgba(0,0,0,0.25); color:var(--paper); }
+  textarea{ min-height:180px; font-family:'IBM Plex Mono',monospace; font-size:13px; }
+  input:focus, textarea:focus{ outline:none; border-color:var(--gold); }
+  .hint{ font-size:11px; color:rgba(243,239,228,0.45); margin-top:6px; line-height:1.5; }
+  .example-box{ background:rgba(0,0,0,0.3); border:1px dashed var(--line); border-radius:8px; padding:12px 14px; font-family:'IBM Plex Mono',monospace; font-size:12px; line-height:1.6; white-space:pre-wrap; color:rgba(243,239,228,0.55); margin-top:8px; }
+  .parsed-preview{ margin-top:10px; font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--gold-2); }
+  .error-box{ display:none; margin-top:12px; padding:11px 13px; border-radius:8px; background:rgba(214,69,69,0.15); border:1px solid var(--danger); color:#ff9d9d; font-size:12.5px; }
+  .error-box.active{ display:block; }
+  .file-status{ font-family:'IBM Plex Mono',monospace; font-size:11px; margin-top:8px; }
+  .file-status.ok{ color:var(--ok); }
+  .file-status.err{ color:var(--danger); }
+
+  #previewArea canvas, #previewArea img{
+    width:100%; border-radius:8px; display:block; margin-bottom:10px;
+    border:1px solid var(--line);
+  }
+  .preview-nav{ display:flex; gap:10px; align-items:center; margin-bottom:10px; font-family:'IBM Plex Mono',monospace; font-size:12px; }
+  .preview-nav button{ padding:8px 14px; background:var(--stage-3); border:1px solid var(--line); color:var(--paper); border-radius:7px; font-family:'Archivo',sans-serif; font-weight:700; font-size:12px; cursor:pointer; }
+  .preview-nav button:hover{ border-color:var(--gold); }
+  label.btn-secondary{ display:flex; align-items:center; justify-content:center; border:1px solid var(--gold); color:var(--gold-2); border-radius:9px; padding:11px 16px; font-size:12.5px; }
+
+  button{ font-family:'Archivo',sans-serif; font-weight:700; cursor:pointer; border:none; border-radius:9px; }
+  .btn-primary{ width:100%; padding:14px; background:linear-gradient(135deg,var(--gold-2),var(--gold)); color:var(--stage); font-size:14px; margin-top:16px; }
+  .btn-secondary{ padding:11px 16px; background:transparent; border:1px solid var(--gold); color:var(--gold-2); font-size:12.5px; border-radius:9px; }
+  .btn-secondary.full{ width:100%; margin-top:10px; }
+  .btn-danger-outline{ padding:6px 10px; font-size:10.5px; background:transparent; border:1px solid var(--danger); color:var(--danger); border-radius:6px; }
+
+  /* Deck list */
+  .deck-row{ display:flex; justify-content:space-between; align-items:center; padding:14px 0; border-bottom:1px dashed var(--line); }
+  .deck-row:last-child{ border-bottom:none; }
+  .deck-name{ font-family:'Archivo',sans-serif; font-weight:700; font-size:15px; }
+  .deck-stats{ display:flex; gap:8px; margin-top:6px; font-family:'IBM Plex Mono',monospace; font-size:11px; }
+  .pill{ padding:2px 8px; border-radius:20px; }
+  .pill.red{ background:rgba(214,69,69,0.18); color:#ff9d9d; }
+  .pill.yellow{ background:rgba(212,167,44,0.18); color:#f0d878; }
+  .pill.green{ background:rgba(74,154,106,0.18); color:#8fdb9f; }
+  .pill.gray{ background:rgba(255,255,255,0.08); color:rgba(243,239,228,0.5); }
+  .deck-actions{ display:flex; gap:8px; align-items:center; }
+  .empty-note{ font-size:13px; color:rgba(243,239,228,0.4); font-style:italic; }
+
+  /* Practice screen */
+  #practiceScreen{ display:none; }
+  .practice-topbar{ display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
+  .practice-topbar .back-link{ font-family:'IBM Plex Mono',monospace; font-size:11px; color:rgba(243,239,228,0.45); cursor:pointer; text-decoration:underline; }
+  .progress-line{ font-family:'IBM Plex Mono',monospace; font-size:12px; color:rgba(243,239,228,0.5); text-align:center; margin-bottom:16px; }
+
+  .q-card{ background:var(--stage-2); border:1px solid var(--line); border-radius:16px; padding:32px 30px; }
+  .q-status-tag{ font-family:'IBM Plex Mono',monospace; font-size:10.5px; padding:4px 10px; border-radius:20px; display:inline-block; margin-bottom:14px; }
+  .q-text{ font-family:'Archivo',sans-serif; font-weight:700; font-size:21px; line-height:1.4; margin-bottom:22px; }
+  .opt-btn{ width:100%; text-align:left; padding:14px 16px; margin-bottom:10px; border-radius:10px; background:var(--stage-3); border:2px solid var(--line); color:var(--paper); font-size:14.5px; font-weight:600; cursor:pointer; }
+  .opt-btn .opt-letter{ font-family:'IBM Plex Mono',monospace; color:var(--gold-2); margin-right:8px; }
+  .opt-btn.correct-answer{ border-color:var(--ok); background:rgba(74,154,106,0.15); }
+  .opt-btn.wrong-answer{ border-color:var(--danger); background:rgba(214,69,69,0.15); }
+  .opt-btn:disabled{ cursor:default; }
+  .open-ans-row{ display:flex; gap:10px; }
+  .open-ans-row input{ flex:1; }
+  .feedback-box{ display:none; margin-top:16px; padding:14px 16px; border-radius:10px; font-size:14px; font-weight:600; }
+  .feedback-box.active{ display:block; }
+  .feedback-box.correct{ background:rgba(74,154,106,0.15); border:1px solid var(--ok); color:#8fdb9f; }
+  .feedback-box.wrong{ background:rgba(214,69,69,0.15); border:1px solid var(--danger); color:#ff9d9d; }
+  .next-btn-row{ margin-top:18px; display:none; }
+  .next-btn-row.active{ display:block; }
+
+  /* Session end */
+  #sessionEndScreen{ display:none; text-align:center; padding:50px 20px; }
+  #sessionEndScreen .big-icon{ font-size:50px; margin-bottom:14px; }
+  #sessionEndScreen h2{ font-family:'Archivo',sans-serif; font-size:24px; margin:0 0 20px; }
+  .end-stats{ display:flex; justify-content:center; gap:14px; margin-bottom:26px; flex-wrap:wrap; }
+  .end-stat{ background:var(--stage-2); border-radius:12px; padding:16px 20px; min-width:90px; }
+  .end-stat b{ display:block; font-family:'Archivo Black',sans-serif; font-size:26px; }
+  .end-stat span{ font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:rgba(243,239,228,0.5); }
+</style>
+</head>
+<body>
+
+<div class="wrap" id="homeScreen">
+  <div class="brand"><div class="brand-mark"></div><h1>Aqlli Takrorlash</h1></div>
+  <div class="sub">Xato qilgan savollaringizni tizim eslab qoladi va aynan ularni qayta-qayta mashq qildiradi</div>
+
+  <div class="card">
+    <h2>To'plamlaringiz</h2>
+    <div id="deckList"><div class="empty-note">Hali to'plam yo'q. Pastda birinchisini yarating.</div></div>
+    <div style="display:flex; gap:10px; margin-top:14px; flex-wrap:wrap;">
+      <button class="btn-secondary" id="exportAllBtn" style="flex:1;">⬇ Eksport (JSON)</button>
+      <label class="btn-secondary" id="importLabel" style="flex:1; text-align:center; cursor:pointer; margin-top:0;">⬆ Import (fayl)<input type="file" id="importInput" accept=".json" style="display:none;"></label>
+    </div>
+    <div class="hint">Eksport — barcha to'plamlaringizni JSON fayl sifatida yuklab oladi. Import (fayl) — boshqa qurilmadan olingan JSON faylni yuklaydi.</div>
+
+    <label for="jsonPasteInput" style="margin-top:18px;">JSON kod orqali kiritish</label>
+    <textarea id="jsonPasteInput" placeholder="JSON kodni shu yerga joylashtiring..." style="min-height:120px;"></textarea>
+    <div class="hint">
+      3 xil format qabul qilinadi:<br>
+      1) To'liq eksport: {"To'plam nomi": {"questions": [...]}}<br>
+      2) Bitta to'plam: {"name": "Nomi", "questions": [...]}<br>
+      3) Faqat savollar massivi (nomini pastdagi "To'plam nomi" maydonidan oladi)
+    </div>
+    <div class="error-box" id="jsonPasteError"></div>
+    <button class="btn-secondary full" id="jsonPasteBtn" style="margin-top:12px;">JSON dan yuklash</button>
+  </div>
+
+  <div class="card">
+    <h2>📄 PDF/Rasm ko'rish (ixtiyoriy)</h2>
+    <div class="hint">Test savollari jadval yoki rasm ko'rinishida bo'lsa — PDF yoki rasmni shu yerda oching, ko'rib turib savol va javoblarni pastda qo'lda kiriting.</div>
+    <input type="file" id="previewFileInput" accept=".pdf,.png,.jpg,.jpeg,.webp">
+    <div id="previewArea" style="margin-top:12px;"></div>
+  </div>
+
+  <div class="card">
+    <h2>Yangi to'plam yaratish</h2>
+    <label for="deckNameInput">To'plam nomi</label>
+    <input type="text" id="deckNameInput" placeholder="Masalan: Tarix — 3-bob atamalari">
+
+    <label for="deckFileInput">Fayldan yuklash (PDF, DOCX yoki TXT) — ixtiyoriy</label>
+    <input type="file" id="deckFileInput" accept=".pdf,.docx,.txt">
+    <div class="file-status" id="deckFileStatus"></div>
+
+    <div class="hint" style="text-align:center; margin:14px 0;">— yoki qo'lda joylashtiring —</div>
+
+    <label for="deckText">Savollar</label>
+    <textarea id="deckText" placeholder="Namunaga qarab yozing..."></textarea>
+    <div class="hint">Variantli (A/B/C/D + Javob) yoki oddiy (savol + Javob) format ishlaydi.</div>
+    <div class="example-box">1. O'zbekiston poytaxti qaysi shahar?
+A) Samarqand
+B) Buxoro
+C) Toshkent
+D) Andijon
+Javob: C
+
+2. Amir Temur qachon tug'ilgan?
+Javob: 1336-yilda</div>
+    <div class="parsed-preview" id="deckPreview"></div>
+    <div class="error-box" id="deckError"></div>
+    <button class="btn-primary" id="createDeckBtn">To'plam yaratish</button>
+  </div>
+</div>
+
+<div class="wrap" id="practiceScreen">
+  <div class="practice-topbar">
+    <span class="back-link" id="backLink">← To'plamlarga qaytish</span>
+    <span class="back-link" id="modeLabel"></span>
+  </div>
+  <div class="progress-line" id="progressLine"></div>
+
+  <div class="q-card">
+    <div class="q-status-tag" id="qStatusTag"></div>
+    <div class="q-text" id="qText"></div>
+    <div id="qOptions"></div>
+    <div class="feedback-box" id="feedbackBox"></div>
+    <div class="next-btn-row" id="nextBtnRow">
+      <button class="btn-primary" id="nextQBtn">Keyingi savol →</button>
+    </div>
+  </div>
+</div>
+
+<div class="wrap" id="sessionEndScreen">
+  <div class="big-icon">✅</div>
+  <h2>Mashq tugadi!</h2>
+  <div class="end-stats" id="endStats"></div>
+  <button class="btn-primary" id="practiceWeakBtn" style="max-width:320px;">🎯 Zaif va tasdiqlanmagan savollarni mashq qilish</button>
+  <button class="btn-secondary full" id="backToHomeBtn" style="max-width:320px; margin:10px auto 0;">To'plamlarga qaytish</button>
+</div>
+
+<script>
+/* FULL SCRIPT - see local file; truncated in this attempt due to size. Restoring original and applying via smaller files. */
+</script>
+</body>
 </html>
