@@ -42,14 +42,6 @@ function downloadFile(file) {
   a.href = file.data; a.download = file.name;
   document.body.appendChild(a); a.click(); document.body.removeChild(a);
 }
-function blobToDataURL(blob) {
-  return new Promise((resolve, reject) => {
-    const r = new FileReader();
-    r.onload = () => resolve(r.result);
-    r.onerror = reject;
-    r.readAsDataURL(blob);
-  });
-}
 function openImageViewer(file) {
   document.getElementById('imgViewerTitle').textContent = file.name;
   document.getElementById('imgViewerImg').src = file.data;
@@ -73,13 +65,13 @@ function openPptxViewer(file) {
   document.getElementById('pptxDownloadBtn').onclick = () => downloadFile(file);
   document.getElementById('pptxCloseBtn').onclick = () => document.getElementById('pptxViewer').classList.remove('active');
 }
-async function showReceivedFile(meta, blob) {
-  const dataUrl = await blobToDataURL(blob);
-  const val = { name: meta.name, type: meta.type, size: meta.size, data: dataUrl };
+function showReceivedFile(meta, blob) {
+  const url = URL.createObjectURL(blob);
+  const val = { name: meta.name, type: meta.type, size: meta.size, data: url };
   currentFile = val;
   const cat = getFileCategory(val.name, val.type);
   document.getElementById('statusLine').textContent = '✅ Fayl qabul qilindi!';
-  document.getElementById('statusLine').classList.add('ok');
+  document.getElementById('statusLine').className = 'status-line ok';
   document.getElementById('fileName').textContent = val.name;
   document.getElementById('fileMeta').textContent = formatSize(val.size);
   document.getElementById('fileResult').classList.add('active');
