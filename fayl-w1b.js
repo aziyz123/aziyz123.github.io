@@ -1,5 +1,5 @@
 async function startHost(room) {
-  const signalRef = getDb().ref('webrtc/' + room);
+  const signalRef = getDb().ref('rooms/' + room);
   await signalRef.remove();
   hostPc = new RTCPeerConnection(ICE_SERVERS);
   const hostChannel = hostPc.createDataChannel('file', { ordered: true });

@@ -1,6 +1,6 @@
 async function setupSend(room) {
   const statusEl = document.getElementById('connStatus');
-  const signalRef = getDb().ref('webrtc/' + room);
+  const signalRef = getDb().ref('rooms/' + room);
   const fileInput = document.getElementById('fileInput');
   statusEl.textContent = 'Kompyuterga ulanilmoqda...';
   statusEl.className = 'status-line';
