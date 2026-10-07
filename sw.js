@@ -1,6 +1,7 @@
-const CACHE_NAME = 'oquv-vositalari-v1';
+const CACHE_NAME = 'oquv-vositalari-v2';
 
-const ASSETS_TO_CACHE = [
+// Only files that actually exist in the repository.
+const CORE_ASSETS = [
   '/',
   '/index.html',
   '/slayd-yaratuvchi.html',
@@ -8,7 +9,6 @@ const ASSETS_TO_CACHE = [
   '/imtihon.html',
   '/fayl-uzatish.html',
   '/dars-jadvali.html',
-  '/yurishlar-xaritasi.html',
   '/aqlli-takrorlash.html',
   '/manifest.json',
   '/icons/icon-192.png',
@@ -18,56 +18,44 @@ const ASSETS_TO_CACHE = [
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then((cache) => {
-        console.log('Caching assets...');
-        return cache.addAll(ASSETS_TO_CACHE).catch(err => {
-          console.warn('Some assets failed to cache:', err);
-        });
-      })
+      // Add each file separately so one missing file cannot block the rest.
+      .then((cache) => Promise.all(CORE_ASSETS.map((url) => cache.add(url).catch(() => {}))))
       .then(() => self.skipWaiting())
   );
 });
 
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((keys) => {
-      return Promise.all(
-        keys.filter(key => key !== CACHE_NAME)
-            .map(key => caches.delete(key))
-      );
-    }).then(() => self.clients.claim())
+    caches.keys()
+      .then((keys) => Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k))))
+      .then(() => self.clients.claim())
   );
 });
 
+// Network-first: always try to fetch the latest version, fall back to cache when offline.
 self.addEventListener('fetch', (event) => {
-  if (event.request.method !== 'GET') return;
+  const req = event.request;
+  if (req.method !== 'GET') return;
+
+  const url = new URL(req.url);
+  if (url.origin !== self.location.origin) return; // leave Firebase, CDNs, fonts alone
 
   event.respondWith(
-    caches.match(event.request)
-      .then((cached) => {
-        if (cached) {
-          return cached;
+    fetch(req, { cache: 'no-cache' })
+      .then((res) => {
+        // Keep a copy for offline use (skip URLs with ?query such as ?exam=1234 to avoid cache bloat).
+        if (res && res.status === 200 && res.type === 'basic' && !url.search) {
+          const copy = res.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(req, copy));
         }
-
-        return fetch(event.request)
-          .then((response) => {
-            if (!response || response.status !== 200 || response.type !== 'basic') {
-              return response;
-            }
-
-            const responseToCache = response.clone();
-            caches.open(CACHE_NAME)
-              .then((cache) => {
-                cache.put(event.request, responseToCache);
-              });
-
-            return response;
-          })
-          .catch(() => {
-            if (event.request.mode === 'navigate') {
-              return caches.match('/');
-            }
-          });
+        return res;
       })
+      .catch(() =>
+        caches.match(req, { ignoreSearch: true }).then((hit) => {
+          if (hit) return hit;
+          if (req.mode === 'navigate') return caches.match('/');
+          return undefined;
+        })
+      )
   );
 });
