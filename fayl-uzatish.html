@@ -9,54 +9,109 @@
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Archivo+Black&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-storage-compat.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <style>
-  :root{ --stage:#12151C; --stage-2:#1B2029; --paper:#F3EFE4; --gold:#A9813F; --gold-2:#C9A45C; --danger:#D64545; --ok:#4A9A6A; --t1:#E8A33D; --t2:#2E8B8B; --t3:#B23A6B; --t4:#6B8F5C; }
-  *{box-sizing:border-box;} body{ margin:0; font-family:'Inter', sans-serif; color: var(--paper); background: radial-gradient(circle at 15% 10%, rgba(169,129,63,0.16) 0%, transparent 45%), radial-gradient(circle at 90% 25%, rgba(46,139,139,0.14) 0%, transparent 40%), var(--stage); min-height:100vh; }
+  :root{
+    --stage:#12151C; --stage-2:#1B2029;
+    --paper:#F3EFE4; --gold:#A9813F; --gold-2:#C9A45C;
+    --danger:#D64545; --ok:#4A9A6A;
+    --t1:#E8A33D; --t2:#2E8B8B; --t3:#B23A6B; --t4:#6B8F5C;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:'Inter', sans-serif; color: var(--paper);
+    background:
+      radial-gradient(circle at 15% 10%, rgba(169,129,63,0.16) 0%, transparent 45%),
+      radial-gradient(circle at 90% 25%, rgba(46,139,139,0.14) 0%, transparent 40%),
+      var(--stage);
+    min-height:100vh;
+  }
   .wrap{ max-width: 620px; margin:0 auto; padding: 48px 22px 60px; }
   .hero-row{ display:flex; align-items:center; gap:18px; margin-bottom: 8px; }
   .cube-logo{ width:52px; height:52px; perspective: 400px; flex-shrink:0; }
   .cube-logo .cube{ width:100%; height:100%; position:relative; transform-style:preserve-3d; animation: cubeSpin 9s linear infinite; }
   .cube-logo .face{ position:absolute; width:52px; height:52px; display:flex; align-items:center; justify-content:center; font-family:'Archivo Black', sans-serif; font-size:16px; color: var(--stage); border: 1px solid rgba(0,0,0,0.15); }
-  .cube-logo .f1{ transform: translateZ(26px); background: var(--gold-2); } .cube-logo .f2{ transform: rotateY(180deg) translateZ(26px); background: var(--t3); } .cube-logo .f3{ transform: rotateY(90deg) translateZ(26px); background: var(--t2); } .cube-logo .f4{ transform: rotateY(-90deg) translateZ(26px); background: var(--t1); } .cube-logo .f5{ transform: rotateX(90deg) translateZ(26px); background: var(--t4); } .cube-logo .f6{ transform: rotateX(-90deg) translateZ(26px); background: var(--gold); }
+  .cube-logo .f1{ transform: translateZ(26px); background: var(--gold-2); }
+  .cube-logo .f2{ transform: rotateY(180deg) translateZ(26px); background: var(--t3); }
+  .cube-logo .f3{ transform: rotateY(90deg) translateZ(26px); background: var(--t2); }
+  .cube-logo .f4{ transform: rotateY(-90deg) translateZ(26px); background: var(--t1); }
+  .cube-logo .f5{ transform: rotateX(90deg) translateZ(26px); background: var(--t4); }
+  .cube-logo .f6{ transform: rotateX(-90deg) translateZ(26px); background: var(--gold); }
   @keyframes cubeSpin{ from{ transform: rotateX(0deg) rotateY(0deg); } to{ transform: rotateX(360deg) rotateY(360deg); } }
   h1{ font-family:'Archivo', sans-serif; font-weight:800; font-size: 26px; margin:0; }
   .sub{ font-family:'IBM Plex Mono', monospace; font-size: 12px; color: var(--gold-2); margin-top:8px; }
-  .card{ background: linear-gradient(155deg, var(--stage-2) 0%, var(--stage) 100%); border: 1px solid rgba(255,255,255,0.07); border-radius: 14px; padding: 26px; margin-top: 24px; box-shadow: 0 1px 0 rgba(255,255,255,0.04) inset, 0 18px 40px -12px rgba(0,0,0,0.5); }
+  .card{
+    background: linear-gradient(155deg, var(--stage-2) 0%, var(--stage) 100%);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 14px; padding: 26px 26px; margin-top: 24px;
+    box-shadow: 0 1px 0 rgba(255,255,255,0.04) inset, 0 18px 40px -12px rgba(0,0,0,0.5);
+  }
   .card h2{ font-family:'Archivo', sans-serif; font-size: 14px; font-weight:700; color: var(--gold-2); margin:0 0 16px 0; }
-  button.primary{ width:100%; padding:16px; border:none; border-radius:10px; background: linear-gradient(135deg, var(--gold-2), var(--gold)); color: var(--stage); font-family:'Archivo', sans-serif; font-weight:800; font-size:15px; cursor:pointer; box-shadow: 0 14px 30px -8px rgba(169,129,63,0.5); }
-  button.secondary{ width:100%; padding:14px; border:1px solid rgba(201,164,92,0.4); border-radius:10px; background: transparent; color: var(--gold-2); font-family:'Archivo', sans-serif; font-weight:700; font-size:14px; cursor:pointer; margin-top:10px; }
-  button.ghost{ width:100%; padding:14px; border:1px dashed rgba(255,255,255,0.2); border-radius:10px; background: rgba(0,0,0,0.2); color: var(--paper); font-family:'Archivo', sans-serif; font-weight:600; font-size:14px; cursor:pointer; margin-top:10px; }
+  button.primary{
+    width:100%; padding:16px; border:none; border-radius:10px;
+    background: linear-gradient(135deg, var(--gold-2), var(--gold));
+    color: var(--stage); font-family:'Archivo', sans-serif; font-weight:800; font-size:15px; cursor:pointer;
+    box-shadow: 0 14px 30px -8px rgba(169,129,63,0.5);
+  }
+  button.primary:hover{ filter:brightness(1.05); }
+  button.secondary{
+    width:100%; padding:14px; border:1px solid rgba(201,164,92,0.4); border-radius:10px;
+    background: transparent; color: var(--gold-2);
+    font-family:'Archivo', sans-serif; font-weight:700; font-size:14px; cursor:pointer; margin-top:10px;
+  }
+  button.ghost{
+    width:100%; padding:14px; border:1px dashed rgba(255,255,255,0.2); border-radius:10px;
+    background: rgba(0,0,0,0.2); color: var(--paper);
+    font-family:'Archivo', sans-serif; font-weight:600; font-size:14px; cursor:pointer; margin-top:10px;
+  }
   .btn-row{ display:flex; flex-direction:column; gap:10px; margin-top:14px; }
   .qr-row{ display:flex; gap: 20px; align-items:center; flex-wrap:wrap; margin-top: 18px; }
   #qrcodeBox{ background:#fff; padding: 10px; border-radius: 8px; display:inline-block; line-height:0; }
   .room-code{ font-family:'Archivo Black', sans-serif; font-size: 26px; color: var(--gold-2); }
   .status-line{ font-family:'IBM Plex Mono', monospace; font-size: 13px; color: rgba(243,239,228,0.55); margin-top: 14px; }
-  .status-line.ok{ color: var(--ok); } .status-line.err{ color: #ff9d9d; }
-  input[type=file]{ width:100%; padding: 14px; border: 2px dashed rgba(255,255,255,0.2); border-radius:10px; background: rgba(0,0,0,0.25); color: var(--paper); font-size:13px; }
+  .status-line.ok{ color: var(--ok); }
+  .status-line.err{ color: #ff9d9d; }
+  input[type=file]{
+    width:100%; padding: 14px; border: 2px dashed rgba(255,255,255,0.2); border-radius:10px;
+    background: rgba(0,0,0,0.25); color: var(--paper); font-family:'Inter',sans-serif; font-size:13px;
+  }
   .hint{ font-size:12px; color: rgba(243,239,228,0.45); margin-top:10px; line-height:1.5; }
   .progress-bar-bg{ height:8px; border-radius:4px; background: rgba(255,255,255,0.1); margin-top:16px; overflow:hidden; display:none; }
   .progress-bar-bg.active{ display:block; }
-  .progress-bar-fill{ height:100%; width:0%; background: linear-gradient(90deg, var(--gold), var(--gold-2)); transition: width 0.15s ease; }
+  .progress-bar-fill{ height:100%; width:0%; background: linear-gradient(90deg, var(--gold), var(--gold-2)); transition: width 0.2s ease; }
   .file-result{ display:none; margin-top: 16px; padding: 16px; background: rgba(74,154,106,0.12); border:1px solid var(--ok); border-radius:8px; }
   .file-result.active{ display:block; }
   .file-name{ font-weight:700; font-size:14px; word-break: break-all; }
   .file-meta{ font-family:'IBM Plex Mono', monospace; font-size:11px; color: rgba(243,239,228,0.5); margin-top:4px; }
-  .file-type-badge{ display:inline-block; margin-top:8px; padding:4px 10px; border-radius:20px; font-size:11px; font-weight:600; background: rgba(201,164,92,0.2); color: var(--gold-2); }
-  .app-footer{ margin-top: 40px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.08); font-family:'IBM Plex Mono', monospace; font-size: 11px; color: rgba(243,239,228,0.4); display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px; }
+  .file-type-badge{
+    display:inline-block; margin-top:8px; padding:4px 10px; border-radius:20px;
+    font-size:11px; font-weight:600; background: rgba(201,164,92,0.2); color: var(--gold-2);
+  }
+  .app-footer{
+    margin-top: 40px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.08);
+    font-family:'IBM Plex Mono', monospace; font-size: 11px; color: rgba(243,239,228,0.4);
+    display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px;
+  }
   .app-footer a{ color: var(--gold-2); text-decoration:none; }
-  .steps{ font-size:12px; color:rgba(243,239,228,0.45); margin-top:12px; line-height:1.6; } .steps b{ color: var(--gold-2); }
-  .divider{ display:flex; align-items:center; gap:12px; margin: 20px 0 8px; font-size:11px; color: rgba(243,239,228,0.35); font-family:'IBM Plex Mono', monospace; }
+  .steps{ font-size:12px; color:rgba(243,239,228,0.45); margin-top:12px; line-height:1.6; }
+  .steps b{ color: var(--gold-2); }
+  .divider{
+    display:flex; align-items:center; gap:12px; margin: 20px 0 8px;
+    font-size:11px; color: rgba(243,239,228,0.35); font-family:'IBM Plex Mono', monospace;
+  }
   .divider::before, .divider::after{ content:''; flex:1; height:1px; background: rgba(255,255,255,0.08); }
-  #scannerBox{ display:none; margin-top:16px; border-radius:12px; overflow:hidden; background:#000; } #scannerBox.active{ display:block; } #qr-reader{ width:100%; }
-  .viewer-overlay{ display:none; position:fixed; inset:0; z-index:1000; background:#0a0a0c; flex-direction:column; } .viewer-overlay.active{ display:flex; }
+  #scannerBox{ display:none; margin-top:16px; border-radius:12px; overflow:hidden; background:#000; position:relative; }
+  #scannerBox.active{ display:block; }
+  #qr-reader{ width:100%; }
+  .viewer-overlay{ display:none; position:fixed; inset:0; z-index:1000; background:#0a0a0c; flex-direction:column; }
+  .viewer-overlay.active{ display:flex; }
   .viewer-toolbar{ display:flex; justify-content:space-between; align-items:center; padding:12px 16px; background:rgba(0,0,0,0.7); color:#fff; }
   .viewer-toolbar .title{ font-size:13px; font-weight:600; max-width:60%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .viewer-toolbar button{ background:rgba(255,255,255,0.12); border:none; color:#fff; padding:8px 14px; border-radius:8px; font-size:13px; cursor:pointer; }
   .viewer-body{ flex:1; display:flex; align-items:center; justify-content:center; overflow:auto; padding:12px; }
-  .viewer-body img{ max-width:100%; max-height:100%; object-fit:contain; } .viewer-body iframe{ width:100%; height:100%; border:none; background:#fff; }
+  .viewer-body img{ max-width:100%; max-height:100%; object-fit:contain; border-radius:4px; }
+  .viewer-body iframe{ width:100%; height:100%; border:none; background:#fff; }
   .viewer-hint{ text-align:center; color:rgba(255,255,255,0.5); font-size:13px; padding:20px; }
   .mode-tabs{ display:flex; gap:8px; margin-top:24px; }
   .mode-tab{ flex:1; padding:12px; text-align:center; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); font-family:'Archivo', sans-serif; font-weight:700; font-size:13px; color: rgba(243,239,228,0.6); cursor:pointer; }
@@ -64,18 +119,24 @@
 </style>
 </head>
 <body>
+
 <div id="homeScreen" class="wrap">
   <div class="hero-row">
     <div class="cube-logo"><div class="cube">
       <div class="face f1">FU</div><div class="face f2">FU</div><div class="face f3">FU</div>
       <div class="face f4">FU</div><div class="face f5">FU</div><div class="face f6">FU</div>
     </div></div>
-    <div><h1>Fayl Uzatish</h1><div class="sub">Telefondan kompyuter / aqlli doskaga · 50 MB gacha</div></div>
+    <div>
+      <h1>Fayl Uzatish</h1>
+      <div class="sub">Telefondan kompyuter / aqlli doskaga · 9 MB gacha</div>
+    </div>
   </div>
+
   <div class="mode-tabs">
     <div class="mode-tab active" id="tabComputer" onclick="showMode('computer')">💻 Kompyuter</div>
     <div class="mode-tab" id="tabPhone" onclick="showMode('phone')">📱 Telefon</div>
   </div>
+
   <div id="computerPanel">
     <div class="card">
       <h2>1 · Xona oching</h2>
@@ -83,9 +144,17 @@
       <div id="roomBox" style="display:none;">
         <div class="qr-row">
           <div id="qrcodeBox"></div>
-          <div><div class="room-code" id="roomCodeDisplay"></div><div class="hint">Telefon bilan shu QR kodni skanerlang</div></div>
+          <div>
+            <div class="room-code" id="roomCodeDisplay"></div>
+            <div class="hint">Telefon bilan shu QR kodni skanerlang</div>
+          </div>
         </div>
-        <div class="steps"><b>Qanday ishlaydi:</b><br>1. Telefonda shu sahifani oching → «Telefon» rejimini tanlang<br>2. «QR skanerlash» bosing va kompyuterdagi QR ni o‘qing<br>3. Fayl tanlang (50 MB gacha) — avtomatik keladi</div>
+        <div class="steps">
+          <b>Qanday ishlaydi:</b><br>
+          1. Telefonda shu sahifani oching → «Telefon» rejimini tanlang<br>
+          2. «QR skanerlash» bosing va kompyuterdagi QR ni o‘qing<br>
+          3. Fayl tanlang (9 MB gacha) — avtomatik keladi
+        </div>
         <div class="status-line" id="statusLine">Fayl kutilmoqda...</div>
         <div class="file-result" id="fileResult">
           <div class="file-name" id="fileName"></div>
@@ -96,6 +165,7 @@
       </div>
     </div>
   </div>
+
   <div id="phonePanel" style="display:none;">
     <div class="card">
       <h2>QR skanerlash</h2>
@@ -106,10 +176,12 @@
       <div class="status-line" id="scanStatus"></div>
       <div class="divider">yoki</div>
       <p class="hint" style="margin-top:0;">Xona kodini qo‘lda kiriting:</p>
-      <input type="text" id="manualCode" placeholder="Masalan: 4832" maxlength="6" style="width:100%; padding:14px; border-radius:10px; border:1px solid rgba(255,255,255,0.15); background:rgba(0,0,0,0.3); color:var(--paper); font-size:18px; letter-spacing:4px; text-align:center; font-family:'Archivo',sans-serif; margin-top:8px;">
+      <input type="text" id="manualCode" placeholder="Masalan: 4832" maxlength="6"
+        style="width:100%; padding:14px; border-radius:10px; border:1px solid rgba(255,255,255,0.15); background:rgba(0,0,0,0.3); color:var(--paper); font-size:18px; letter-spacing:4px; text-align:center; font-family:'Archivo',sans-serif; margin-top:8px;">
       <button class="ghost" id="manualJoinBtn" style="margin-top:12px;">Xonaga kirish</button>
     </div>
   </div>
+
   <div class="app-footer">
     <span>Ushbu ilova <a href="https://t.me/byaziyz" target="_blank" rel="noopener">@byaziyz</a> tomonidan yaratilgan</span>
     <span><a href="/">← Bosh sahifa</a></span>
@@ -122,28 +194,55 @@
       <div class="face f1">FU</div><div class="face f2">FU</div><div class="face f3">FU</div>
       <div class="face f4">FU</div><div class="face f5">FU</div><div class="face f6">FU</div>
     </div></div>
-    <div><h1>Fayl yuborish</h1><div class="sub" id="sendRoomLabel">Xona: ----</div></div>
+    <div>
+      <h1>Fayl yuborish</h1>
+      <div class="sub" id="sendRoomLabel">Xona: ----</div>
+    </div>
   </div>
   <div class="card">
     <h2>Faylni tanlang</h2>
-    <input type="file" id="fileInput" accept="*/*">
-    <div class="hint">Rasm, PDF, PPTX yoki boshqa fayl. Maksimal: <b style="color:var(--gold-2)">50 MB</b></div>
+    <input type="file" id="fileInput" accept="image/*,.pdf,.pptx,.ppt,.doc,.docx,.xls,.xlsx,.zip,.txt">
+    <div class="hint">Rasm, PDF, PPTX yoki boshqa fayl. Maksimal: <b style="color:var(--gold-2)">9 MB</b></div>
     <div class="progress-bar-bg" id="progressBarBg"><div class="progress-bar-fill" id="progressBarFill"></div></div>
     <div class="status-line" id="sendStatus"></div>
   </div>
 </div>
 
 <div class="viewer-overlay" id="imageViewer">
-  <div class="viewer-toolbar"><span class="title" id="imgViewerTitle">Rasm</span><div><button id="imgDownloadBtn">Yuklab olish</button><button id="imgCloseBtn" style="margin-left:8px;">Yopish</button></div></div>
+  <div class="viewer-toolbar">
+    <span class="title" id="imgViewerTitle">Rasm</span>
+    <div>
+      <button id="imgDownloadBtn">Yuklab olish</button>
+      <button id="imgCloseBtn" style="margin-left:8px;">Yopish</button>
+    </div>
+  </div>
   <div class="viewer-body"><img id="imgViewerImg" src="" alt="Rasm"></div>
 </div>
+
 <div class="viewer-overlay" id="pdfViewer">
-  <div class="viewer-toolbar"><span class="title" id="pdfViewerTitle">PDF</span><div><button id="pdfDownloadBtn">Yuklab olish</button><button id="pdfCloseBtn" style="margin-left:8px;">Yopish</button></div></div>
+  <div class="viewer-toolbar">
+    <span class="title" id="pdfViewerTitle">PDF</span>
+    <div>
+      <button id="pdfDownloadBtn">Yuklab olish</button>
+      <button id="pdfCloseBtn" style="margin-left:8px;">Yopish</button>
+    </div>
+  </div>
   <div class="viewer-body" style="padding:0;"><iframe id="pdfViewerFrame" src=""></iframe></div>
 </div>
+
 <div class="viewer-overlay" id="pptxViewer">
-  <div class="viewer-toolbar"><span class="title" id="pptxViewerTitle">PowerPoint</span><div><button id="pptxCloseBtn">Yopish</button></div></div>
-  <div class="viewer-body"><div class="viewer-hint"><p style="font-size:18px; margin-bottom:12px;">📄 PowerPoint fayli</p><p>Brauzer PPTX faylini to‘liq ocha olmaydi.</p><p style="margin-top:16px;">Yuklab olib, PowerPoint yoki Google Slides da oching.</p><button class="primary" id="pptxDownloadBtn" style="max-width:280px; margin:24px auto 0; display:block;">Yuklab olish</button></div></div>
+  <div class="viewer-toolbar">
+    <span class="title" id="pptxViewerTitle">PowerPoint</span>
+    <div><button id="pptxCloseBtn">Yopish</button></div>
+  </div>
+  <div class="viewer-body">
+    <div class="viewer-hint">
+      <p style="font-size:18px; margin-bottom:12px;">📄 PowerPoint fayli</p>
+      <p>Brauzer PPTX faylini to‘liq ocha olmaydi.</p>
+      <p style="margin-top:16px;">Yuklab olib, PowerPoint yoki Google Slides da oching.</p>
+      <button class="primary" id="pptxDownloadBtn" style="max-width:280px; margin:24px auto 0; display:block;">Yuklab olish</button>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -156,20 +255,19 @@ const firebaseConfig = {
   messagingSenderId: "363556171064",
   appId: "1:363556171064:web:e21be98e50dff4d031e5cd"
 };
-let fbApp = null, fbDb = null, fbStorage = null;
-function initFirebase() {
-  if (!fbApp) {
-    fbApp = firebase.initializeApp(firebaseConfig);
-    fbDb = firebase.database();
-    fbStorage = firebase.storage();
-  }
-  return { db: fbDb, storage: fbStorage };
+let fbDb = null;
+function getDb(){
+  if(!fbDb){ firebase.initializeApp(firebaseConfig); fbDb = firebase.database(); }
+  return fbDb;
 }
-const MAX_BYTES = 50 * 1024 * 1024;
 function generateRoomCode(){ return String(Math.floor(1000 + Math.random() * 9000)); }
+
 let html5QrCode = null;
+let currentFile = null;
+
 function getFileCategory(name, mime) {
-  const lower = (name || '').toLowerCase(); const m = (mime || '').toLowerCase();
+  const lower = (name || '').toLowerCase();
+  const m = (mime || '').toLowerCase();
   if (m.startsWith('image/') || /\.(jpe?g|png|gif|webp|bmp|svg)$/i.test(lower)) return 'image';
   if (m === 'application/pdf' || lower.endsWith('.pdf')) return 'pdf';
   if (m.includes('presentation') || m.includes('powerpoint') || /\.(pptx?|ppsx?)$/i.test(lower)) return 'pptx';
@@ -180,25 +278,30 @@ function formatSize(bytes) {
   if (bytes < 1024*1024) return (bytes/1024).toFixed(0) + ' KB';
   return (bytes/1024/1024).toFixed(1) + ' MB';
 }
-function fileUrl(file) { return file.url || file.data || ''; }
 function downloadFile(file) {
   const a = document.createElement('a');
-  a.href = fileUrl(file); a.download = file.name; a.target = '_blank'; a.rel = 'noopener';
-  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  a.href = file.data;
+  a.download = file.name;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
 }
 function openImageViewer(file) {
   document.getElementById('imgViewerTitle').textContent = file.name;
-  document.getElementById('imgViewerImg').src = fileUrl(file);
+  document.getElementById('imgViewerImg').src = file.data;
   document.getElementById('imageViewer').classList.add('active');
   document.getElementById('imgDownloadBtn').onclick = () => downloadFile(file);
   document.getElementById('imgCloseBtn').onclick = () => document.getElementById('imageViewer').classList.remove('active');
 }
 function openPdfViewer(file) {
   document.getElementById('pdfViewerTitle').textContent = file.name;
-  document.getElementById('pdfViewerFrame').src = fileUrl(file);
+  document.getElementById('pdfViewerFrame').src = file.data;
   document.getElementById('pdfViewer').classList.add('active');
   document.getElementById('pdfDownloadBtn').onclick = () => downloadFile(file);
-  document.getElementById('pdfCloseBtn').onclick = () => { document.getElementById('pdfViewer').classList.remove('active'); document.getElementById('pdfViewerFrame').src = ''; };
+  document.getElementById('pdfCloseBtn').onclick = () => {
+    document.getElementById('pdfViewer').classList.remove('active');
+    document.getElementById('pdfViewerFrame').src = '';
+  };
 }
 function openPptxViewer(file) {
   document.getElementById('pptxViewerTitle').textContent = file.name;
@@ -207,19 +310,30 @@ function openPptxViewer(file) {
   document.getElementById('pptxCloseBtn').onclick = () => document.getElementById('pptxViewer').classList.remove('active');
 }
 function showReceivedFile(val) {
+  currentFile = val;
   const cat = getFileCategory(val.name, val.type);
   document.getElementById('statusLine').textContent = '✅ Fayl qabul qilindi!';
   document.getElementById('statusLine').classList.add('ok');
   document.getElementById('fileName').textContent = val.name;
-  document.getElementById('fileMeta').textContent = formatSize(val.size || 0);
+  document.getElementById('fileMeta').textContent = formatSize(val.size);
   document.getElementById('fileResult').classList.add('active');
+  const badge = document.getElementById('fileTypeBadge');
   const labels = { image: '🖼 Rasm', pdf: '📄 PDF', pptx: '📊 PowerPoint', other: '📁 Fayl' };
-  document.getElementById('fileTypeBadge').textContent = labels[cat] || labels.other;
-  const actions = document.getElementById('actionButtons'); actions.innerHTML = '';
-  if (cat === 'image') { const b = document.createElement('button'); b.className = 'primary'; b.textContent = 'To‘liq ekranda ochish'; b.onclick = () => openImageViewer(val); actions.appendChild(b); }
-  else if (cat === 'pdf') { const b = document.createElement('button'); b.className = 'primary'; b.textContent = 'PDF ni ochish'; b.onclick = () => openPdfViewer(val); actions.appendChild(b); }
-  else if (cat === 'pptx') { const b = document.createElement('button'); b.className = 'primary'; b.textContent = 'PowerPoint haqida'; b.onclick = () => openPptxViewer(val); actions.appendChild(b); }
-  const dl = document.createElement('button'); dl.className = 'secondary'; dl.textContent = 'Yuklab olish'; dl.onclick = () => downloadFile(val); actions.appendChild(dl);
+  badge.textContent = labels[cat] || labels.other;
+  const actions = document.getElementById('actionButtons');
+  actions.innerHTML = '';
+  if (cat === 'image') {
+    const btn = document.createElement('button'); btn.className = 'primary';
+    btn.textContent = 'To‘liq ekranda ochish'; btn.onclick = () => openImageViewer(val); actions.appendChild(btn);
+  } else if (cat === 'pdf') {
+    const btn = document.createElement('button'); btn.className = 'primary';
+    btn.textContent = 'PDF ni ochish'; btn.onclick = () => openPdfViewer(val); actions.appendChild(btn);
+  } else if (cat === 'pptx') {
+    const btn = document.createElement('button'); btn.className = 'primary';
+    btn.textContent = 'PowerPoint haqida'; btn.onclick = () => openPptxViewer(val); actions.appendChild(btn);
+  }
+  const dl = document.createElement('button'); dl.className = 'secondary';
+  dl.textContent = 'Yuklab olish'; dl.onclick = () => downloadFile(val); actions.appendChild(dl);
 }
 function showMode(mode) {
   document.getElementById('tabComputer').classList.toggle('active', mode === 'computer');
@@ -240,51 +354,48 @@ function setupSend(room) {
   const newInput = input.cloneNode(true);
   input.parentNode.replaceChild(newInput, input);
   newInput.addEventListener('change', (e) => {
-    const file = e.target.files[0]; if (!file) return;
+    const file = e.target.files[0];
+    if (!file) return;
     const statusEl = document.getElementById('sendStatus');
-    const barBg = document.getElementById('progressBarBg');
-    const barFill = document.getElementById('progressBarFill');
-    if (file.size > MAX_BYTES) {
-      statusEl.textContent = '✗ Fayl juda katta (' + formatSize(file.size) + '). Maksimal 50 MB.';
-      statusEl.className = 'status-line err'; return;
+    const maxBytes = 9 * 1024 * 1024;
+    if (file.size > maxBytes) {
+      statusEl.textContent = '✗ Fayl juda katta (' + (file.size/1024/1024).toFixed(1) + ' MB). 9 MB dan kichik tanlang.';
+      statusEl.className = 'status-line err';
+      return;
     }
-    statusEl.textContent = 'Yuklanmoqda... 0%'; statusEl.className = 'status-line';
-    barBg.classList.add('active'); barFill.style.width = '0%';
-    const { db, storage } = initFirebase();
-    const safeName = file.name.replace(/[^\w.\-()+ ]/g, '_');
-    const path = 'rooms/' + room + '/' + Date.now() + '_' + safeName;
-    const ref = storage.ref(path);
-    const task = ref.put(file, { contentType: file.type || 'application/octet-stream' });
-    task.on('state_changed',
-      (snap) => {
-        const pct = Math.round((snap.bytesTransferred / snap.totalBytes) * 100);
-        barFill.style.width = pct + '%'; statusEl.textContent = 'Yuklanmoqda... ' + pct + '%';
-      },
-      (err) => {
-        statusEl.textContent = '✗ Yuklash xatosi: ' + (err.message || err.code || 'noma\'lum');
-        statusEl.className = 'status-line err'; barBg.classList.remove('active');
-      },
-      () => {
-        task.snapshot.ref.getDownloadURL().then((url) => {
-          return db.ref('rooms/' + room + '/file').set({
-            name: file.name, type: file.type || 'application/octet-stream',
-            size: file.size, url: url, sentAt: Date.now()
-          });
-        }).then(() => {
-          barFill.style.width = '100%';
-          statusEl.textContent = '✅ Yuborildi! Kompyuter / doskada ko‘ring.';
-          statusEl.classList.add('ok');
-        }).catch((err) => {
-          statusEl.textContent = '✗ Xato: ' + (err.message || err);
-          statusEl.className = 'status-line err';
-        });
-      }
-    );
+    statusEl.textContent = 'Yuklanmoqda...';
+    statusEl.className = 'status-line';
+    document.getElementById('progressBarBg').classList.add('active');
+    document.getElementById('progressBarFill').style.width = '30%';
+    const reader = new FileReader();
+    reader.onload = () => {
+      document.getElementById('progressBarFill').style.width = '70%';
+      getDb().ref('rooms/' + room + '/file').set({
+        name: file.name,
+        type: file.type || 'application/octet-stream',
+        size: file.size,
+        data: reader.result,
+        sentAt: Date.now()
+      }).then(() => {
+        document.getElementById('progressBarFill').style.width = '100%';
+        statusEl.textContent = '✅ Yuborildi! Kompyuter / doskada ko‘ring.';
+        statusEl.classList.add('ok');
+      }).catch(err => {
+        statusEl.textContent = '✗ Xato: ' + err.message;
+        statusEl.className = 'status-line err';
+      });
+    };
+    reader.readAsDataURL(file);
   });
 }
 function extractRoomFromUrl(text) {
-  try { const u = new URL(text); const send = u.searchParams.get('send'); if (send && /^\d{4,6}$/.test(send)) return send; } catch(e) {}
-  if (/^\d{4,6}$/.test(text.trim())) return text.trim(); return null;
+  try {
+    const u = new URL(text);
+    const send = u.searchParams.get('send');
+    if (send && /^\d{4,6}$/.test(send)) return send;
+  } catch(e) {}
+  if (/^\d{4,6}$/.test(text.trim())) return text.trim();
+  return null;
 }
 async function startScanner() {
   const status = document.getElementById('scanStatus');
@@ -294,14 +405,25 @@ async function startScanner() {
   document.getElementById('stopScanBtn').style.display = 'block';
   html5QrCode = new Html5Qrcode('qr-reader');
   try {
-    await html5QrCode.start({ facingMode: 'environment' }, { fps: 10, qrbox: { width: 250, height: 250 } },
+    await html5QrCode.start(
+      { facingMode: 'environment' },
+      { fps: 10, qrbox: { width: 250, height: 250 } },
       (decodedText) => {
         const room = extractRoomFromUrl(decodedText);
-        if (room) { status.textContent = '✅ Topildi! Xona: ' + room; status.classList.add('ok'); stopScanner().then(() => goToSend(room)); }
-        else { status.textContent = 'Bu QR Fayl Uzatish uchun emas.'; status.className = 'status-line err'; }
-      }, () => {});
+        if (room) {
+          status.textContent = '✅ Topildi! Xona: ' + room;
+          status.classList.add('ok');
+          stopScanner().then(() => goToSend(room));
+        } else {
+          status.textContent = 'Bu QR Fayl Uzatish uchun emas.';
+          status.className = 'status-line err';
+        }
+      },
+      () => {}
+    );
   } catch (err) {
-    status.textContent = 'Kamera ochilmadi: ' + (err.message || err); status.className = 'status-line err';
+    status.textContent = 'Kamera ochilmadi: ' + (err.message || err);
+    status.className = 'status-line err';
     document.getElementById('scannerBox').classList.remove('active');
     document.getElementById('startScanBtn').style.display = 'block';
     document.getElementById('stopScanBtn').style.display = 'none';
@@ -309,7 +431,11 @@ async function startScanner() {
 }
 async function stopScanner() {
   if (html5QrCode) {
-    try { const state = html5QrCode.getState && html5QrCode.getState(); if (state === 2) await html5QrCode.stop(); html5QrCode.clear(); } catch (e) {}
+    try {
+      const state = html5QrCode.getState && html5QrCode.getState();
+      if (state === 2) await html5QrCode.stop();
+      html5QrCode.clear();
+    } catch (e) {}
     html5QrCode = null;
   }
   document.getElementById('scannerBox').classList.remove('active');
@@ -321,18 +447,26 @@ document.getElementById('stopScanBtn').addEventListener('click', stopScanner);
 document.getElementById('manualJoinBtn').addEventListener('click', () => {
   const code = document.getElementById('manualCode').value.trim();
   if (/^\d{4,6}$/.test(code)) goToSend(code);
-  else { document.getElementById('scanStatus').textContent = '4–6 xonali kod kiriting'; document.getElementById('scanStatus').className = 'status-line err'; }
+  else {
+    document.getElementById('scanStatus').textContent = '4–6 xonali kod kiriting';
+    document.getElementById('scanStatus').className = 'status-line err';
+  }
 });
 document.getElementById('openRoomBtn').addEventListener('click', () => {
   const room = generateRoomCode();
   const sendUrl = location.origin + location.pathname + '?send=' + room;
   document.getElementById('roomCodeDisplay').textContent = room;
   document.getElementById('qrcodeBox').innerHTML = '';
-  new QRCode(document.getElementById('qrcodeBox'), { text: sendUrl, width: 140, height: 140, colorDark: '#12151C', colorLight: '#ffffff' });
+  new QRCode(document.getElementById('qrcodeBox'), {
+    text: sendUrl, width: 140, height: 140, colorDark: '#12151C', colorLight: '#ffffff'
+  });
   document.getElementById('roomBox').style.display = 'block';
   document.getElementById('openRoomBtn').style.display = 'none';
-  const { db } = initFirebase();
-  db.ref('rooms/' + room + '/file').on('value', (snapshot) => { const val = snapshot.val(); if (!val) return; showReceivedFile(val); });
+  getDb().ref('rooms/' + room + '/file').on('value', (snapshot) => {
+    const val = snapshot.val();
+    if (!val) return;
+    showReceivedFile(val);
+  });
 });
 const urlParams = new URLSearchParams(location.search);
 const sendRoom = urlParams.get('send');
