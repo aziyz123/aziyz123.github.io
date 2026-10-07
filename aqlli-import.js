@@ -153,3 +153,5 @@ document.getElementById('previewFileInput').addEventListener('change', async (e)
     document.getElementById('pdfNext').onclick = async () => { if(pdfCurrPage < pdfDoc.numPages){ pdfCurrPage++; await renderPdfPage(); } };
   }
 });
+
+renderDeckList();
