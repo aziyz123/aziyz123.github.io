@@ -4,29 +4,25 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Bilim Kechasi</title>
-<style>
-  html,body{margin:0;height:100%;background:#12151C;color:#F3EFE4;font-family:system-ui,sans-serif}
-  #msg{padding:48px 24px;text-align:center}
-  a{color:#C9A45C}
-</style>
+<style>html,body{margin:0;height:100%;overflow:hidden;background:#12151C}</style>
 </head>
 <body>
-<div id="msg">Yuklanmoqda...</div>
+<iframe id="app" style="border:0;width:100%;height:100%" title="Bilim Kechasi"></iframe>
 <script>
 (async function () {
-  var msg = document.getElementById('msg');
+  var frame = document.getElementById('app');
   try {
     var url = 'https://cdn.jsdelivr.net/gh/aziyz123/aziyz123.github.io@9b1abdba2c4f4f427f37cbc2c64d9f723665798d/sinf-musobaqasi.html';
     var html = await fetch(url + '?t=' + Date.now()).then(function (r) {
-      if (!r.ok) throw new Error('Yuklash xatosi: ' + r.status);
+      if (!r.ok) throw new Error('Yuklash: ' + r.status);
       return r.text();
     });
 
-    // Bonus: +yarim o'rniga +2x to'liq ball
-    var done = false;
+    // Syurpriz bonus: 2x to'liq ball
+    var once = false;
     html = html.replace(/team\.score \+= session\.halfPoints;/g, function (m) {
-      if (done) return m;
-      done = true;
+      if (once) return m;
+      once = true;
       return 'const bonusPts = session.correctPoints * 2; team.score += bonusPts;';
     });
     html = html.replace(
@@ -35,12 +31,11 @@
     );
 
     var blob = new Blob([html], { type: 'text/html;charset=utf-8' });
-    var blobUrl = URL.createObjectURL(blob);
-    location.replace(blobUrl);
+    frame.src = URL.createObjectURL(blob);
   } catch (e) {
-    msg.innerHTML =
-      '<p>Xato: ' + (e.message || e) + '</p>' +
-      '<p><a href="https://cdn.jsdelivr.net/gh/aziyz123/aziyz123.github.io@9b1abdba2c4f4f427f37cbc2c64d9f723665798d/sinf-musobaqasi.html">Eski versiyani ochish</a></p>';
+    frame.srcdoc = '<p style="font-family:sans-serif;padding:40px;color:#c00">Xato: ' +
+      (e.message || e) +
+      '</p><p style="padding:0 40px"><a href="https://cdn.jsdelivr.net/gh/aziyz123/aziyz123.github.io@9b1abdba2c4f4f427f37cbc2c64d9f723665798d/sinf-musobaqasi.html">Eski versiya</a></p>';
   }
 })();
 </script>
