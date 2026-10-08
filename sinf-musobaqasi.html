@@ -1,20 +1,67 @@
 <!DOCTYPE html>
-<html lang="uz"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Bilim Kechasi</title></head>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bilim Kechasi</title>
+</head>
 <body>
 <script>
-(async function(){
+(async function () {
   try {
-    const parts = await Promise.all([0,1,2].map(i => fetch('sinf-b64-'+i+'.txt').then(r=>{ if(!r.ok) throw new Error('qism '+i); return r.text(); })));
-    const b64 = parts.join('');
-    const bin = atob(b64);
-    const bytes = new Uint8Array(bin.length);
-    for (let i=0;i<bin.length;i++) bytes[i]=bin.charCodeAt(i);
-    const html = new TextDecoder('utf-8').decode(bytes);
-    document.open(); document.write(html); document.close();
-  } catch(e) {
-    document.body.innerHTML='<p style="font-family:sans-serif;padding:40px;color:#c00">Xato: '+e.message+'</p>';
+    const url = 'https://cdn.jsdelivr.net/gh/aziyz123/aziyz123.github.io@9b1abdba2c4f4f427f37cbc2c64d9f723665798d/sinf-musobaqasi.html';
+    let html = await fetch(url).then(function (r) {
+      if (!r.ok) throw new Error('Yuklash: ' + r.status);
+      return r.text();
+    });
+
+    // Bonus: yarim ball o'rniga 2x to'liq ball
+    var oldBlock =
+      "if(type === 'bonus'){\n" +
+      "    icon='🎁'; title='Bonus ball!'; desc = escapeHtml(team.name) + ' jamoasiga +' + session.halfPoints + ' ball qo\\'shildi.';\n" +
+      "    team.score += session.halfPoints;";
+
+    var newBlock =
+      "if(type === 'bonus'){\n" +
+      "    const bonusPts = session.correctPoints * 2;\n" +
+      "    icon='🎁'; title='Bonus ball!'; desc = escapeHtml(team.name) + ' jamoasiga +' + bonusPts + ' ball qo\\'shildi.';\n" +
+      "    team.score += bonusPts;";
+
+    if (html.indexOf("team.score += session.halfPoints") === -1) {
+      // fallback simpler replace
+      html = html.replace(
+        /team\.score \+= session\.halfPoints;/,
+        'const bonusPts = session.correctPoints * 2; team.score += bonusPts;'
+      );
+      html = html.replace(
+        /jamoasiga \+' \+ session\.halfPoints \+ ' ball/,
+        "jamoasiga +' + (session.correctPoints * 2) + ' ball"
+      );
+    } else {
+      // Only replace first occurrence in bonus block context
+      var once = true;
+      html = html.replace(/team\.score \+= session\.halfPoints;/g, function (m) {
+        if (once) { once = false; return 'const bonusPts = session.correctPoints * 2; team.score += bonusPts;'; }
+        return m; // leave penalty/steal halfPoints alone if any other uses
+      });
+      // Fix the desc line for bonus (first halfPoints in desc after bonus)
+      html = html.replace(
+        "jamoasiga +' + session.halfPoints + ' ball qo\\'shildi.",
+        "jamoasiga +' + bonusPts + ' ball qo\\'shildi."
+      );
+    }
+
+    document.open();
+    document.write(html);
+    document.close();
+  } catch (e) {
+    document.body.innerHTML =
+      '<p style="font-family:sans-serif;padding:40px;color:#c00">Xato: ' +
+      (e && e.message ? e.message : e) +
+      '</p><p style="font-family:sans-serif;padding:0 40px"><a href="https://cdn.jsdelivr.net/gh/aziyz123/aziyz123.github.io@9b1abdba2c4f4f427f37cbc2c64d9f723665798d/sinf-musobaqasi.html">Eski versiyani ochish</a></p>';
   }
 })();
 </script>
 <p style="font-family:sans-serif;padding:40px;color:#888">Yuklanmoqda...</p>
-</body></html>
+</body>
+</html>
