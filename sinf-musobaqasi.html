@@ -4,64 +4,45 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Bilim Kechasi</title>
+<style>html,body{margin:0;height:100%;overflow:hidden;background:#12151C}#msg{font-family:sans-serif;color:#888;padding:40px}</style>
 </head>
 <body>
+<p id="msg">Yuklanmoqda...</p>
 <script>
 (async function () {
+  var msg = document.getElementById('msg');
   try {
-    const url = 'https://cdn.jsdelivr.net/gh/aziyz123/aziyz123.github.io@9b1abdba2c4f4f427f37cbc2c64d9f723665798d/sinf-musobaqasi.html';
-    let html = await fetch(url).then(function (r) {
-      if (!r.ok) throw new Error('Yuklash: ' + r.status);
+    var url = 'https://cdn.jsdelivr.net/gh/aziyz123/aziyz123.github.io@9b1abdba2c4f4f427f37cbc2c64d9f723665798d/sinf-musobaqasi.html';
+    var html = await fetch(url).then(function (r) {
+      if (!r.ok) throw new Error('Yuklash xatosi: ' + r.status);
       return r.text();
     });
 
-    // Bonus: yarim ball o'rniga 2x to'liq ball
-    var oldBlock =
-      "if(type === 'bonus'){\n" +
-      "    icon='🎁'; title='Bonus ball!'; desc = escapeHtml(team.name) + ' jamoasiga +' + session.halfPoints + ' ball qo\\'shildi.';\n" +
-      "    team.score += session.halfPoints;";
+    // 1) Bonus ballni 2x qilish (faqat birinchi team.score += session.halfPoints)
+    var replaced = false;
+    html = html.replace(/team\.score \+= session\.halfPoints;/g, function (m) {
+      if (!replaced) {
+        replaced = true;
+        return 'const bonusPts = session.correctPoints * 2; team.score += bonusPts;';
+      }
+      return m;
+    });
 
-    var newBlock =
-      "if(type === 'bonus'){\n" +
-      "    const bonusPts = session.correctPoints * 2;\n" +
-      "    icon='🎁'; title='Bonus ball!'; desc = escapeHtml(team.name) + ' jamoasiga +' + bonusPts + ' ball qo\\'shildi.';\n" +
-      "    team.score += bonusPts;";
+    // 2) Matnda ham 2x ko'rinsin
+    html = html.replace(
+      "jamoasiga +' + session.halfPoints + ' ball",
+      "jamoasiga +' + bonusPts + ' ball"
+    );
 
-    if (html.indexOf("team.score += session.halfPoints") === -1) {
-      // fallback simpler replace
-      html = html.replace(
-        /team\.score \+= session\.halfPoints;/,
-        'const bonusPts = session.correctPoints * 2; team.score += bonusPts;'
-      );
-      html = html.replace(
-        /jamoasiga \+' \+ session\.halfPoints \+ ' ball/,
-        "jamoasiga +' + (session.correctPoints * 2) + ' ball"
-      );
-    } else {
-      // Only replace first occurrence in bonus block context
-      var once = true;
-      html = html.replace(/team\.score \+= session\.halfPoints;/g, function (m) {
-        if (once) { once = false; return 'const bonusPts = session.correctPoints * 2; team.score += bonusPts;'; }
-        return m; // leave penalty/steal halfPoints alone if any other uses
-      });
-      // Fix the desc line for bonus (first halfPoints in desc after bonus)
-      html = html.replace(
-        "jamoasiga +' + session.halfPoints + ' ball qo\\'shildi.",
-        "jamoasiga +' + bonusPts + ' ball qo\\'shildi."
-      );
-    }
-
+    // To'liq sahifani ochish
     document.open();
     document.write(html);
     document.close();
   } catch (e) {
-    document.body.innerHTML =
-      '<p style="font-family:sans-serif;padding:40px;color:#c00">Xato: ' +
-      (e && e.message ? e.message : e) +
-      '</p><p style="font-family:sans-serif;padding:0 40px"><a href="https://cdn.jsdelivr.net/gh/aziyz123/aziyz123.github.io@9b1abdba2c4f4f427f37cbc2c64d9f723665798d/sinf-musobaqasi.html">Eski versiyani ochish</a></p>';
+    msg.innerHTML = 'Xato: ' + (e.message || e) +
+      '<br><br><a style="color:#C9A45C" href="https://cdn.jsdelivr.net/gh/aziyz123/aziyz123.github.io@9b1abdba2c4f4f427f37cbc2c64d9f723665798d/sinf-musobaqasi.html">Eski versiyani ochish</a>';
   }
 })();
 </script>
-<p style="font-family:sans-serif;padding:40px;color:#888">Yuklanmoqda...</p>
 </body>
 </html>
