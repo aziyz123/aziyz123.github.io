@@ -4,43 +4,43 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Bilim Kechasi</title>
-<style>html,body{margin:0;height:100%;overflow:hidden;background:#12151C}#msg{font-family:sans-serif;color:#888;padding:40px}</style>
+<style>
+  html,body{margin:0;height:100%;background:#12151C;color:#F3EFE4;font-family:system-ui,sans-serif}
+  #msg{padding:48px 24px;text-align:center}
+  a{color:#C9A45C}
+</style>
 </head>
 <body>
-<p id="msg">Yuklanmoqda...</p>
+<div id="msg">Yuklanmoqda...</div>
 <script>
 (async function () {
   var msg = document.getElementById('msg');
   try {
     var url = 'https://cdn.jsdelivr.net/gh/aziyz123/aziyz123.github.io@9b1abdba2c4f4f427f37cbc2c64d9f723665798d/sinf-musobaqasi.html';
-    var html = await fetch(url).then(function (r) {
+    var html = await fetch(url + '?t=' + Date.now()).then(function (r) {
       if (!r.ok) throw new Error('Yuklash xatosi: ' + r.status);
       return r.text();
     });
 
-    // 1) Bonus ballni 2x qilish (faqat birinchi team.score += session.halfPoints)
-    var replaced = false;
+    // Bonus: +yarim o'rniga +2x to'liq ball
+    var done = false;
     html = html.replace(/team\.score \+= session\.halfPoints;/g, function (m) {
-      if (!replaced) {
-        replaced = true;
-        return 'const bonusPts = session.correctPoints * 2; team.score += bonusPts;';
-      }
-      return m;
+      if (done) return m;
+      done = true;
+      return 'const bonusPts = session.correctPoints * 2; team.score += bonusPts;';
     });
-
-    // 2) Matnda ham 2x ko'rinsin
     html = html.replace(
       "jamoasiga +' + session.halfPoints + ' ball",
       "jamoasiga +' + bonusPts + ' ball"
     );
 
-    // To'liq sahifani ochish
-    document.open();
-    document.write(html);
-    document.close();
+    var blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+    var blobUrl = URL.createObjectURL(blob);
+    location.replace(blobUrl);
   } catch (e) {
-    msg.innerHTML = 'Xato: ' + (e.message || e) +
-      '<br><br><a style="color:#C9A45C" href="https://cdn.jsdelivr.net/gh/aziyz123/aziyz123.github.io@9b1abdba2c4f4f427f37cbc2c64d9f723665798d/sinf-musobaqasi.html">Eski versiyani ochish</a>';
+    msg.innerHTML =
+      '<p>Xato: ' + (e.message || e) + '</p>' +
+      '<p><a href="https://cdn.jsdelivr.net/gh/aziyz123/aziyz123.github.io@9b1abdba2c4f4f427f37cbc2c64d9f723665798d/sinf-musobaqasi.html">Eski versiyani ochish</a></p>';
   }
 })();
 </script>
