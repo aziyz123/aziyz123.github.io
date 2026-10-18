@@ -4,9 +4,69 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Slayd Yaratuvchi</title>
-<style>html,body{margin:0;height:100%;overflow:hidden;background:#F3EFE4}</style>
+<style>
+html,body{margin:0;height:100%;background:#F3EFE4;font-family:system-ui,sans-serif}
+#msg{padding:48px 24px;text-align:center;color:#888}
+#msg a{color:#A9813F}
+</style>
 </head>
 <body>
-<iframe src="https://cdn.jsdelivr.net/gh/aziyz123/aziyz123.github.io@0395ca05c456f81b9e24c79793bb50b6f87121a3/slayd-yaratuvchi.html" style="border:0;width:100%;height:100%" title="Slayd Yaratuvchi"></iframe>
+<div id="msg">Yuklanmoqda...</div>
+<script>
+(async function () {
+  var msg = document.getElementById('msg');
+  try {
+    var url = 'https://cdn.jsdelivr.net/gh/aziyz123/aziyz123.github.io@0395ca05c456f81b9e24c79793bb50b6f87121a3/slayd-yaratuvchi.html';
+    var html = await fetch(url + '?t=' + Date.now()).then(function (r) {
+      if (!r.ok) throw new Error('Yuklash: ' + r.status);
+      return r.text();
+    });
+
+    html = html.replace(
+      '.edit-slide-item.removed{ opacity:0.35; }',
+      '.edit-slide-item.removed{ opacity:0.35; }\n' +
+      '  .esi-actions{display:flex;gap:6px;align-items:center;flex-wrap:wrap}\n' +
+      '  .esi-actions button{border:1px solid var(--line);background:var(--paper-2);color:var(--ink);' +
+      "font-family:'IBM Plex Mono',monospace;font-size:11px;cursor:pointer;padding:4px 8px}\n" +
+      '  .esi-actions button:hover{border-color:var(--gold);color:var(--gold)}\n' +
+      '  .esi-actions button.esi-remove{border-color:var(--danger);color:var(--danger)}\n' +
+      '  .esi-actions button.esi-remove:hover{background:var(--danger);color:var(--paper)}\n' +
+      '  #addSlideBtn{width:100%;margin:4px 0 14px;padding:12px;border:1px dashed var(--gold);' +
+      'background:transparent;color:var(--gold);' +
+      "font-family:'Zilla Slab',serif;font-weight:700;font-size:13px;cursor:pointer}\n" +
+      '  #addSlideBtn:hover{background:rgba(169,129,63,0.1)}'
+    );
+
+    html = html.replace(
+      '<option value="umumiy">Umumiy — ko\'k/moviy standart</option>\n    </select>',
+      '<option value="umumiy">Umumiy — ko\'k/moviy standart</option>\n' +
+      '      <option value="zamonaviy">Zamonaviy — qorong\'u fon, oltin aksent</option>\n    </select>'
+    );
+
+    html = html.replace(
+      "umumiy: {\n    label: 'Umumiy',\n    bg: 'F4F4F2', ink: '222222', accent: '3D5A80', accent2: '98C1D9',\n    headFont: 'Arial', bodyFont: 'Arial'\n  }\n};",
+      "umumiy: {\n    label: 'Umumiy',\n    bg: 'F4F4F2', ink: '222222', accent: '3D5A80', accent2: '98C1D9',\n    headFont: 'Arial', bodyFont: 'Arial'\n  },\n" +
+      "  zamonaviy: {\n    label: 'Zamonaviy',\n    bg: '12151C', ink: 'F3EFE4', accent: 'C9A45C', accent2: 'A9813F',\n    headFont: 'Arial', bodyFont: 'Arial'\n  }\n};"
+    );
+
+    html = html.replace(
+      '<div class="hint" style="margin-bottom:16px;">Har bir slayd sarlavhasi va matnini kerak bo\'lsa o\'zgartiring, keraksizini o\'chiring. Tayyor bo\'lgach, pastdagi tugmani bosing.</div>\n      <div id="editSlideList"></div>\n      <button class="primary" id="confirmBuildBtn" style="margin-top:8px;">PPTX faylini yaratish</button>',
+      '<div class="hint" style="margin-bottom:16px;">Sarlavha va matnni o\'zgartiring, rasm qo\'shing, tartibini ↑↓ bilan o\'zgartiring yoki yangi slayd qo\'shing.</div>\n      <div id="editSlideList"></div>\n      <button type="button" id="addSlideBtn">+ Yangi slayd qo\'shish</button>\n      <button class="primary" id="confirmBuildBtn" style="margin-top:8px;">PPTX faylini yaratish</button>'
+    );
+
+    var enhanceCode = "(function () {\n  function renumberEditSlides() {\n    var items = Array.from(document.querySelectorAll('#editSlideList .edit-slide-item'));\n    items.forEach(function (item, idx) {\n      item.dataset.index = idx;\n      var num = item.querySelector('.esi-num');\n      if (num) num.textContent = idx === 0 ? 'Sarlavha slaydi' : ('Slayd ' + (idx + 1));\n    });\n  }\n\n  function wireEditItem(item) {\n    if (item._wiredMove) return;\n    item._wiredMove = true;\n    var head = item.querySelector('.esi-head');\n    var removeBtn = item.querySelector('.esi-remove');\n    if (!head || !removeBtn || item.querySelector('.esi-up')) return;\n    var actions = document.createElement('div');\n    actions.className = 'esi-actions';\n    var up = document.createElement('button');\n    up.type = 'button';\n    up.className = 'esi-up';\n    up.textContent = '↑';\n    up.title = 'Yuqoriga';\n    var down = document.createElement('button');\n    down.type = 'button';\n    down.className = 'esi-down';\n    down.textContent = '↓';\n    down.title = 'Pastga';\n    up.onclick = function () {\n      var p = item.previousElementSibling;\n      if (p) {\n        item.parentNode.insertBefore(item, p);\n        renumberEditSlides();\n      }\n    };\n    down.onclick = function () {\n      var n = item.nextElementSibling;\n      if (n) {\n        item.parentNode.insertBefore(n, item);\n        renumberEditSlides();\n      }\n    };\n    removeBtn.parentNode.insertBefore(actions, removeBtn);\n    actions.appendChild(up);\n    actions.appendChild(down);\n    actions.appendChild(removeBtn);\n  }\n\n  function wireAddBtn() {\n    var btn = document.getElementById('addSlideBtn');\n    if (!btn || btn._wired) return;\n    btn._wired = true;\n    btn.onclick = function () {\n      var list = document.getElementById('editSlideList');\n      if (!list || typeof window.renderEditPanel !== 'function') return;\n      var cur = [];\n      Array.from(list.querySelectorAll('.edit-slide-item')).forEach(function (it) {\n        if (it.dataset.removed === '1') return;\n        cur.push({\n          title: (it.querySelector('.esi-title') || {}).value || '',\n          bullets: [(it.querySelector('.esi-body') || {}).value || ''],\n          image: it._imageData || null\n        });\n      });\n      cur.push({ title: '', bullets: [''] });\n      window.renderEditPanel(cur);\n      var last = list.querySelector('.edit-slide-item:last-child');\n      if (last) {\n        last.scrollIntoView({ behavior: 'smooth', block: 'nearest' });\n        var t = last.querySelector('.esi-title');\n        if (t) t.focus();\n      }\n    };\n  }\n\n  var _re = window.renderEditPanel;\n  if (typeof _re === 'function') {\n    window.renderEditPanel = function (slides) {\n      _re(slides);\n      Array.from(document.querySelectorAll('#editSlideList .edit-slide-item')).forEach(wireEditItem);\n      wireAddBtn();\n    };\n  }\n\n  var obs = new MutationObserver(function () {\n    wireAddBtn();\n    Array.from(document.querySelectorAll('#editSlideList .edit-slide-item')).forEach(wireEditItem);\n  });\n  obs.observe(document.documentElement, { childList: true, subtree: true });\n  wireAddBtn();\n})();\n";
+    var enhanceTag = '\n<script>\n' + enhanceCode + '\n</scr' + 'ipt>\n';
+    html = html.replace('</body>', enhanceTag + '</body>');
+
+    var blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+    location.replace(URL.createObjectURL(blob));
+  } catch (e) {
+    msg.innerHTML =
+      'Xato: ' +
+      (e.message || e) +
+      '<br><br><a href="https://cdn.jsdelivr.net/gh/aziyz123/aziyz123.github.io@0395ca05c456f81b9e24c79793bb50b6f87121a3/slayd-yaratuvchi.html">Eski versiyani ochish</a>';
+  }
+})();
+</script>
 </body>
 </html>
