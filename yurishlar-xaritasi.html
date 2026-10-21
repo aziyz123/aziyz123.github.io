@@ -11,122 +11,81 @@
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM Sans',system-ui,sans-serif;overflow:hidden}
 button{font-family:inherit}
-.topbar{height:58px;display:flex;align-items:center;gap:12px;padding:0 12px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,#101928,#0a101c);position:relative;z-index:30}
-.logo{display:flex;align-items:center;gap:10px;min-width:0}
-.logo-mark{width:36px;height:36px;border-radius:10px;border:1px solid #8a6a2e;background:radial-gradient(circle at 30% 30%,#3a2a12,#1a1408);display:grid;place-items:center;font-size:16px;flex:none}
-.logo h1{font-family:'Cinzel',serif;font-size:12px;letter-spacing:.1em;line-height:1.2;color:var(--gold2)}
-.logo small{display:block;font-size:9px;color:var(--muted);font-weight:400;margin-top:1px}
+.topbar{height:56px;display:flex;align-items:center;gap:10px;padding:0 12px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,#101928,#0a101c);z-index:40;position:relative}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit;min-width:0}
+.logo-mark{width:34px;height:34px;border-radius:9px;border:1px solid #8a6a2e;flex:none;background:radial-gradient(circle at 30% 30%,#3a2a12,#1a1408);display:grid;place-items:center;font-size:15px}
+.logo h1{font-family:'Cinzel',serif;font-size:11px;letter-spacing:.1em;line-height:1.2;color:var(--gold2)}
+.logo small{display:block;font-size:8px;color:var(--muted);font-weight:400;margin-top:1px}
 .timeline{flex:1;display:flex;align-items:center;justify-content:center;gap:2px;overflow-x:auto}
-.tl-item{border:none;background:transparent;color:var(--muted);padding:5px 10px;border-radius:999px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:1px;flex:none}
-.tl-item .yr{font-size:12px;font-weight:700}.tl-item .lb{font-size:8px;text-transform:uppercase;opacity:.7}
-.tl-item.active{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#0a0e17;box-shadow:0 0 16px #d4a84b55}
+.tl-item{border:none;background:transparent;color:var(--muted);padding:5px 9px;border-radius:999px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:1px;flex:none}
+.tl-item .yr{font-size:12px;font-weight:700}.tl-item .lb{font-size:7px;text-transform:uppercase;opacity:.7}
+.tl-item.active{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#0a0e17;box-shadow:0 0 14px #d4a84b55}
 .tl-item.active .lb{color:#3a2a10;opacity:1}
-.home{width:34px;height:34px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--muted);cursor:pointer}
-.stage{height:calc(100% - 58px - 150px);position:relative;overflow:hidden;background:radial-gradient(ellipse at 50% 40%,#1a2a3d 0%,transparent 55%),linear-gradient(180deg,#0a1520,#070b14)}
-.map-svg{width:100%;height:100%;display:block}
-.region{stroke:#0a0e17;stroke-width:1.2;fill-opacity:0;transition:fill-opacity .45s ease;cursor:pointer}
-.region.on{fill-opacity:.55}.region:hover{filter:brightness(1.15)}
-.route{fill:none;stroke:#f0d078;stroke-width:1.8;stroke-dasharray:7 8;stroke-opacity:0;transition:stroke-opacity .4s}
-.route.on{stroke-opacity:.9}
-.battle{cursor:pointer}.battle circle{fill:#d4a84b;stroke:#0a0e17;stroke-width:2}
-.battle text{font-size:9px;fill:#0a0e17;font-weight:700;text-anchor:middle;pointer-events:none}
-.battle.hidden{opacity:0;pointer-events:none}
-.capital circle{fill:#f0d078;stroke:#0a0e17;stroke-width:2}
-.label{font-size:8px;fill:#9aabc0;font-family:'DM Sans',sans-serif;pointer-events:none}
-.label.city{fill:var(--gold2);font-size:9px;font-weight:600}
-.sea{fill:#0d1a28;stroke:#1a3048;stroke-width:.8}
-.land{fill:#121c28;stroke:#1e2d40;stroke-width:.6}
-.float{position:absolute;z-index:10;background:rgba(12,21,36,.92);border:1px solid var(--line);border-radius:12px;padding:8px 11px;font-size:11px;color:var(--muted)}
-.float.cap{top:12px;right:12px}.float.leg{bottom:12px;right:12px;display:flex;flex-direction:column;gap:5px}
-.float b{color:var(--gold2)}.float .row{display:flex;align-items:center;gap:7px}
-.dot{width:8px;height:8px;border-radius:50%;background:var(--gold);flex:none}
-.bottom{height:150px;border-top:1px solid var(--line);background:linear-gradient(180deg,#0d1524,#0a101c);display:grid;grid-template-columns:1fr;padding:10px 12px;gap:8px}
+.home{width:32px;height:32px;border-radius:9px;border:1px solid var(--line);background:var(--panel);color:var(--muted);cursor:pointer;flex:none}
+.stage{height:calc(100% - 56px - 148px);position:relative;overflow:hidden;background:#0a121c;display:flex;align-items:center;justify-content:center}
+.map-frame{position:relative;width:100%;height:100%;max-width:1400px;margin:0 auto}
+.map-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;display:block}
+.tint{position:absolute;inset:0;pointer-events:none;transition:opacity .4s ease;opacity:0;mix-blend-mode:soft-light}
+.tint.on{opacity:1}
+.tint.y1336{background:radial-gradient(ellipse at 55% 45%, #3b82c488 0%, transparent 45%)}
+.tint.y1370{background:radial-gradient(ellipse at 50% 50%, #d4a01755 0%, transparent 55%)}
+.tint.y1380{background:radial-gradient(ellipse at 40% 45%, #e07a2f55 0%, transparent 50%)}
+.tint.y1390{background:radial-gradient(ellipse at 50% 48%, #c93c3c44 0%, transparent 60%)}
+.hotspot{position:absolute;width:28px;height:28px;margin-left:-14px;margin-top:-14px;border-radius:50%;border:2px solid #0a0e17;background:var(--gold);color:#0a0e17;display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer;z-index:5;box-shadow:0 0 10px #d4a84b77;transition:transform .15s, opacity .3s}
+.hotspot:hover{transform:scale(1.15)}
+.hotspot.hidden{opacity:0;pointer-events:none;transform:scale(.6)}
+.hotspot.capital{background:var(--gold2);width:22px;height:22px;margin-left:-11px;margin-top:-11px;font-size:10px;box-shadow:0 0 12px #f0d07899}
+.float{position:absolute;z-index:8;background:rgba(12,21,36,.9);border:1px solid var(--line);border-radius:11px;padding:7px 10px;font-size:10px;color:var(--muted)}
+.float.cap{top:10px;right:10px}.float.leg{bottom:10px;right:10px;display:flex;flex-direction:column;gap:4px}
+.float b{color:var(--gold2);font-size:11px}.float .row{display:flex;align-items:center;gap:6px}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--gold)}
+.bottom{height:148px;border-top:1px solid var(--line);background:linear-gradient(180deg,#0d1524,#0a101c);padding:10px 12px;display:flex;flex-direction:column;gap:8px}
 .bio-row{display:flex;gap:12px;align-items:center}
-.portrait{width:56px;height:64px;border-radius:10px;border:1px solid #8a6a2e;flex:none;background:radial-gradient(circle at 50% 30%,#c9a05044,transparent 45%),linear-gradient(180deg,#2a1c0a,#0e0a05);display:grid;place-items:center;font-size:28px}
-.bio-text h3{font-family:'Cinzel',serif;font-size:13px;color:var(--gold2)}
-.bio-text p{font-size:11px;color:var(--muted);line-height:1.4;margin:4px 0 0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.cards-head h2{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold)}
-.cards{display:flex;gap:8px;overflow-x:auto;padding-bottom:2px}
-.card{min-width:140px;flex:none;background:#111c2e;border:1px solid var(--line);border-radius:10px;padding:8px 10px;cursor:pointer}
-.card:hover{border-color:#8a6a2e}.card .cy{font-size:10px;font-weight:700;color:var(--gold)}.card h4{font-size:11px;margin:4px 0 2px}.card p{font-size:9px;color:var(--muted)}
-dialog{border:1px solid #526078;border-radius:16px;background:#0d1524;color:var(--text);padding:22px;max-width:400px;width:calc(100% - 28px)}
-dialog::backdrop{background:#02060bd9}dialog h3{font-family:'Cinzel',serif;color:var(--gold2);margin:6px 0 8px;font-size:17px}
-dialog p{font-size:13px;color:var(--muted);line-height:1.6}
+.portrait{width:52px;height:60px;border-radius:10px;border:1px solid #8a6a2e;flex:none;background:radial-gradient(circle at 50% 30%,#c9a05044,transparent 45%),linear-gradient(180deg,#2a1c0a,#0e0a05);display:grid;place-items:center;font-size:26px}
+.bio-text h3{font-family:'Cinzel',serif;font-size:12px;color:var(--gold2)}
+.bio-text p{font-size:10px;color:var(--muted);line-height:1.4;margin-top:3px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.cards-head h2{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:6px}
+.cards{display:flex;gap:8px;overflow-x:auto}
+.card{min-width:132px;flex:none;background:#111c2e;border:1px solid var(--line);border-radius:10px;padding:8px;cursor:pointer}
+.card:hover{border-color:#8a6a2e}.card .cy{font-size:10px;font-weight:700;color:var(--gold)}.card h4{font-size:11px;margin:3px 0 2px}.card p{font-size:9px;color:var(--muted)}
+dialog{border:1px solid #526078;border-radius:16px;background:#0d1524;color:var(--text);padding:20px;max-width:380px;width:calc(100% - 24px)}
+dialog::backdrop{background:#02060bd9}dialog h3{font-family:'Cinzel',serif;color:var(--gold2);margin:6px 0 8px;font-size:16px}
+dialog p{font-size:13px;color:var(--muted);line-height:1.55}
 dialog .close-x{float:right;background:none;border:0;color:var(--muted);font-size:22px;cursor:pointer}
-@media(min-width:800px){.bottom{grid-template-columns:280px 1fr;height:160px}.bio-row{border-right:1px solid var(--line);padding-right:14px}.portrait{width:72px;height:84px;font-size:34px}.bio-text p{-webkit-line-clamp:3}}
+@media(min-width:800px){.logo h1{font-size:13px}.bottom{height:160px}.portrait{width:64px;height:74px;font-size:32px}.bio-text p{-webkit-line-clamp:3;font-size:11px}.hotspot{width:32px;height:32px;margin-left:-16px;margin-top:-16px;font-size:13px}}
 </style>
 </head>
 <body>
 <header class="topbar">
-  <a class="logo" href="./" style="text-decoration:none;color:inherit">
-    <div class="logo-mark">⚔</div>
-    <div><h1>AMIR TEMUR<br>DAVLATI KENGAYISHI</h1><small>Buyuk imperiyaning yuksalish yo‘li</small></div>
-  </a>
+  <a class="logo" href="./"><div class="logo-mark">⚔</div><div><h1>AMIR TEMUR<br>DAVLATI KENGAYISHI</h1><small>Buyuk imperiyaning yuksalish yo‘li</small></div></a>
   <nav class="timeline" id="timeline"></nav>
   <button class="home" onclick="location.href='./'">⌂</button>
 </header>
-<div class="stage" id="stage">
-  <svg class="map-svg" viewBox="0 0 1000 620" preserveAspectRatio="xMidYMid meet" id="mapSvg">
-    <defs>
-      <linearGradient id="gSea" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0e1f30"/><stop offset="100%" stop-color="#0a1520"/></linearGradient>
-    </defs>
-    <rect width="1000" height="620" fill="#0a121c"/>
-    <path class="land" d="M40,80 L180,60 L320,50 L480,55 L620,70 L760,90 L900,130 L960,200 L980,320 L950,420 L900,500 L820,560 L700,590 L560,600 L420,580 L300,540 L180,480 L90,400 L50,300 L40,200 Z"/>
-    <ellipse class="sea" cx="280" cy="310" rx="95" ry="70"/>
-    <ellipse class="sea" cx="420" cy="380" rx="55" ry="40"/>
-    <path class="sea" d="M200,480 Q280,520 360,500 Q320,560 220,560 Q160,520 200,480"/>
-    <path id="r1336" class="region" data-from="1336" fill="#3b82c4" d="M560,250 L620,240 L670,260 L680,310 L650,350 L590,360 L550,330 L540,280 Z"/>
-    <path id="r1360" class="region" data-from="1360" fill="#3d9b6a" d="M540,200 L620,185 L700,210 L720,270 L680,300 L600,290 L550,250 Z"/>
-    <path id="r1370" class="region" data-from="1370" fill="#d4a017" d="M500,300 L580,290 L640,320 L630,390 L560,420 L490,400 L470,340 Z"/>
-    <path id="r1380" class="region" data-from="1380" fill="#e07a2f" d="M320,240 L420,230 L480,270 L470,340 L400,360 L330,330 L300,280 Z"/>
-    <path id="r1390" class="region" data-from="1390" fill="#c93c3c" d="M280,200 L420,170 L560,180 L700,220 L780,300 L760,420 L680,500 L520,520 L380,480 L280,400 L250,300 Z"/>
-    <path id="route1" class="route" data-from="1370" d="M600,300 Q580,360 640,430 Q700,480 780,470"/>
-    <path id="route2" class="route" data-from="1380" d="M600,300 Q480,280 380,290 Q320,300 300,280"/>
-    <path id="route3" class="route" data-from="1390" d="M600,300 Q580,220 520,150"/>
-    <text class="label city" x="600" y="295">Samarqand</text>
-    <text class="label" x="640" y="360">Xuroson</text>
-    <text class="label" x="360" y="290">Kavkaz</text>
-    <text class="label" x="300" y="250">Anadolu</text>
-    <text class="label" x="760" y="460">Hindiston</text>
-    <text class="label" x="520" y="160">Oltin O‘rda</text>
-    <text class="label" x="420" y="360">Kaspiy</text>
-    <g class="capital"><circle cx="600" cy="300" r="7"/><text x="600" y="304" text-anchor="middle" font-size="8" fill="#0a0e17" font-weight="700">★</text></g>
-    <g class="battle" data-year="1371" data-title="Panjakent jangi" data-place="Panjakent" data-detail="Dastlabki g‘alabalardan biri. Temur hokimiyati mustahkamlandi." transform="translate(580,280)"><circle r="11"/><text y="3.5">⚔</text></g>
-    <g class="battle" data-year="1378" data-title="Xo‘jand jangi" data-place="Xo‘jand" data-detail="Shimoliy chegaralar mustahkamlandi." transform="translate(640,250)"><circle r="11"/><text y="3.5">⚔</text></g>
-    <g class="battle" data-year="1381" data-title="Hirot jangi" data-place="Hirot" data-detail="Xuroson yo‘nalishidagi muhim g‘alaba." transform="translate(560,370)"><circle r="11"/><text y="3.5">⚔</text></g>
-    <g class="battle" data-year="1386" data-title="Tbilisi yo‘nalishi" data-place="Kavkaz" data-detail="Kavkazdagi yurishlar boshlandi." transform="translate(400,270)"><circle r="11"/><text y="3.5">⚔</text></g>
-    <g class="battle" data-year="1391" data-title="To‘xtamish bilan jang" data-place="Qunduzcha" data-detail="Oltin O‘rda ustidan muhim g‘alaba." transform="translate(520,170)"><circle r="11"/><text y="3.5">⚔</text></g>
-    <g class="battle" data-year="1395" data-title="Tabriz jangi" data-place="Tabriz" data-detail="Eron va Kavkaz nazorati mustahkamlandi." transform="translate(420,320)"><circle r="11"/><text y="3.5">⚔</text></g>
-    <g class="battle" data-year="1398" data-title="Dehli yurishi" data-place="Dehli" data-detail="Shimoliy Hindistonga yurish." transform="translate(780,470)"><circle r="11"/><text y="3.5">⚔</text></g>
-    <g class="battle" data-year="1402" data-title="Anqara jangi" data-place="Anqara" data-detail="Usmonlilar ustidan g‘alaba. Boyazid I mag‘lub." transform="translate(300,270)"><circle r="11"/><text y="3.5">⚔</text></g>
-  </svg>
-  <div class="float cap"><b>★ Poytaxt: Samarqand</b></div>
-  <div class="float leg">
-    <div class="row"><span class="dot"></span> Muhim janglar</div>
-    <div class="row"><span style="color:#f0d078">→</span> Yurish yo‘nalishlari</div>
-    <div class="row"><span style="width:12px;border-top:2px solid #c93c3c;opacity:.7"></span> Kengayish hududi</div>
+<div class="stage">
+  <div class="map-frame">
+    <img class="map-bg" src="temur-map-bg.jpg" alt="Amir Temur davlati xaritasi">
+    <div class="tint y1336" data-from="1336"></div>
+    <div class="tint y1370" data-from="1370"></div>
+    <div class="tint y1380" data-from="1380"></div>
+    <div class="tint y1390" data-from="1390"></div>
+    <button class="hotspot capital" style="left:58%;top:42%" title="Samarqand">★</button>
+    <button class="hotspot" data-year="1371" style="left:55%;top:40%" data-title="Panjakent jangi" data-place="Panjakent" data-detail="Dastlabki g‘alabalardan biri. Temur hokimiyati mustahkamlandi.">⚔</button>
+    <button class="hotspot" data-year="1378" style="left:62%;top:36%" data-title="Xo‘jand jangi" data-place="Xo‘jand" data-detail="Shimoliy chegaralar mustahkamlandi.">⚔</button>
+    <button class="hotspot" data-year="1381" style="left:52%;top:55%" data-title="Hirot jangi" data-place="Hirot" data-detail="Xuroson yo‘nalishidagi muhim g‘alaba.">⚔</button>
+    <button class="hotspot" data-year="1386" style="left:38%;top:38%" data-title="Tbilisi yo‘nalishi" data-place="Kavkaz" data-detail="Kavkazdagi yurishlar boshlandi.">⚔</button>
+    <button class="hotspot" data-year="1391" style="left:48%;top:22%" data-title="To‘xtamish bilan jang" data-place="Qunduzcha" data-detail="Oltin O‘rda ustidan muhim g‘alaba.">⚔</button>
+    <button class="hotspot" data-year="1395" style="left:42%;top:48%" data-title="Tabriz jangi" data-place="Tabriz" data-detail="Eron va Kavkaz nazorati mustahkamlandi.">⚔</button>
+    <button class="hotspot" data-year="1398" style="left:78%;top:62%" data-title="Dehli yurishi" data-place="Dehli" data-detail="Shimoliy Hindistonga yurish.">⚔</button>
+    <button class="hotspot" data-year="1402" style="left:28%;top:40%" data-title="Anqara jangi" data-place="Anqara" data-detail="Usmonlilar ustidan g‘alaba. Boyazid I mag‘lub.">⚔</button>
+    <div class="float cap"><b>★ Poytaxt: Samarqand</b></div>
+    <div class="float leg"><div class="row"><span class="dot"></span> Muhim janglar</div><div class="row"><span style="color:#f0d078">→</span> Yurish yo‘nalishlari</div></div>
   </div>
 </div>
 <footer class="bottom">
-  <div class="bio-row">
-    <div class="portrait">👑</div>
-    <div class="bio-text">
-      <h3>AMIR TEMUR (1336–1405)</h3>
-      <p>Dono siyosati, kuchli armiyasi va madaniyatga e’tibori bilan o‘z davrining eng buyuk hukmdorlaridan biri. Samarqand — poytaxt.</p>
-    </div>
-  </div>
-  <div>
-    <div class="cards-head"><h2>Janglar va muhim voqealar</h2></div>
-    <div class="cards" id="cards"></div>
-  </div>
+  <div class="bio-row"><div class="portrait">👑</div><div class="bio-text"><h3>AMIR TEMUR (1336–1405)</h3><p>Dono siyosati, kuchli armiyasi va madaniyatga e’tibori bilan o‘z davrining eng buyuk hukmdorlaridan biri.</p></div></div>
+  <div><div class="cards-head"><h2>Janglar va muhim voqealar</h2></div><div class="cards" id="cards"></div></div>
 </footer>
-<dialog id="dlg">
-  <button class="close-x" id="dlgClose">×</button>
-  <div id="dlgYear" style="color:var(--gold);font-size:11px;font-weight:700"></div>
-  <h3 id="dlgTitle"></h3>
-  <p id="dlgText"></p>
-  <p id="dlgPlace" style="color:var(--gold2);font-size:12px;margin-top:8px"></p>
-</dialog>
+<dialog id="dlg"><button class="close-x" id="dlgClose">×</button><div id="dlgYear" style="color:var(--gold);font-size:11px;font-weight:700"></div><h3 id="dlgTitle"></h3><p id="dlgText"></p><p id="dlgPlace" style="color:var(--gold2);font-size:12px;margin-top:6px"></p></dialog>
 <script>
 (()=>{
 'use strict';
@@ -142,34 +101,11 @@ const BATTLES=[
 {year:1398,title:'Dehli yurishi',place:'Dehli',summary:'Hindiston',detail:'Shimoliy Hindistonga yurish.'},
 {year:1402,title:'Anqara jangi',place:'Anqara',summary:'Usmonlilar',detail:'Boyazid I mag‘lubiyatga uchradi.'}
 ];
-function buildTimeline(){
-  const el=document.getElementById('timeline');
-  el.innerHTML=YEARS.map(t=>`<button class="tl-item${t.y===current?' active':''}" data-y="${t.y}"><span class="yr">${t.y}</span><span class="lb">${t.short}</span></button>`).join('');
-  el.querySelectorAll('.tl-item').forEach(b=>b.onclick=()=>setYear(+b.dataset.y));
-}
-function setYear(y){
-  current=y;buildTimeline();
-  document.querySelectorAll('.region').forEach(r=>r.classList.toggle('on',current>=+r.dataset.from));
-  document.querySelectorAll('.route').forEach(r=>r.classList.toggle('on',current>=+r.dataset.from));
-  document.querySelectorAll('.battle').forEach(b=>b.classList.toggle('hidden',current<+b.dataset.year));
-  buildCards();
-}
-function buildCards(){
-  const el=document.getElementById('cards');
-  const list=BATTLES.filter(b=>b.year<=current);
-  el.innerHTML=list.map(b=>`<article class="card" data-year="${b.year}"><div class="cy">${b.year}</div><h4>${b.title}</h4><p>${b.summary}</p></article>`).join('');
-  el.querySelectorAll('.card').forEach(c=>c.onclick=()=>{const b=BATTLES.find(x=>x.year===+c.dataset.year);if(b)openDlg(b)});
-}
-function openDlg(b){
-  document.getElementById('dlgYear').textContent=b.year+' · '+b.place;
-  document.getElementById('dlgTitle').textContent=b.title;
-  document.getElementById('dlgText').textContent=b.detail;
-  document.getElementById('dlgPlace').textContent=b.place;
-  document.getElementById('dlg').showModal();
-}
-document.querySelectorAll('.battle').forEach(g=>{
-  g.addEventListener('click',()=>openDlg({year:+g.dataset.year,title:g.dataset.title,place:g.dataset.place,detail:g.dataset.detail}));
-});
+function buildTimeline(){const el=document.getElementById('timeline');el.innerHTML=YEARS.map(t=>`<button class="tl-item${t.y===current?' active':''}" data-y="${t.y}"><span class="yr">${t.y}</span><span class="lb">${t.short}</span></button>`).join('');el.querySelectorAll('.tl-item').forEach(b=>b.onclick=()=>setYear(+b.dataset.y))}
+function setYear(y){current=y;buildTimeline();document.querySelectorAll('.tint').forEach(t=>t.classList.toggle('on',current>=+t.dataset.from));document.querySelectorAll('.hotspot[data-year]').forEach(h=>h.classList.toggle('hidden',current<+h.dataset.year));buildCards()}
+function buildCards(){const el=document.getElementById('cards');const list=BATTLES.filter(b=>b.year<=current);el.innerHTML=list.map(b=>`<article class="card" data-year="${b.year}"><div class="cy">${b.year}</div><h4>${b.title}</h4><p>${b.summary}</p></article>`).join('');el.querySelectorAll('.card').forEach(c=>c.onclick=()=>{const b=BATTLES.find(x=>x.year===+c.dataset.year);if(b)openDlg(b)})}
+function openDlg(b){document.getElementById('dlgYear').textContent=b.year+' · '+b.place;document.getElementById('dlgTitle').textContent=b.title;document.getElementById('dlgText').textContent=b.detail;document.getElementById('dlgPlace').textContent=b.place;document.getElementById('dlg').showModal()}
+document.querySelectorAll('.hotspot[data-year]').forEach(h=>h.addEventListener('click',()=>openDlg({year:+h.dataset.year,title:h.dataset.title,place:h.dataset.place,detail:h.dataset.detail})));
 document.getElementById('dlgClose').onclick=()=>document.getElementById('dlg').close();
 document.getElementById('dlg').addEventListener('click',e=>{if(e.target.id==='dlg')document.getElementById('dlg').close()});
 buildTimeline();setYear(1390);
