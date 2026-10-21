@@ -8,10 +8,7 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap');
-:root{
-  --bg:#070b14; --panel:#0d1524; --panel2:#111c2e; --line:#1e2d45;
-  --gold:#d4a84b; --gold2:#f0d078; --text:#eef3fb; --muted:#8fa0b8;
-}
+:root{--bg:#070b14;--panel:#0d1524;--panel2:#111c2e;--line:#1e2d45;--gold:#d4a84b;--gold2:#f0d078;--text:#eef3fb;--muted:#8fa0b8}
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM Sans',system-ui,sans-serif;overflow:hidden}
 a{color:var(--gold2);text-decoration:none}
@@ -19,29 +16,27 @@ a{color:var(--gold2);text-decoration:none}
 .logo{display:flex;align-items:center;gap:12px;min-width:220px}
 .logo-mark{width:40px;height:40px;border-radius:10px;border:1px solid #8a6a2e;display:grid;place-items:center;background:radial-gradient(circle at 30% 30%,#3a2a12,#1a1408);color:var(--gold);font-size:18px}
 .logo h1{font-family:'Cinzel',serif;font-size:13px;letter-spacing:.12em;line-height:1.25;color:var(--gold2)}
-.logo small{display:block;font-family:'DM Sans',sans-serif;font-size:10px;color:var(--muted);letter-spacing:.04em;margin-top:2px;font-weight:400}
-.timeline{flex:1;display:flex;align-items:center;justify-content:center;gap:0;position:relative;max-width:640px;margin:0 auto}
+.logo small{display:block;font-size:10px;color:var(--muted);margin-top:2px}
+.timeline{flex:1;display:flex;align-items:center;justify-content:center;position:relative;max-width:640px;margin:0 auto}
 .timeline::before{content:'';position:absolute;left:8%;right:8%;top:50%;height:2px;background:linear-gradient(90deg,transparent,var(--line),var(--line),transparent);z-index:0}
-.tl-item{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;padding:6px 14px;border:none;background:transparent;color:var(--muted);font-family:inherit;transition:.2s}
-.tl-item .yr{font-size:13px;font-weight:700;letter-spacing:.04em}
-.tl-item .lb{font-size:9px;text-transform:uppercase;letter-spacing:.06em;opacity:.75}
-.tl-item:hover{color:var(--gold2)}
+.tl-item{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;padding:6px 14px;border:none;background:transparent;color:var(--muted);font-family:inherit}
+.tl-item .yr{font-size:13px;font-weight:700}.tl-item .lb{font-size:9px;text-transform:uppercase;opacity:.75}
 .tl-item.active{color:#0a0e17;background:linear-gradient(135deg,var(--gold),var(--gold2));border-radius:999px;box-shadow:0 0 20px #d4a84b55}
 .tl-item.active .lb{color:#3a2a10;opacity:1}
-.top-actions{display:flex;align-items:center;gap:8px;margin-left:auto}
-.icon-btn{width:36px;height:36px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--muted);cursor:pointer;display:grid;place-items:center;font-size:14px}
+.top-actions{display:flex;gap:8px;margin-left:auto}
+.icon-btn{width:36px;height:36px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--muted);cursor:pointer;display:grid;place-items:center}
 .icon-btn:hover{border-color:var(--gold);color:var(--gold)}
-.lang{font-size:11px;font-weight:700;letter-spacing:.08em;padding:0 10px;width:auto}
+.lang{font-size:11px;font-weight:700;padding:0 10px;width:auto}
 .layout{display:grid;grid-template-columns:280px 1fr;height:calc(100% - 64px - 168px)}
 .sidebar{background:var(--panel);border-right:1px solid var(--line);overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:14px}
 .panel{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:14px}
-.panel h2{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;font-weight:700}
+.panel h2{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:12px}
 .year-list,.battle-list{display:flex;flex-direction:column;gap:6px}
 .year-item,.battle-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;cursor:pointer;border:1px solid transparent;background:transparent;color:var(--text);font-size:12px;text-align:left;width:100%;font-family:inherit}
 .year-item:hover,.battle-item:hover{background:#152238}
 .year-item.active{border-color:#8a6a2e;background:#1a150c}
 .dot{width:10px;height:10px;border-radius:50%;flex:none}
-.year-item span:last-child,.battle-item span:last-child{color:var(--muted);font-size:11px;margin-left:auto}
+.year-item span:last-child{color:var(--muted);font-size:11px;margin-left:auto}
 .legend-row{display:flex;align-items:center;gap:8px;font-size:12px;padding:5px 0;color:var(--muted)}
 .swatch{width:14px;height:10px;border-radius:3px;flex:none}
 .swatch.dash{background:transparent;border:1px dashed #6a7a90;height:0;border-top-width:2px}
@@ -49,47 +44,35 @@ a{color:var(--gold2);text-decoration:none}
 #map{width:100%;height:100%}
 .leaflet-container{background:#0a1520;font-family:'DM Sans',sans-serif}
 .leaflet-control-zoom a{background:#0d1524!important;color:var(--gold)!important;border-color:var(--line)!important}
-.map-float{position:absolute;z-index:500;background:rgba(13,21,36,.92);backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:11px;color:var(--muted)}
-.map-float.capital{top:16px;right:16px}
-.map-float.legend-map{bottom:16px;right:16px;display:flex;flex-direction:column;gap:6px}
-.map-float b{color:var(--gold2);font-size:12px}
-.map-float .row{display:flex;align-items:center;gap:8px}
+.map-float{position:absolute;z-index:500;background:rgba(13,21,36,.92);border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:11px;color:var(--muted)}
+.map-float.capital{top:16px;right:16px}.map-float.legend-map{bottom:16px;right:16px;display:flex;flex-direction:column;gap:6px}
+.map-float b{color:var(--gold2);font-size:12px}.map-float .row{display:flex;align-items:center;gap:8px}
 .bottom{height:168px;border-top:1px solid var(--line);background:linear-gradient(180deg,#0d1524,#0a101c);display:grid;grid-template-columns:280px 1fr}
 .bio{display:flex;gap:14px;padding:14px 16px;border-right:1px solid var(--line);align-items:center}
-.portrait{width:88px;height:100px;border-radius:12px;flex:none;background:linear-gradient(145deg,#3a2a12,#1a1208);border:1px solid #8a6a2e;display:grid;place-items:center;overflow:hidden}
-.portrait-inner{width:100%;height:100%;background:radial-gradient(circle at 50% 30%,#c9a050 0%,transparent 40%),linear-gradient(180deg,#2a1c0a 0%,#0e0a05 100%);display:flex;align-items:flex-end;justify-content:center;padding-bottom:8px;font-size:42px}
-.bio-text h3{font-family:'Cinzel',serif;font-size:14px;color:var(--gold2);letter-spacing:.06em}
+.portrait{width:88px;height:100px;border-radius:12px;flex:none;border:1px solid #8a6a2e;overflow:hidden}
+.portrait-inner{width:100%;height:100%;background:radial-gradient(circle at 50% 30%,#c9a050 0%,transparent 40%),linear-gradient(180deg,#2a1c0a,#0e0a05);display:flex;align-items:flex-end;justify-content:center;padding-bottom:8px;font-size:42px}
+.bio-text h3{font-family:'Cinzel',serif;font-size:14px;color:var(--gold2)}
 .bio-text p{font-size:11px;color:var(--muted);line-height:1.55;margin:6px 0 10px;max-height:56px;overflow:hidden}
-.bio-btn{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:8px;border:1px solid #8a6a2e;background:transparent;color:var(--gold2);font-size:11px;cursor:pointer;font-family:inherit}
-.bio-btn:hover{background:#1a150c}
+.bio-btn{padding:7px 12px;border-radius:8px;border:1px solid #8a6a2e;background:transparent;color:var(--gold2);font-size:11px;cursor:pointer;font-family:inherit}
 .cards-wrap{padding:12px 16px;overflow:hidden;display:flex;flex-direction:column}
 .cards-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
 .cards-head h2{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold)}
-.cards-nav{display:flex;gap:6px}
 .cards-nav button{width:28px;height:28px;border-radius:8px;border:1px solid var(--line);background:var(--panel);color:var(--muted);cursor:pointer}
-.cards-nav button:hover{color:var(--gold);border-color:var(--gold)}
-.cards{display:flex;gap:10px;overflow-x:auto;scroll-behavior:smooth;padding-bottom:4px}
-.card{min-width:160px;max-width:180px;flex:none;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px;cursor:pointer;transition:.15s}
-.card:hover{border-color:#8a6a2e;transform:translateY(-2px)}
-.card .cy{font-size:11px;font-weight:700;color:var(--gold)}
-.card h4{font-size:12px;margin:6px 0 4px;line-height:1.3}
-.card p{font-size:10px;color:var(--muted);line-height:1.4}
-dialog{border:1px solid #526078;border-radius:16px;background:#0d1524;color:var(--text);padding:24px;max-width:440px;width:calc(100% - 32px);box-shadow:0 30px 80px #000a}
-dialog::backdrop{background:#02060bd9;backdrop-filter:blur(4px)}
-dialog h3{font-family:'Cinzel',serif;color:var(--gold2);margin:8px 0 10px;font-size:18px}
-dialog p{font-size:13px;color:var(--muted);line-height:1.65;margin-bottom:12px}
+.cards{display:flex;gap:10px;overflow-x:auto;scroll-behavior:smooth}
+.card{min-width:160px;flex:none;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px;cursor:pointer}
+.card:hover{border-color:#8a6a2e}.card .cy{font-size:11px;font-weight:700;color:var(--gold)}.card h4{font-size:12px;margin:6px 0 4px}.card p{font-size:10px;color:var(--muted)}
+dialog{border:1px solid #526078;border-radius:16px;background:#0d1524;color:var(--text);padding:24px;max-width:440px;width:calc(100% - 32px)}
+dialog::backdrop{background:#02060bd9}dialog h3{font-family:'Cinzel',serif;color:var(--gold2);margin:8px 0 10px}
 dialog .close-x{float:right;background:none;border:0;color:var(--muted);font-size:22px;cursor:pointer}
-@media(max-width:900px){.layout{grid-template-columns:1fr;height:calc(100% - 64px - 200px)}.sidebar{display:none}.bottom{grid-template-columns:1fr;height:200px}.bio{border-right:0;border-bottom:1px solid var(--line)}.timeline .lb{display:none}.logo small{display:none}}
+.battle-icon{background:transparent;border:none}
+@media(max-width:900px){.layout{grid-template-columns:1fr;height:calc(100% - 64px - 200px)}.sidebar{display:none}.bottom{grid-template-columns:1fr;height:200px}.timeline .lb{display:none}}
 </style>
 </head>
 <body>
 <header class="topbar">
   <a class="logo" href="./"><div class="logo-mark">⚔</div><div><h1>AMIR TEMUR<br>DAVLATI KENGAYISHI</h1><small>Buyuk imperiyaning yuksalish yo‘li</small></div></a>
   <nav class="timeline" id="timeline"></nav>
-  <div class="top-actions">
-    <button class="icon-btn" title="Asosiy" onclick="location.href='./'">⌂</button>
-    <button class="icon-btn lang">UZ</button>
-  </div>
+  <div class="top-actions"><button class="icon-btn" onclick="location.href='./'">⌂</button><button class="icon-btn lang">UZ</button></div>
 </header>
 <div class="layout">
   <aside class="sidebar">
@@ -102,8 +85,8 @@ dialog .close-x{float:right;background:none;border:0;color:var(--muted);font-siz
     <div class="map-float capital"><b>★ Poytaxt: Samarqand</b></div>
     <div class="map-float legend-map">
       <div class="row"><span class="dot" style="background:var(--gold)"></span> Muhim janglar</div>
-      <div class="row"><span style="color:#52d5d0">→</span> Yurish yo‘nalishlari</div>
-      <div class="row"><span style="border-top:2px dashed #6a7a90;width:14px"></span> Davlat chegaralari (sxematik)</div>
+      <div class="row"><span style="color:#f0d078">→</span> Yurish yo‘nalishlari</div>
+      <div class="row"><span style="border-top:2px dashed #6a7a90;width:14px"></span> Sxematik hududlar</div>
     </div>
   </div>
 </div>
@@ -112,7 +95,7 @@ dialog .close-x{float:right;background:none;border:0;color:var(--muted);font-siz
     <div class="portrait"><div class="portrait-inner">👑</div></div>
     <div class="bio-text">
       <h3>AMIR TEMUR (1336–1405)</h3>
-      <p>Amir Temur o‘zining dono siyosati, kuchli armiyasi va madaniyatga bo‘lgan e’tibori bilan o‘z davrining eng buyuk hukmdorlaridan biri bo‘ldi. Uning imperiyasi Osiyoning katta qismini, Yaqin Sharq va Kavkazni egallagan.</p>
+      <p>Amir Temur o‘zining dono siyosati, kuchli armiyasi va madaniyatga bo‘lgan e’tibori bilan o‘z davrining eng buyuk hukmdorlaridan biri bo‘ldi.</p>
       <button class="bio-btn" id="bioMore">Batafsil ma’lumot →</button>
     </div>
   </div>
@@ -124,45 +107,49 @@ dialog .close-x{float:right;background:none;border:0;color:var(--muted);font-siz
 <dialog id="dlg"><button class="close-x" id="dlgClose">×</button><div id="dlgYear" style="color:var(--gold);font-size:12px;font-weight:700"></div><h3 id="dlgTitle"></h3><p id="dlgText"></p><p id="dlgPlace" style="color:var(--gold2);font-size:12px"></p></dialog>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-(() => {
+(()=>{
 'use strict';
-const STAGES = [
-  {year:1336,label:'Boshlanishi',color:'#3b82c4',short:'Boshlanishi'},
-  {year:1360,label:'Dastlabki yurishlar',color:'#3d9b6a',short:'Dastlabki yurishlar'},
-  {year:1370,label:'Kengayish davri',color:'#d4a017',short:'Kengayish davri'},
-  {year:1380,label:'Yevropa va Kavkaz',color:'#e07a2f',short:'Yevropa va Kavkaz'},
-  {year:1390,label:'Imperiyaning cho‘qqisi',color:'#5b6fd6',short:'Cho‘qqi davri'},
-  {year:1400,label:'So‘nggi yurishlar',color:'#c93c3c',short:'So‘nggi yurishlar'},
-  {year:1405,label:'Vafoti',color:'#8b3a3a',short:'Vafoti'}
+const STAGES=[
+{year:1336,label:'Boshlanishi',color:'#3b82c4',short:'Boshlanishi'},
+{year:1360,label:'Dastlabki yurishlar',color:'#3d9b6a',short:'Dastlabki yurishlar'},
+{year:1370,label:'Kengayish davri',color:'#d4a017',short:'Kengayish davri'},
+{year:1380,label:'Yevropa va Kavkaz',color:'#e07a2f',short:'Yevropa va Kavkaz'},
+{year:1390,label:'Imperiyaning cho‘qqisi',color:'#5b6fd6',short:'Cho‘qqi davri'},
+{year:1400,label:'So‘nggi yurishlar',color:'#c93c3c',short:'So‘nggi yurishlar'},
+{year:1405,label:'Vafoti',color:'#8b3a3a',short:'Vafoti'}
 ];
-const GROW_LEGEND = [
-  {c:'#3b82c4',t:'1336–1360: Moviy'},{c:'#3d9b6a',t:'1360–1370: Yashil'},
-  {c:'#d4a017',t:'1370–1380: Sariq'},{c:'#e07a2f',t:'1380–1390: To‘q sariq'},{c:'#c93c3c',t:'1390–1405: Qizil'}
+const GROW_LEGEND=[
+{c:'#3b82c4',t:'1336–1360: Moviy — Movarounnahr'},
+{c:'#3d9b6a',t:'1360–1370: Yashil — shimol'},
+{c:'#d4a017',t:'1370–1380: Sariq — Xuroson'},
+{c:'#e07a2f',t:'1380–1390: To‘q sariq — Kavkaz'},
+{c:'#c93c3c',t:'1390–1405: Qizil — eng keng'}
 ];
-const AREAS = [
-  {from:1336,to:1360,center:[39.2,66.5],radius:180000,color:'#3b82c4',label:'Movarounnahr'},
-  {from:1360,to:1370,center:[40.0,68.0],radius:280000,color:'#3d9b6a',label:'Shimoliy kengayish'},
-  {from:1370,to:1380,center:[37.5,62.0],radius:450000,color:'#d4a017',label:'Xuroson'},
-  {from:1380,to:1390,center:[40.5,45.0],radius:520000,color:'#e07a2f',label:'Kavkaz va G‘arb'},
-  {from:1390,to:1405,center:[36.0,55.0],radius:700000,color:'#c93c3c',label:'Imperiya cho‘qqisi (sxematik)'}
+/* Sxematik poligonlar — rasmga yaqin, aniq tarixiy chegara emas */
+const POLYGONS=[
+{from:1336,color:'#3b82c4',name:'Movarounnahr',coords:[[42.5,63],[42.8,70],[41.5,73],[39.2,72],[37.8,68],[38.2,64],[40.0,62],[42.5,63]]},
+{from:1360,color:'#3d9b6a',name:'Shimoliy kengayish',coords:[[44.5,62],[44.8,72],[42.5,75],[40.5,73],[39.5,68],[40.5,63],[42.5,61],[44.5,62]]},
+{from:1370,color:'#d4a017',name:'Xuroson',coords:[[38.5,55],[39.5,62],[37.5,68],[34.0,67],[32.5,60],[33.5,55],[36.0,53],[38.5,55]]},
+{from:1380,color:'#e07a2f',name:'Kavkaz va G‘arb',coords:[[43.5,38],[43.0,48],[40.5,52],[37.0,50],[36.5,42],[38.5,36],[41.5,35],[43.5,38]]},
+{from:1390,color:'#c93c3c',name:'Eng keng doira',coords:[[45,35],[44,55],[42,75],[38,78],[32,75],[28,72],[26,65],[28,55],[30,45],[33,35],[36,30],[40,28],[43,30],[45,35]]}
 ];
-const BATTLES = [
-  {year:1371,title:'Panjakent jangi',place:'Panjakent',coords:[39.49,67.61],summary:'Dastlabki g‘alabalardan biri.',detail:'Panjakent atrofida Temur hokimiyati mustahkamlandi.'},
-  {year:1378,title:'Xo‘jand jangi',place:'Xo‘jand',coords:[40.28,69.62],summary:'Shimoliy chegaralar mustahkamlandi.',detail:'Xo‘jand yo‘nalishi Temur davlatining shimoliy qanotini mustahkamladi.'},
-  {year:1381,title:'Hirot jangi',place:'Hirot, Xuroson',coords:[34.35,62.20],summary:'Xuroson yo‘nalishidagi g‘alaba.',detail:'Hirotning olinishi Xuroson bo‘ylab kengayishga yo‘l ochdi.'},
-  {year:1386,title:'Tbilisi yo‘nalishi',place:'Kavkaz',coords:[41.72,44.79],summary:'Kavkazdagi yurishlar.',detail:'Temur qo‘shinlari Kavkaz yo‘nalishida faol harakat qildi.'},
-  {year:1391,title:'To‘xtamish bilan jang',place:'Qunduzcha atrofi',coords:[53.2,51.0],summary:'Oltin O‘rda ustidan g‘alaba.',detail:'To‘xtamishxon bilan jang shimoliy siyosatda muhim burilish bo‘ldi.'},
-  {year:1395,title:'Tabriz / Kavkaz',place:'Tabriz',coords:[38.08,46.29],summary:'Eron va Kavkaz nazorati.',detail:'Tabriz yo‘nalishi g‘arbiy frontni mustahkamladi.'},
-  {year:1398,title:'Dehli yurishi',place:'Dehli',coords:[28.61,77.21],summary:'Shimoliy Hindistonga yurish.',detail:'1398-yilda Temur Dehliga yurish qildi.'},
-  {year:1402,title:'Anqara jangi',place:'Anqara',coords:[40.02,32.85],summary:'Usmonlilar ustidan g‘alaba.',detail:'Boyazid I mag‘lubiyatga uchradi; Usmonlilar tarixiga katta ta’sir.'}
+const BATTLES=[
+{year:1371,title:'Panjakent jangi',place:'Panjakent',coords:[39.49,67.61],summary:'Dastlabki g‘alabalardan biri.',detail:'Panjakent atrofida Temur hokimiyati mustahkamlandi.'},
+{year:1378,title:'Xo‘jand jangi',place:'Xo‘jand',coords:[40.28,69.62],summary:'Shimoliy chegaralar mustahkamlandi.',detail:'Xo‘jand yo‘nalishi shimoliy qanotni mustahkamladi.'},
+{year:1381,title:'Hirot jangi',place:'Hirot',coords:[34.35,62.20],summary:'Xuroson yo‘nalishidagi g‘alaba.',detail:'Hirotning olinishi Xuroson bo‘ylab kengayishga yo‘l ochdi.'},
+{year:1386,title:'Tbilisi yo‘nalishi',place:'Kavkaz',coords:[41.72,44.79],summary:'Kavkazdagi yurishlar.',detail:'Temur qo‘shinlari Kavkaz yo‘nalishida faol harakat qildi.'},
+{year:1391,title:'To‘xtamish bilan jang',place:'Qunduzcha',coords:[53.2,51.0],summary:'Oltin O‘rda ustidan g‘alaba.',detail:'To‘xtamishxon bilan jang shimoliy siyosatda muhim burilish bo‘ldi.'},
+{year:1395,title:'Tabriz jangi',place:'Tabriz',coords:[38.08,46.29],summary:'Eron va Kavkaz nazorati.',detail:'Tabriz yo‘nalishi g‘arbiy frontni mustahkamladi.'},
+{year:1398,title:'Dehli yurishi',place:'Dehli',coords:[28.61,77.21],summary:'Shimoliy Hindistonga yurish.',detail:'1398-yilda Temur Dehliga yurish qildi.'},
+{year:1402,title:'Anqara jangi',place:'Anqara',coords:[40.02,32.85],summary:'Usmonlilar ustidan g‘alaba.',detail:'Boyazid I mag‘lubiyatga uchradi.'}
 ];
-const ROUTES = [
-  {from:1370,to:1405,latlngs:[[39.65,66.96],[34.35,62.20],[28.61,77.21]],color:'#52d5d0'},
-  {from:1380,to:1405,latlngs:[[39.65,66.96],[40.02,32.85]],color:'#52d5d0'},
-  {from:1390,to:1405,latlngs:[[39.65,66.96],[53.2,51.0]],color:'#7ec8e3'}
+const ROUTES=[
+{from:1370,to:1405,latlngs:[[39.65,66.96],[34.35,62.20],[28.61,77.21]],color:'#f0d078'},
+{from:1380,to:1405,latlngs:[[39.65,66.96],[41.72,44.79],[40.02,32.85]],color:'#f0d078'},
+{from:1390,to:1405,latlngs:[[39.65,66.96],[53.2,51.0]],color:'#7ec8e3'}
 ];
-let currentYear = 1390;
-const map = L.map('map',{worldCopyJump:false,zoomControl:true}).setView([38.5,58],4);
+let currentYear=1390;
+const map=L.map('map',{worldCopyJump:false,zoomControl:true}).setView([38,55],4);
 L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',{maxZoom:16,attribution:'&copy; Esri'}).addTo(map);
 const areaLayer=L.layerGroup().addTo(map),routeLayer=L.layerGroup().addTo(map),battleLayer=L.layerGroup().addTo(map);
 function buildTimeline(){
@@ -177,7 +164,7 @@ function buildYearList(){
   el.querySelectorAll('.year-item').forEach(b=>b.onclick=()=>setYear(+b.dataset.year));
 }
 function buildLegend(){
-  document.getElementById('legendGrow').innerHTML=GROW_LEGEND.map(g=>`<div class="legend-row"><i class="swatch" style="background:${g.c}"></i>${g.t}</div>`).join('')+`<div class="legend-row"><i class="swatch dash"></i> Hozirgi davlat chegaralari</div>`;
+  document.getElementById('legendGrow').innerHTML=GROW_LEGEND.map(g=>`<div class="legend-row"><i class="swatch" style="background:${g.c}"></i>${g.t}</div>`).join('')+`<div class="legend-row"><i class="swatch dash"></i> Sxematik (aniq chegara emas)</div>`;
 }
 function buildBattleList(){
   const el=document.getElementById('battleList');
@@ -193,17 +180,18 @@ function buildCards(){
 }
 function renderMap(){
   areaLayer.clearLayers();routeLayer.clearLayers();battleLayer.clearLayers();
-  AREAS.filter(a=>currentYear>=a.from).forEach(a=>{
-    L.circle(a.center,{radius:a.radius,color:a.color,weight:1.5,fillColor:a.color,fillOpacity:0.12,dashArray:'4 6'}).bindTooltip(a.label).addTo(areaLayer);
+  POLYGONS.filter(p=>currentYear>=p.from).forEach(p=>{
+    L.polygon(p.coords,{color:p.color,weight:1.5,fillColor:p.color,fillOpacity:0.38,opacity:0.95}).bindTooltip(p.name).addTo(areaLayer);
   });
   ROUTES.filter(r=>currentYear>=r.from&&currentYear<=r.to).forEach(r=>{
-    L.polyline(r.latlngs,{color:r.color,weight:2.5,dashArray:'6 10',opacity:0.85}).addTo(routeLayer);
+    L.polyline(r.latlngs,{color:r.color,weight:2.5,dashArray:'8 10',opacity:0.9}).addTo(routeLayer);
   });
   BATTLES.filter(b=>b.year<=currentYear).forEach(b=>{
-    const m=L.circleMarker(b.coords,{radius:8,color:'#0a0e17',weight:2,fillColor:'#d4a84b',fillOpacity:1}).addTo(battleLayer);
+    const icon=L.divIcon({className:'battle-icon',html:'<div style="width:28px;height:28px;border-radius:50%;background:#d4a84b;border:2px solid #0a0e17;display:flex;align-items:center;justify-content:center;font-size:12px;box-shadow:0 0 8px #d4a84b88">⚔</div>',iconSize:[28,28],iconAnchor:[14,14]});
+    const m=L.marker(b.coords,{icon}).addTo(battleLayer);
     m.bindTooltip(`<b>${b.year}</b> · ${b.title}`);m.on('click',()=>openBattle(b));
   });
-  L.circleMarker([39.65,66.96],{radius:7,color:'#f0d078',weight:2,fillColor:'#d4a84b',fillOpacity:1}).bindTooltip('Samarqand — poytaxt').addTo(battleLayer);
+  L.circleMarker([39.65,66.96],{radius:9,color:'#f0d078',weight:2,fillColor:'#d4a84b',fillOpacity:1}).bindTooltip('★ Samarqand — poytaxt').addTo(battleLayer);
 }
 function setYear(y){currentYear=y;buildTimeline();buildYearList();buildBattleList();buildCards();renderMap()}
 function openBattle(b){
@@ -218,7 +206,7 @@ document.getElementById('dlg').addEventListener('click',e=>{if(e.target===docume
 document.getElementById('bioMore').onclick=()=>{
   document.getElementById('dlgYear').textContent='1336–1405';
   document.getElementById('dlgTitle').textContent='Amir Temur';
-  document.getElementById('dlgText').textContent='Amir Temur (1336–1405) Markaziy Osiyo tarixidagi eng yirik davlat arboblaridan biri. Samarqand poytaxt qilib, Movarounnahr, Xuroson, Eron, Kavkaz, Shimoliy Hindiston va Anadolugacha ta’sir doirasini kengaytirdi. Bu sahifa o‘quv demosi: sxematik hududlar aniq tarixiy chegaralar o‘rnini bosmaydi.';
+  document.getElementById('dlgText').textContent='Amir Temur (1336–1405) Markaziy Osiyo tarixidagi eng yirik davlat arboblaridan biri. Rangli hududlar o‘quv sxemasi — aniq tarixiy davlat chegaralari emas.';
   document.getElementById('dlgPlace').textContent='Manbalar alohida tekshiriladi';
   document.getElementById('dlg').showModal();
 };
