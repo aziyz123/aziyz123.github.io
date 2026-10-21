@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "note": "Dastlabki janglar ro‘yxati. Koordinatalar taxminiy; aniq maydonlar manbalar bilan tekshiriladi.",
+  "battles": [
+    {
+      "id": "kulikovo",
+      "year": 1380,
+      "name": "Kulikovo jangi",
+      "latitude": 53.66,
+      "longitude": 38.66,
+      "source": "https://www.britannica.com/event/Battle-of-Kulikovo"
+    },
+    {
+      "id": "delhi",
+      "year": 1398,
+      "name": "Amir Temurning Hindiston yurishi",
+      "latitude": 28.61,
+      "longitude": 77.21,
+      "source": "https://www.britannica.com/biography/Timur"
+    },
+    {
+      "id": "ankara",
+      "year": 1402,
+      "name": "Anqara jangi",
+      "latitude": 40.02,
+      "longitude": 32.85,
+      "source": "https://www.britannica.com/event/Battle-of-Ankara-1402"
+    },
+    {
+      "id": "constantinople",
+      "year": 1453,
+      "name": "Konstantinopolning zabt etilishi",
+      "latitude": 41.01,
+      "longitude": 28.97,
+      "source": "https://www.britannica.com/event/Fall-of-Constantinople-1453"
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "notice": "Boshlang‘ich metadata. Hudud chegaralari alohida manbalar bilan tekshiriladi.",
+  "empires": [
+    {
+      "id": "timur",
+      "name": "Amir Temur davlati",
+      "startYear": 1370,
+      "endYear": 1405,
+      "capital": "Samarqand",
+      "source": "https://www.britannica.com/biography/Timur"
+    },
+    {
+      "id": "roman",
+      "name": "Rim imperiyasi",
+      "startYear": -27,
+      "endYear": 476,
+      "capital": "Rim",
+      "source": "https://www.britannica.com/place/ancient-Rome"
+    },
+    {
+      "id": "mongol",
+      "name": "Mo‘g‘ullar imperiyasi",
+      "startYear": 1206,
+      "endYear": 1368,
+      "capital": "Qoraqurum",
+      "source": "https://www.britannica.com/biography/Genghis-Khan"
+    },
+    {
+      "id": "ottoman",
+      "name": "Usmonlilar imperiyasi",
+      "startYear": 1299,
+      "endYear": 1922,
+      "capital": "Bursa, Edirne va Istanbul (davrga qarab)",
+      "source": "https://www.britannica.com/topic/Ottoman-Empire"
+    }
+  ]
+}

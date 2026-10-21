@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#07111f">
+<meta name="description" content="Tarixiy interaktiv atlas: imperiyalar, davrlar va tarixiy voqealar.">
+<title>Yurishlar Xaritasi — O‘quv Vositalari</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="css/tarixiy-atlas.css">
+</head>
+<body>
+<header class="topbar"><a class="brand" href="./"><span class="mark">✦</span><span><b>YURISHLAR XARITASI</b><small>Vaqt bo‘ylab sayohat</small></span></a><a class="back" href="./">← Asosiy sahifa</a></header>
+<main class="layout">
+<aside class="sidebar">
+<section class="panel intro"><p class="eyebrow">DUNYO TARIXI</p><h1>Imperiyalar <em>izidan</em></h1><p>Yilni tanlang, davrlar o‘zgarishini kuzating va tarixiy voqealarni o‘rganing.</p></section>
+<section class="panel"><div class="heading"><h2>Vaqt chizig‘i</h2><b id="yearLabel">1400</b></div><input id="yearSlider" type="range" min="-500" max="2000" step="10" value="1400"><div class="range"><span>500-yil avvalgi</span><span>2000-yil</span></div><div class="controls"><button id="prev">←</button><button id="play">▶ Animatsiyani boshlash</button><button id="next">→</button></div><p id="period" class="muted">So‘nggi o‘rta asrlar</p></section>
+<section class="panel"><h2>Ko‘rsatish</h2><label class="toggle"><span><i class="dot gold"></i> Tarixiy voqealar</span><input id="showEvents" type="checkbox" checked></label><label class="toggle"><span><i class="dot cyan"></i> Yurish yo‘nalishlari</span><input id="showRoutes" type="checkbox" checked></label><label class="toggle"><span><i class="dot violet"></i> Sxematik hududlar</span><input id="showAreas" type="checkbox" checked></label><p class="note">Sxematik doiralar tarixiy davlat chegarasi emas. Ular faqat dastlabki demo uchun.</p></section>
+<section class="panel"><div class="heading"><h2>Imperiyalar</h2><small>DEMO</small></div><div id="empires" class="empire-list"></div></section>
+<section class="panel"><h2>Manbalar</h2><p>Voqealar kartalarida tarixiy ma’lumot manbalariga havolalar beriladi. Chegaralar alohida tekshiriladi.</p><a href="https://www.britannica.com/biography/Timur" target="_blank" rel="noopener">Encyclopaedia Britannica ↗</a></section>
+</aside>
+<section class="main"><div class="map-head"><div><p class="eyebrow">TANLANGAN DAVR</p><h2 id="mapYear">1400-yil</h2></div><div class="legend"><span><i class="dot gold"></i> Voqea</span><span><i class="dot cyan"></i> Yurish</span></div></div>
+<div id="map" aria-label="Tarixiy voqealar xaritasi"></div><div class="map-foot"><span>© OpenStreetMap</span><span id="status">Demo ma’lumotlar</span></div>
+<section class="events"><div class="heading"><div><p class="eyebrow">TARIXIY XOTIRA</p><h2>Tanlangan davr voqealari</h2></div><small id="count"></small></div><div id="cards" class="cards"></div></section>
+</section></main>
+<dialog id="dialog"><button id="close" class="close">×</button><p class="eyebrow" id="dDate"></p><h2 id="dTitle"></h2><p id="dText"></p><p id="dSource"></p><a id="dLink" href="#" target="_blank" rel="noopener">Manbani ko‘rish ↗</a></dialog>
+<footer>Tarixiy Atlas • Birinchi demo versiya. Tarixiy chegaralar manbalar asosida keyinroq to‘ldiriladi.</footer>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script><script src="js/tarixiy-atlas.js"></script>
+</body></html>
