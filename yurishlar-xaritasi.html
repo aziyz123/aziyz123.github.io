@@ -1,74 +1,391 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="uz">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#07111f">
-<meta name="description" content="Tarixiy interaktiv atlas: imperiyalar, davrlar va tarixiy voqealar.">
-<title>Yurishlar Xaritasi — O‘quv Vositalari</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0a0e17">
+<title>Amir Temur davlati kengayishi — Yurishlar Xaritasi</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap');
-:root{color-scheme:dark;--bg:#050b14;--panel:#0b1726;--line:#203249;--gold:#e8bd67;--text:#eef4fc;--muted:#9aabc0;--cyan:#52d5d0;--violet:#a995ff}
-*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 70% 0,#16283d,transparent 45%),var(--bg);color:var(--text);font-family:'DM Sans',sans-serif}a{color:#f6d995;text-decoration:none}.topbar{height:76px;border-bottom:1px solid #1b2a3c;display:flex;align-items:center;justify-content:space-between;padding:0 4vw}.brand{display:flex;align-items:center;gap:12px;color:var(--text)}.mark{display:grid;place-items:center;width:40px;height:40px;border:1px solid #98733c;border-radius:12px;color:var(--gold);font-size:24px}.brand b{display:block;letter-spacing:.14em;font-size:13px}.brand small{display:block;color:var(--muted);font-size:11px;margin-top:4px}.back{border:1px solid var(--line);border-radius:10px;padding:10px 13px;font-size:12px}.layout{max-width:1650px;margin:auto;padding:22px;display:grid;grid-template-columns:290px minmax(0,1fr);gap:18px}.sidebar{display:flex;flex-direction:column;gap:13px}.panel,.events{background:linear-gradient(145deg,#0d1a2a,#091321);border:1px solid var(--line);border-radius:17px;padding:17px}.intro{background:radial-gradient(circle at 100% 0,#45351e66,transparent 50%),linear-gradient(145deg,#122237,#091321)}.eyebrow{color:var(--gold);font-size:10px;letter-spacing:.18em;font-weight:700;margin:0 0 8px}.intro h1{font:600 30px/1.15 'Playfair Display',serif;margin:0 0 12px}.intro em{color:#f6d995}.panel p{font-size:12px;color:var(--muted);line-height:1.65}.heading,.map-head{display:flex;align-items:center;justify-content:space-between;gap:12px}.heading h2,.panel h2,.events h2{font-size:14px;margin:0 0 12px}.heading b{color:#f6d995;background:#342819;padding:6px 9px;border-radius:8px}input[type=range]{width:100%;accent-color:var(--gold)}.range{display:flex;justify-content:space-between;font-size:9px;color:#74869b}.controls{display:flex;gap:7px;margin-top:14px}.controls button{border:1px solid #34445a;background:#142338;color:var(--text);border-radius:9px;min-height:38px;cursor:pointer}.controls button:first-child,.controls button:last-child{width:38px}.controls #play{flex:1;background:linear-gradient(110deg,#e8bd67,#f5d993);color:#191307;border:0;font-size:11px;font-weight:700}.toggle{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid #17273a;font-size:12px}.toggle input{accent-color:var(--gold)}.toggle span,.legend span{display:flex;align-items:center;gap:8px}.dot{display:inline-block;width:8px;height:8px;border-radius:50%;flex:none}.gold{background:var(--gold)}.cyan{background:var(--cyan)}.violet{background:var(--violet)}.note{font-size:10px!important}.empire-list{display:grid;gap:7px}.empire{display:flex;align-items:center;gap:10px;border:1px solid transparent;border-radius:9px;padding:10px;background:#0b1929;color:#c9d5e4;text-align:left;cursor:pointer;font-size:12px}.empire.active,.empire:hover{border-color:#9e7b42;background:#292316;color:#ffe2a0}.swatch{width:10px;height:10px;border-radius:3px;flex:none}.empire small{display:block;color:#8a9bb0;margin-top:3px}.main{min-width:0}.map-head{padding:3px 2px 12px}.map-head h2{font:600 22px 'Playfair Display',serif;margin:0}.legend{display:flex;gap:14px;color:var(--muted);font-size:11px}.legend span{gap:6px}#map{height:580px;border:1px solid #2b3c4e;border-radius:17px;overflow:hidden;background:#0b1725}.leaflet-container{background:#0b1725;font-family:'DM Sans',sans-serif}.leaflet-control-zoom a{background:#0b1726!important;color:#f3d58d!important;border-color:#30445a!important}.leaflet-popup-content-wrapper,.leaflet-popup-tip{background:#0b1726;color:#edf4ff;border:1px solid #35465a}.leaflet-popup-content{font-size:12px;line-height:1.6}.map-foot{display:flex;justify-content:space-between;color:#7e90a5;font-size:10px;padding:10px 4px 22px}.events{padding:19px}.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.card{background:linear-gradient(145deg,#142338,#0d1928);border:1px solid #26374b;border-radius:12px;padding:13px;cursor:pointer}.card:hover{border-color:#9c7a43}.date{color:var(--gold);font-size:10px;font-weight:700}.card h3{font-size:13px;margin:8px 0 6px}.card p{color:var(--muted);font-size:11px;line-height:1.55;margin:0}.card span:last-child{display:inline-block;font-size:10px;color:#f6d995;margin-top:10px}footer{text-align:center;border-top:1px solid #1b2a3c;color:#71849b;padding:20px;font-size:10px}dialog{max-width:520px;width:calc(100% - 30px);background:#0b1726;color:var(--text);border:1px solid #526078;border-radius:17px;padding:27px;box-shadow:0 25px 100px #000b}dialog::backdrop{background:#02060bd9;backdrop-filter:blur(5px)}dialog h2{font:600 24px 'Playfair Display',serif}dialog p{font-size:13px;line-height:1.7;color:#c4d0df}.close{float:right;background:none;border:0;color:#cdd8e6;font-size:26px;cursor:pointer}
-@media(max-width:1000px){.layout{grid-template-columns:250px minmax(0,1fr);padding:14px;gap:12px}#map{height:500px}.cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:740px){.topbar{padding:12px 15px;height:auto;min-height:68px}.layout{display:flex;flex-direction:column;padding:11px}.intro h1{font-size:27px}#map{height:55vh;min-height:350px}.cards{grid-template-columns:1fr}.panel{padding:15px}.map-head h2{font-size:18px}.legend{font-size:10px;gap:8px}}
-@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap');
+:root{
+  --bg:#070b14; --panel:#0d1524; --panel2:#111c2e; --line:#1e2d45;
+  --gold:#d4a84b; --gold2:#f0d078; --text:#eef3fb; --muted:#8fa0b8;
+  --blue:#3b82c4; --green:#3d9b6a; --yellow:#d4a017; --orange:#e07a2f; --red:#c93c3c;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM Sans',system-ui,sans-serif;overflow:hidden}
+a{color:var(--gold2);text-decoration:none}
+.topbar{
+  height:64px; display:flex; align-items:center; gap:20px;
+  padding:0 18px; border-bottom:1px solid var(--line);
+  background:linear-gradient(180deg,#0f1828,#0a101c);
+  position:relative; z-index:20;
+}
+.logo{display:flex;align-items:center;gap:12px;min-width:220px}
+.logo-mark{
+  width:40px;height:40px;border-radius:10px;
+  border:1px solid #8a6a2e; display:grid;place-items:center;
+  background:radial-gradient(circle at 30% 30%,#3a2a12,#1a1408);
+  color:var(--gold); font-size:18px;
+}
+.logo h1{font-family:'Cinzel',serif;font-size:13px;letter-spacing:.12em;line-height:1.25;color:var(--gold2)}
+.logo small{display:block;font-family:'DM Sans',sans-serif;font-size:10px;color:var(--muted);letter-spacing:.04em;margin-top:2px;font-weight:400}
+.timeline{flex:1;display:flex;align-items:center;justify-content:center;gap:0;position:relative;max-width:640px;margin:0 auto}
+.timeline::before{
+  content:'';position:absolute;left:8%;right:8%;top:50%;height:2px;
+  background:linear-gradient(90deg,transparent,var(--line),var(--line),transparent);z-index:0;
+}
+.tl-item{
+  position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:4px;
+  cursor:pointer;padding:6px 14px;border:none;background:transparent;color:var(--muted);
+  font-family:inherit;transition:.2s;
+}
+.tl-item .yr{font-size:13px;font-weight:700;letter-spacing:.04em}
+.tl-item .lb{font-size:9px;text-transform:uppercase;letter-spacing:.06em;opacity:.75}
+.tl-item:hover{color:var(--gold2)}
+.tl-item.active{
+  color:#0a0e17; background:linear-gradient(135deg,var(--gold),var(--gold2));
+  border-radius:999px; box-shadow:0 0 20px #d4a84b55;
+}
+.tl-item.active .lb{color:#3a2a10;opacity:1}
+.top-actions{display:flex;align-items:center;gap:8px;margin-left:auto}
+.icon-btn{
+  width:36px;height:36px;border-radius:10px;border:1px solid var(--line);
+  background:var(--panel);color:var(--muted);cursor:pointer;display:grid;place-items:center;font-size:14px;
+}
+.icon-btn:hover{border-color:var(--gold);color:var(--gold)}
+.lang{font-size:11px;font-weight:700;letter-spacing:.08em;padding:0 10px;width:auto}
+.layout{display:grid;grid-template-columns:280px 1fr;height:calc(100% - 64px - 168px)}
+.sidebar{
+  background:var(--panel); border-right:1px solid var(--line);
+  overflow-y:auto; padding:14px; display:flex; flex-direction:column; gap:14px;
+}
+.panel{
+  background:var(--panel2); border:1px solid var(--line); border-radius:14px; padding:14px;
+}
+.panel h2{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;font-weight:700}
+.year-list,.battle-list{display:flex;flex-direction:column;gap:6px}
+.year-item,.battle-item{
+  display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;
+  cursor:pointer;border:1px solid transparent;background:transparent;color:var(--text);
+  font-size:12px;text-align:left;width:100%;font-family:inherit;
+}
+.year-item:hover,.battle-item:hover{background:#152238}
+.year-item.active{border-color:#8a6a2e;background:#1a150c}
+.dot{width:10px;height:10px;border-radius:50%;flex:none}
+.year-item span:last-child,.battle-item span:last-child{color:var(--muted);font-size:11px;margin-left:auto}
+.legend-row{display:flex;align-items:center;gap:8px;font-size:12px;padding:5px 0;color:var(--muted)}
+.swatch{width:14px;height:10px;border-radius:3px;flex:none}
+.swatch.dash{background:transparent;border:1px dashed #6a7a90;height:0;border-top-width:2px}
+.map-wrap{position:relative;min-width:0;background:#0a1520}
+#map{width:100%;height:100%}
+.leaflet-container{background:#0a1520;font-family:'DM Sans',sans-serif}
+.leaflet-control-zoom a{background:#0d1524!important;color:var(--gold)!important;border-color:var(--line)!important}
+.map-float{
+  position:absolute;z-index:500;background:rgba(13,21,36,.92);backdrop-filter:blur(8px);
+  border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:11px;color:var(--muted);
+}
+.map-float.capital{top:16px;right:16px}
+.map-float.legend-map{bottom:16px;right:16px;display:flex;flex-direction:column;gap:6px}
+.map-float b{color:var(--gold2);font-size:12px}
+.map-float .row{display:flex;align-items:center;gap:8px}
+.bottom{
+  height:168px; border-top:1px solid var(--line);
+  background:linear-gradient(180deg,#0d1524,#0a101c);
+  display:grid; grid-template-columns:280px 1fr; gap:0;
+}
+.bio{
+  display:flex; gap:14px; padding:14px 16px; border-right:1px solid var(--line); align-items:center;
+}
+.portrait{
+  width:88px;height:100px;border-radius:12px;flex:none;
+  background:linear-gradient(145deg,#3a2a12,#1a1208);
+  border:1px solid #8a6a2e; display:grid;place-items:center;overflow:hidden;
+}
+.portrait-inner{
+  width:100%;height:100%;
+  background:radial-gradient(circle at 50% 30%,#c9a050 0%,transparent 40%),linear-gradient(180deg,#2a1c0a 0%,#0e0a05 100%);
+  display:flex;align-items:flex-end;justify-content:center;padding-bottom:8px;font-size:42px;
+}
+.bio-text h3{font-family:'Cinzel',serif;font-size:14px;color:var(--gold2);letter-spacing:.06em}
+.bio-text p{font-size:11px;color:var(--muted);line-height:1.55;margin:6px 0 10px;max-height:56px;overflow:hidden}
+.bio-btn{
+  display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:8px;border:1px solid #8a6a2e;
+  background:transparent;color:var(--gold2);font-size:11px;cursor:pointer;font-family:inherit;
+}
+.bio-btn:hover{background:#1a150c}
+.cards-wrap{padding:12px 16px;overflow:hidden;display:flex;flex-direction:column}
+.cards-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.cards-head h2{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold)}
+.cards-nav{display:flex;gap:6px}
+.cards-nav button{
+  width:28px;height:28px;border-radius:8px;border:1px solid var(--line);
+  background:var(--panel);color:var(--muted);cursor:pointer;
+}
+.cards-nav button:hover{color:var(--gold);border-color:var(--gold)}
+.cards{display:flex;gap:10px;overflow-x:auto;scroll-behavior:smooth;padding-bottom:4px}
+.cards::-webkit-scrollbar{height:4px}
+.cards::-webkit-scrollbar-thumb{background:#2a3a55;border-radius:4px}
+.card{
+  min-width:160px;max-width:180px;flex:none;
+  background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px;
+  cursor:pointer;transition:.15s;
+}
+.card:hover{border-color:#8a6a2e;transform:translateY(-2px)}
+.card .cy{font-size:11px;font-weight:700;color:var(--gold)}
+.card h4{font-size:12px;margin:6px 0 4px;line-height:1.3}
+.card p{font-size:10px;color:var(--muted);line-height:1.4}
+dialog{
+  border:1px solid #526078;border-radius:16px;background:#0d1524;color:var(--text);
+  padding:24px;max-width:440px;width:calc(100% - 32px);box-shadow:0 30px 80px #000a;
+}
+dialog::backdrop{background:#02060bd9;backdrop-filter:blur(4px)}
+dialog h3{font-family:'Cinzel',serif;color:var(--gold2);margin:8px 0 10px;font-size:18px}
+dialog p{font-size:13px;color:var(--muted);line-height:1.65;margin-bottom:12px}
+dialog .close-x{float:right;background:none;border:0;color:var(--muted);font-size:22px;cursor:pointer}
+@media(max-width:900px){
+  .layout{grid-template-columns:1fr;height:calc(100% - 64px - 200px)}
+  .sidebar{display:none}
+  .bottom{grid-template-columns:1fr;height:200px}
+  .bio{border-right:0;border-bottom:1px solid var(--line)}
+  .timeline .lb{display:none}
+  .logo{min-width:auto}
+  .logo small{display:none}
+}
 </style>
 </head>
 <body>
-<header class="topbar"><a class="brand" href="./"><span class="mark">✦</span><span><b>YURISHLAR XARITASI</b><small>Vaqt bo‘ylab sayohat</small></span></a><a class="back" href="./">← Asosiy sahifa</a></header>
-<main class="layout">
-<aside class="sidebar">
-<section class="panel intro"><p class="eyebrow">DUNYO TARIXI</p><h1>Imperiyalar <em>izidan</em></h1><p>Yilni tanlang, davrlar o‘zgarishini kuzating va tarixiy voqealarni o‘rganing.</p></section>
-<section class="panel"><div class="heading"><h2>Vaqt chizig‘i</h2><b id="yearLabel">1400</b></div><input id="yearSlider" type="range" min="-500" max="2000" step="10" value="1400"><div class="range"><span>500-yil avvalgi</span><span>2000-yil</span></div><div class="controls"><button id="prev">←</button><button id="play">▶ Animatsiyani boshlash</button><button id="next">→</button></div><p id="period" class="muted">So‘nggi o‘rta asrlar</p></section>
-<section class="panel"><h2>Ko‘rsatish</h2><label class="toggle"><span><i class="dot gold"></i> Tarixiy voqealar</span><input id="showEvents" type="checkbox" checked></label><label class="toggle"><span><i class="dot cyan"></i> Yurish yo‘nalishlari</span><input id="showRoutes" type="checkbox" checked></label><label class="toggle"><span><i class="dot violet"></i> Sxematik hududlar</span><input id="showAreas" type="checkbox" checked></label><p class="note">Sxematik doiralar tarixiy davlat chegarasi emas. Ular faqat dastlabki demo uchun.</p></section>
-<section class="panel"><div class="heading"><h2>Imperiyalar</h2><small>DEMO</small></div><div id="empires" class="empire-list"></div></section>
-<section class="panel"><h2>Manbalar</h2><p>Voqealar kartalarida tarixiy ma’lumot manbalariga havolalar beriladi. Chegaralar alohida tekshiriladi.</p><a href="https://www.britannica.com/biography/Timur" target="_blank" rel="noopener">Encyclopaedia Britannica ↗</a></section>
-</aside>
-<section class="main"><div class="map-head"><div><p class="eyebrow">TANLANGAN DAVR</p><h2 id="mapYear">1400-yil</h2></div><div class="legend"><span><i class="dot gold"></i> Voqea</span><span><i class="dot cyan"></i> Yurish</span></div></div>
-<div id="map" aria-label="Tarixiy voqealar xaritasi"></div><div class="map-foot"><span>© OpenStreetMap</span><span id="status">Demo ma’lumotlar</span></div>
-<section class="events"><div class="heading"><div><p class="eyebrow">TARIXIY XOTIRA</p><h2>Tanlangan davr voqealari</h2></div><small id="count"></small></div><div id="cards" class="cards"></div></section>
-</section></main>
-<dialog id="dialog"><button id="close" class="close">×</button><p class="eyebrow" id="dDate"></p><h2 id="dTitle"></h2><p id="dText"></p><p id="dSource"></p><a id="dLink" href="#" target="_blank" rel="noopener">Manbani ko‘rish ↗</a></dialog>
-<footer>Tarixiy Atlas • Birinchi demo versiya. Tarixiy chegaralar manbalar asosida keyinroq to‘ldiriladi.</footer>
+<header class="topbar">
+  <a class="logo" href="./">
+    <div class="logo-mark">⚔</div>
+    <div>
+      <h1>AMIR TEMUR<br>DAVLATI KENGAYISHI</h1>
+      <small>Buyuk imperiyaning yuksalish yo‘li</small>
+    </div>
+  </a>
+  <nav class="timeline" id="timeline"></nav>
+  <div class="top-actions">
+    <button class="icon-btn" title="Asosiy" onclick="location.href='./'">⌂</button>
+    <button class="icon-btn lang">UZ</button>
+  </div>
+</header>
+<div class="layout">
+  <aside class="sidebar">
+    <section class="panel">
+      <h2>Yillar bo‘yicha xarita</h2>
+      <div class="year-list" id="yearList"></div>
+    </section>
+    <section class="panel">
+      <h2>Imperiya kengayishi</h2>
+      <div id="legendGrow"></div>
+    </section>
+    <section class="panel">
+      <h2>⚔ Janglar va muhim voqealar</h2>
+      <div class="battle-list" id="battleList"></div>
+    </section>
+  </aside>
+  <div class="map-wrap">
+    <div id="map"></div>
+    <div class="map-float capital"><b>★ Poytaxt: Samarqand</b></div>
+    <div class="map-float legend-map">
+      <div class="row"><span class="dot" style="background:var(--gold)"></span> Muhim janglar</div>
+      <div class="row"><span style="color:#52d5d0">→</span> Yurish yo‘nalishlari</div>
+      <div class="row"><span style="border-top:2px dashed #6a7a90;width:14px"></span> Davlat chegaralari (sxematik)</div>
+    </div>
+  </div>
+</div>
+<footer class="bottom">
+  <div class="bio">
+    <div class="portrait"><div class="portrait-inner">👑</div></div>
+    <div class="bio-text">
+      <h3>AMIR TEMUR (1336–1405)</h3>
+      <p>Amir Temur o‘zining dono siyosati, kuchli armiyasi va madaniyatga bo‘lgan e’tibori bilan o‘z davrining eng buyuk hukmdorlaridan biri bo‘ldi. Uning imperiyasi Osiyoning katta qismini, Yaqin Sharq va Kavkazni egallagan.</p>
+      <button class="bio-btn" id="bioMore">Batafsil ma’lumot →</button>
+    </div>
+  </div>
+  <div class="cards-wrap">
+    <div class="cards-head">
+      <h2>Janglar va muhim voqealar</h2>
+      <div class="cards-nav">
+        <button id="cardPrev">‹</button>
+        <button id="cardNext">›</button>
+      </div>
+    </div>
+    <div class="cards" id="cards"></div>
+  </div>
+</footer>
+<dialog id="dlg">
+  <button class="close-x" id="dlgClose">×</button>
+  <div class="cy" id="dlgYear" style="color:var(--gold);font-size:12px;font-weight:700"></div>
+  <h3 id="dlgTitle"></h3>
+  <p id="dlgText"></p>
+  <p id="dlgPlace" style="color:var(--gold2);font-size:12px"></p>
+</dialog>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 (() => {
 'use strict';
-const $=id=>document.getElementById(id);
-const slider=$('yearSlider');let playing=false,timer=null,selected='all';
-const empires=[
-{id:'all',name:'Barcha imperiyalar',period:'Turli davrlar',color:'#e8bd67'},
-{id:'timur',name:'Amir Temur davlati',period:'1370–1405',color:'#e8bd67'},
-{id:'roman',name:'Rim imperiyasi',period:'Mil. avv. 27 – mil. 476',color:'#55d5cf'},
-{id:'mongol',name:'Mo‘g‘ullar imperiyasi',period:'1206–1368',color:'#a995ff'},
-{id:'ottoman',name:'Usmonlilar imperiyasi',period:'taxm. 1299–1922',color:'#f28d68'}];
-const events=[
-{year:476,title:'G‘arbiy Rim imperiyasining yakuni',place:'Ravenna, Italiya',coords:[44.42,12.2],empire:'roman',summary:'476-yil odatda G‘arbiy Rim imperiyasining yakuniy sanasi sifatida keltiriladi.',detail:'476-yil ramziy sana hisoblanadi: Rim dunyosining siyosiy va ma’muriy o‘zgarishlari uzoq davom etgan. Sharqiy Rim imperiyasi esa yana ko‘p asrlar mavjud bo‘lgan.',source:'https://www.britannica.com/place/ancient-Rome/The-fall-of-the-Western-Empire'},
-{year:1206,title:'Mo‘g‘ullar imperiyasining tashkil topishi',place:'Mo‘g‘ul platosi',coords:[47.92,106.92],empire:'mongol',summary:'1206-yilda Temujin Chingizxon deb e’lon qilinib, mo‘g‘ul qabilalari birlashtirildi.',detail:'Bu siyosiy birlashuv keyingi o‘n yilliklarda Yevrosiyoning katta qismiga yoyilgan imperiya kengayishining muhim boshlanish nuqtasi bo‘ldi.',source:'https://www.britannica.com/biography/Genghis-Khan'},
-{year:1370,title:'Amir Temur hokimiyat tepasiga keladi',place:'Balx va Movarounnahr',coords:[36.76,66.9],empire:'timur',summary:'1370-yilda Amir Temur Movarounnahrdagi hokimiyatini mustahkamlab, Samarqandni davlatining markaziga aylantirdi.',detail:'Amir Temur hokimiyatining mustahkamlanishi Markaziy Osiyodagi siyosiy kuchlar muvozanatini o‘zgartirdi. Aniq hududiy chegaralar davrma-davr manbalar bilan tekshirilishi kerak.',source:'https://www.britannica.com/biography/Timur'},
-{year:1380,title:'Kulikovo jangi',place:'Don daryosi yaqinida',coords:[53.66,38.66],empire:'mongol',summary:'1380-yildagi jang Moskva knyazligi va Oltin O‘rda o‘rtasidagi qarama-qarshilik tarixida muhim voqea bo‘ldi.',detail:'Jang Dmitriy Donskoy boshchiligidagi rus qo‘shinlari va Mamay kuchlari o‘rtasida kechgan. Bu Oltin O‘rda hukmronligi shu zahoti tugaganini anglatmaydi.',source:'https://www.britannica.com/event/Battle-of-Kulikovo'},
-{year:1398,title:'Amir Temurning Hindiston yurishi',place:'Dehli, Hindiston',coords:[28.61,77.21],empire:'timur',summary:'1398-yilda Amir Temur Shimoliy Hindistonga yurish qilib, Dehliga kirib bordi.',detail:'Yurish Dehli sultonligi tarixida katta talafot va siyosiy oqibatlar keltirib chiqardi. Kampaniyaning batafsil marshruti uchun alohida manbalar talab qilinadi.',source:'https://www.britannica.com/biography/Timur'},
-{year:1402,title:'Anqara jangi',place:'Anqara atrofi, Anadolu',coords:[40.02,32.85],empire:'timur',summary:'1402-yilda Amir Temur qo‘shinlari Usmonli sultoni Boyazid I qo‘shinlarini Anqara yaqinida mag‘lub etdi.',detail:'Jang Anadolu va Usmonlilar tarixiga katta ta’sir ko‘rsatdi. Boyazid I ning asir olinishi Usmonlilar davlatida vorislik kurashi davriga olib keldi.',source:'https://www.britannica.com/event/Battle-of-Ankara-1402'},
-{year:1453,title:'Konstantinopolning zabt etilishi',place:'Konstantinopol (Istanbul)',coords:[41.01,28.97],empire:'ottoman',summary:'1453-yilda Mehmed II boshchiligidagi Usmonli qo‘shinlari Konstantinopolni egalladi.',detail:'Konstantinopolning qulashi Vizantiya imperiyasining yakunlanishi va Usmonlilar davlatining qudrati oshishi bilan bog‘liq muhim burilish bo‘ldi.',source:'https://www.britannica.com/event/Fall-of-Constantinople-1453'}];
-const map=L.map('map',{worldCopyJump:true}).setView([35,48],3);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18,attribution:'&copy; OpenStreetMap'}).addTo(map);
-const eventLayer=L.layerGroup().addTo(map),routeLayer=L.layerGroup().addTo(map),areaLayer=L.layerGroup().addTo(map);
-const areas=[
-{empire:'timur',center:[39,66],radius:420000,color:'#e8bd67',from:1370,to:1405,label:'Markaziy Osiyo — sxematik ko‘lam'},
-{empire:'roman',center:[41,20],radius:600000,color:'#55d5cf',from:-27,to:476,label:'Rim dunyosi — sxematik ko‘lam'},
-{empire:'mongol',center:[46,95],radius:1000000,color:'#a995ff',from:1206,to:1368,label:'Mo‘g‘ullar davlati — sxematik ko‘lam'},
-{empire:'ottoman',center:[39,34],radius:480000,color:'#f28d68',from:1299,to:1922,label:'Usmonlilar davlati — sxematik ko‘lam'}];
-function yearText(y){return y<0?Math.abs(y)+'-yil (mil. avv.)':y+'-yil'}
-function periodText(y){if(y<0)return 'Miloddan avvalgi davr';if(y<500)return 'Qadimgi dunyo';if(y<1000)return 'Ilk o‘rta asrlar';if(y<1300)return 'O‘rta asrlar';if(y<1500)return 'So‘nggi o‘rta asrlar';if(y<1800)return 'Yangi davr';return 'Zamonaviy davr'}
-function filtered(){const y=+slider.value;return events.filter(e=>e.year<=y&&(selected==='all'||e.empire===selected)).sort((a,b)=>b.year-a.year)}
-function openCard(e){$('dDate').textContent=yearText(e.year)+' • '+e.place;$('dTitle').textContent=e.title;$('dText').textContent=e.detail;$('dSource').textContent='Manba: Encyclopaedia Britannica (qisqa o‘quv ma’lumoti).';$('dLink').href=e.source;$('dialog').showModal()}
-function render(){const y=+slider.value;$('yearLabel').textContent=yearText(y);$('mapYear').textContent=yearText(y);$('period').textContent=periodText(y);const list=filtered();$('count').textContent=list.length+' ta';$('status').textContent=selected==='all'?'Barcha imperiyalar':empires.find(e=>e.id===selected).name;eventLayer.clearLayers();routeLayer.clearLayers();areaLayer.clearLayers();list.forEach(e=>{const m=L.circleMarker(e.coords,{radius:8,color:'#e8bd67',fillColor:'#e8bd67',fillOpacity:.85,weight:2}).addTo(eventLayer);m.bindPopup('<b>'+e.title+'</b><br>'+yearText(e.year));m.on('click',()=>openCard(e))});if($('showRoutes').checked&&y>=1370&&y<=1405&&(selected==='all'||selected==='timur')){L.polyline([[39.65,66.96],[36.76,66.9],[28.61,77.21]],{color:'#52d5d0',weight:3,dashArray:'6 8',opacity:.8}).addTo(routeLayer);L.polyline([[39.65,66.96],[40.02,32.85]],{color:'#52d5d0',weight:3,dashArray:'6 8',opacity:.8}).addTo(routeLayer)}if($('showAreas').checked){areas.filter(a=>y>=a.from&&y<=a.to&&(selected==='all'||selected===a.empire)).forEach(a=>{L.circle(a.center,{radius:a.radius,color:a.color,fillColor:a.color,fillOpacity:.08,weight:1.5,dashArray:'4 6'}).bindTooltip(a.label).addTo(areaLayer)})}$('cards').innerHTML=list.map((e,i)=>'<article class="card" data-i="'+i+'"><div class="date">'+yearText(e.year)+'</div><h3>'+e.title+'</h3><p>'+e.summary+'</p><span>'+e.place+' →</span></article>').join('')||'<p class="panel" style="margin:0">Bu yil uchun tanlangan filtrda voqea topilmadi.</p>';[...$('cards').children].forEach((c,i)=>c.onclick=()=>openCard(list[i]))}
-function renderEmpires(){$('empires').innerHTML=empires.map(e=>'<button class="empire'+(e.id===selected?' active':'')+'" data-id="'+e.id+'"><i class="swatch" style="background:'+e.color+'"></i><span><b>'+e.name+'</b><small>'+e.period+'</small></span></button>').join('');[...$('empires').children].forEach(b=>b.onclick=()=>{selected=b.dataset.id;renderEmpires();render()})}
-function step(d){slider.value=Math.max(+slider.min,Math.min(+slider.max,+slider.value+d*10));render()}
-function togglePlay(){if(playing){clearInterval(timer);playing=false;$('play').textContent='▶ Animatsiyani boshlash';return}playing=true;$('play').textContent='❚❚ To‘xtatish';timer=setInterval(()=>{if(+slider.value>=+slider.max){togglePlay();return}step(1)},900)}
-slider.oninput=render;$('prev').onclick=()=>step(-1);$('next').onclick=()=>step(1);$('play').onclick=togglePlay;['showEvents','showRoutes','showAreas'].forEach(id=>$(id).onchange=()=>{if(id==='showEvents'){if($('showEvents').checked)map.addLayer(eventLayer);else map.removeLayer(eventLayer)}render()});$('close').onclick=()=>$('dialog').close();$('dialog').addEventListener('click',e=>{if(e.target===$('dialog'))$('dialog').close()});
-renderEmpires();render();
+const STAGES = [
+  {year:1336, key:'start', label:'Boshlanishi', color:'#3b82c4', short:'Boshlanishi'},
+  {year:1360, key:'early', label:'Dastlabki yurishlar', color:'#3d9b6a', short:'Dastlabki yurishlar'},
+  {year:1370, key:'expand', label:'Kengayish davri', color:'#d4a017', short:'Kengayish davri'},
+  {year:1380, key:'west', label:'Yevropa va Kavkaz', color:'#e07a2f', short:'Yevropa va Kavkaz'},
+  {year:1390, key:'peak', label:'Imperiyaning cho‘qqisi', color:'#5b6fd6', short:'Cho‘qqi davri'},
+  {year:1400, key:'late', label:'So‘nggi yurishlar', color:'#c93c3c', short:'So‘nggi yurishlar'},
+  {year:1405, key:'end', label:'Vafoti', color:'#8b3a3a', short:'Vafoti'}
+];
+const GROW_LEGEND = [
+  {c:'#3b82c4', t:'1336–1360: Moviy'},
+  {c:'#3d9b6a', t:'1360–1370: Yashil'},
+  {c:'#d4a017', t:'1370–1380: Sariq'},
+  {c:'#e07a2f', t:'1380–1390: To‘q sariq'},
+  {c:'#c93c3c', t:'1390–1405: Qizil'}
+];
+const AREAS = [
+  {from:1336, to:1360, center:[39.2, 66.5], radius:180000, color:'#3b82c4', label:'Movarounnahr — boshlang‘ich'},
+  {from:1360, to:1370, center:[40.0, 68.0], radius:280000, color:'#3d9b6a', label:'Shimoliy kengayish'},
+  {from:1370, to:1380, center:[37.5, 62.0], radius:450000, color:'#d4a017', label:'Xuroson yo‘nalishi'},
+  {from:1380, to:1390, center:[40.5, 45.0], radius:520000, color:'#e07a2f', label:'Kavkaz va G‘arb'},
+  {from:1390, to:1405, center:[36.0, 55.0], radius:700000, color:'#c93c3c', label:'Imperiya cho‘qqisi (sxematik)'}
+];
+const BATTLES = [
+  {year:1371, title:'Panjakent jangi', place:'Panjakent, Movarounnahr', coords:[39.49, 67.61],
+   summary:'Amir Temurning dastlabki g‘alabalaridan biri.',
+   detail:'Panjakent atrofidagi to‘qnashuvlar Temurning Movarounnahrdagi hokimiyatini mustahkamlash yo‘lidagi muhim qadam bo‘ldi.'},
+  {year:1378, title:'Xo‘jand jangi', place:'Xo‘jand', coords:[40.28, 69.62],
+   summary:'Movarounnahrning shimoliy chegaralari mustahkamlandi.',
+   detail:'Xo‘jand yo‘nalishidagi harakatlar Temur davlatining shimoliy qanotini mustahkamladi.'},
+  {year:1381, title:'Hirot jangi', place:'Hirot, Xuroson', coords:[34.35, 62.20],
+   summary:'Xuroson yo‘nalishidagi muhim g‘alaba.',
+   detail:'Hirotning olinishi Temur hokimiyatining Xuroson bo‘ylab kengayishiga yo‘l ochdi.'},
+  {year:1386, title:'Tbilisi yo‘nalishi', place:'Kavkaz', coords:[41.72, 44.79],
+   summary:'Kavkazdagi yurishlar boshlandi.',
+   detail:'1380-yillar o‘rtalarida Temur qo‘shinlari Kavkaz yo‘nalishida faol harakat qildi.'},
+  {year:1391, title:'To‘xtamish bilan jang', place:'Qunduzcha daryosi atrofi', coords:[53.2, 51.0],
+   summary:'Oltin O‘rda ustidan muhim g‘alaba.',
+   detail:'To‘xtamishxon bilan bo‘lgan jang Temurning shimoliy siyosatida muhim burilish bo‘ldi.'},
+  {year:1395, title:'Tabriz / Kavkaz', place:'Tabriz — Kavkaz', coords:[38.08, 46.29],
+   summary:'Eron va Kavkaz to‘liq nazoratga olindi.',
+   detail:'Tabriz va atrofidagi yurishlar g‘arbiy frontni mustahkamladi.'},
+  {year:1398, title:'Dehli yurishi', place:'Dehli, Hindiston', coords:[28.61, 77.21],
+   summary:'Shimoliy Hindistonga yurish.',
+   detail:'1398-yilda Temur Dehliga yurish qilib, mintaqa siyosiy manzarasini o‘zgartirdi.'},
+  {year:1402, title:'Anqara jangi', place:'Anqara atrofi', coords:[40.02, 32.85],
+   summary:'Usmonlilar ustidan muhim g‘alaba.',
+   detail:'1402-yilda Anqara yaqinida Boyazid I qo‘shinlari mag‘lub etildi. Bu Usmonlilar tarixiga katta ta’sir ko‘rsatdi.'}
+];
+const ROUTES = [
+  {from:1370, to:1405, latlngs:[[39.65,66.96],[34.35,62.20],[28.61,77.21]], color:'#52d5d0'},
+  {from:1380, to:1405, latlngs:[[39.65,66.96],[40.02,32.85]], color:'#52d5d0'},
+  {from:1390, to:1405, latlngs:[[39.65,66.96],[53.2,51.0]], color:'#7ec8e3'}
+];
+let currentYear = 1390;
+const map = L.map('map', {worldCopyJump:false, zoomControl:true}).setView([38.5, 58], 4);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+  maxZoom: 18, attribution: '&copy; OpenStreetMap &copy; CARTO'
+}).addTo(map);
+const areaLayer = L.layerGroup().addTo(map);
+const routeLayer = L.layerGroup().addTo(map);
+const battleLayer = L.layerGroup().addTo(map);
+function buildTimeline(){
+  const el = document.getElementById('timeline');
+  const main = [1336,1370,1380,1390,1405];
+  el.innerHTML = main.map(y => {
+    const s = STAGES.find(x => x.year === y) || {year:y, short:String(y)};
+    return `<button class="tl-item${y===currentYear?' active':''}" data-year="${y}">
+      <span class="yr">${y}</span><span class="lb">${s.short}</span></button>`;
+  }).join('');
+  el.querySelectorAll('.tl-item').forEach(b => b.onclick = () => setYear(+b.dataset.year));
+}
+function buildYearList(){
+  const el = document.getElementById('yearList');
+  el.innerHTML = STAGES.map(s => `<button class="year-item${s.year===currentYear?' active':''}" data-year="${s.year}">
+    <i class="dot" style="background:${s.color}"></i>
+    <span>${s.year}</span>
+    <span>${s.label}</span>
+  </button>`).join('');
+  el.querySelectorAll('.year-item').forEach(b => b.onclick = () => setYear(+b.dataset.year));
+}
+function buildLegend(){
+  document.getElementById('legendGrow').innerHTML = GROW_LEGEND.map(g =>
+    `<div class="legend-row"><i class="swatch" style="background:${g.c}"></i>${g.t}</div>`
+  ).join('') + `<div class="legend-row"><i class="swatch dash"></i> Hozirgi davlat chegaralari</div>`;
+}
+function buildBattleList(){
+  const el = document.getElementById('battleList');
+  const list = BATTLES.filter(b => b.year <= currentYear);
+  el.innerHTML = list.map(b => `<button class="battle-item" data-year="${b.year}">
+    <span style="color:var(--gold);font-weight:700;min-width:36px">${b.year}</span>
+    <span>⚔ ${b.title}</span>
+  </button>`).join('') || '<p style="font-size:12px;color:var(--muted)">Bu yilgacha jang yo‘q</p>';
+  el.querySelectorAll('.battle-item').forEach(b => b.onclick = () => {
+    const battle = BATTLES.find(x => x.year === +b.dataset.year);
+    if(battle) openBattle(battle);
+  });
+}
+function buildCards(){
+  const el = document.getElementById('cards');
+  const list = BATTLES.filter(b => b.year <= currentYear);
+  el.innerHTML = list.map(b => `<article class="card" data-year="${b.year}">
+    <div class="cy">${b.year}</div>
+    <h4>${b.title}</h4>
+    <p>${b.summary}</p>
+  </article>`).join('');
+  el.querySelectorAll('.card').forEach(c => c.onclick = () => {
+    const battle = BATTLES.find(x => x.year === +c.dataset.year);
+    if(battle) openBattle(battle);
+  });
+}
+function renderMap(){
+  areaLayer.clearLayers(); routeLayer.clearLayers(); battleLayer.clearLayers();
+  AREAS.filter(a => currentYear >= a.from).forEach(a => {
+    L.circle(a.center, {
+      radius: a.radius, color: a.color, weight: 1.5,
+      fillColor: a.color, fillOpacity: 0.12, dashArray: '4 6'
+    }).bindTooltip(a.label).addTo(areaLayer);
+  });
+  ROUTES.filter(r => currentYear >= r.from && currentYear <= r.to).forEach(r => {
+    L.polyline(r.latlngs, {color:r.color, weight:2.5, dashArray:'6 10', opacity:0.85}).addTo(routeLayer);
+  });
+  BATTLES.filter(b => b.year <= currentYear).forEach(b => {
+    const m = L.circleMarker(b.coords, {
+      radius: 8, color:'#0a0e17', weight:2, fillColor:'#d4a84b', fillOpacity:1
+    }).addTo(battleLayer);
+    m.bindTooltip(`<b>${b.year}</b> · ${b.title}`, {direction:'top'});
+    m.on('click', () => openBattle(b));
+  });
+  L.circleMarker([39.65, 66.96], {
+    radius: 7, color:'#f0d078', weight:2, fillColor:'#d4a84b', fillOpacity:1
+  }).bindTooltip('Samarqand — poytaxt').addTo(battleLayer);
+}
+function setYear(y){
+  currentYear = y;
+  buildTimeline(); buildYearList(); buildBattleList(); buildCards(); renderMap();
+}
+function openBattle(b){
+  document.getElementById('dlgYear').textContent = b.year + ' · ' + b.place;
+  document.getElementById('dlgTitle').textContent = b.title;
+  document.getElementById('dlgText').textContent = b.detail;
+  document.getElementById('dlgPlace').textContent = b.place;
+  document.getElementById('dlg').showModal();
+  map.panTo(b.coords);
+}
+document.getElementById('dlgClose').onclick = () => document.getElementById('dlg').close();
+document.getElementById('dlg').addEventListener('click', e => {
+  if(e.target === document.getElementById('dlg')) document.getElementById('dlg').close();
+});
+document.getElementById('bioMore').onclick = () => {
+  document.getElementById('dlgYear').textContent = '1336–1405';
+  document.getElementById('dlgTitle').textContent = 'Amir Temur';
+  document.getElementById('dlgText').textContent = 'Amir Temur (1336, Xo‘ja Ilg‘or — 1405, O‘trar) Markaziy Osiyo tarixidagi eng yirik davlat arboblaridan biri. Samarqandni poytaxt qilib, Movarounnahr, Xuroson, Eron, Kavkaz, Shimoliy Hindiston va Anadolugacha ta’sir doirasini kengaytirdi. Bu sahifa o‘quv demosi: sxematik hududlar aniq tarixiy chegaralar o‘rnini bosmaydi.';
+  document.getElementById('dlgPlace').textContent = 'Manbalar alohida tekshiriladi';
+  document.getElementById('dlg').showModal();
+};
+document.getElementById('cardPrev').onclick = () => document.getElementById('cards').scrollBy({left:-180,behavior:'smooth'});
+document.getElementById('cardNext').onclick = () => document.getElementById('cards').scrollBy({left:180,behavior:'smooth'});
+buildTimeline(); buildYearList(); buildLegend(); buildBattleList(); buildCards(); renderMap();
 })();
 </script>
-</body></html>
+</body>
+</html>
