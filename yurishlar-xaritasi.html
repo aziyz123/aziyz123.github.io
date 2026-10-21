@@ -11,66 +11,33 @@
 :root{
   --bg:#070b14; --panel:#0d1524; --panel2:#111c2e; --line:#1e2d45;
   --gold:#d4a84b; --gold2:#f0d078; --text:#eef3fb; --muted:#8fa0b8;
-  --blue:#3b82c4; --green:#3d9b6a; --yellow:#d4a017; --orange:#e07a2f; --red:#c93c3c;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM Sans',system-ui,sans-serif;overflow:hidden}
 a{color:var(--gold2);text-decoration:none}
-.topbar{
-  height:64px; display:flex; align-items:center; gap:20px;
-  padding:0 18px; border-bottom:1px solid var(--line);
-  background:linear-gradient(180deg,#0f1828,#0a101c);
-  position:relative; z-index:20;
-}
+.topbar{height:64px;display:flex;align-items:center;gap:20px;padding:0 18px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,#0f1828,#0a101c);position:relative;z-index:20}
 .logo{display:flex;align-items:center;gap:12px;min-width:220px}
-.logo-mark{
-  width:40px;height:40px;border-radius:10px;
-  border:1px solid #8a6a2e; display:grid;place-items:center;
-  background:radial-gradient(circle at 30% 30%,#3a2a12,#1a1408);
-  color:var(--gold); font-size:18px;
-}
+.logo-mark{width:40px;height:40px;border-radius:10px;border:1px solid #8a6a2e;display:grid;place-items:center;background:radial-gradient(circle at 30% 30%,#3a2a12,#1a1408);color:var(--gold);font-size:18px}
 .logo h1{font-family:'Cinzel',serif;font-size:13px;letter-spacing:.12em;line-height:1.25;color:var(--gold2)}
 .logo small{display:block;font-family:'DM Sans',sans-serif;font-size:10px;color:var(--muted);letter-spacing:.04em;margin-top:2px;font-weight:400}
 .timeline{flex:1;display:flex;align-items:center;justify-content:center;gap:0;position:relative;max-width:640px;margin:0 auto}
-.timeline::before{
-  content:'';position:absolute;left:8%;right:8%;top:50%;height:2px;
-  background:linear-gradient(90deg,transparent,var(--line),var(--line),transparent);z-index:0;
-}
-.tl-item{
-  position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:4px;
-  cursor:pointer;padding:6px 14px;border:none;background:transparent;color:var(--muted);
-  font-family:inherit;transition:.2s;
-}
+.timeline::before{content:'';position:absolute;left:8%;right:8%;top:50%;height:2px;background:linear-gradient(90deg,transparent,var(--line),var(--line),transparent);z-index:0}
+.tl-item{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;padding:6px 14px;border:none;background:transparent;color:var(--muted);font-family:inherit;transition:.2s}
 .tl-item .yr{font-size:13px;font-weight:700;letter-spacing:.04em}
 .tl-item .lb{font-size:9px;text-transform:uppercase;letter-spacing:.06em;opacity:.75}
 .tl-item:hover{color:var(--gold2)}
-.tl-item.active{
-  color:#0a0e17; background:linear-gradient(135deg,var(--gold),var(--gold2));
-  border-radius:999px; box-shadow:0 0 20px #d4a84b55;
-}
+.tl-item.active{color:#0a0e17;background:linear-gradient(135deg,var(--gold),var(--gold2));border-radius:999px;box-shadow:0 0 20px #d4a84b55}
 .tl-item.active .lb{color:#3a2a10;opacity:1}
 .top-actions{display:flex;align-items:center;gap:8px;margin-left:auto}
-.icon-btn{
-  width:36px;height:36px;border-radius:10px;border:1px solid var(--line);
-  background:var(--panel);color:var(--muted);cursor:pointer;display:grid;place-items:center;font-size:14px;
-}
+.icon-btn{width:36px;height:36px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--muted);cursor:pointer;display:grid;place-items:center;font-size:14px}
 .icon-btn:hover{border-color:var(--gold);color:var(--gold)}
 .lang{font-size:11px;font-weight:700;letter-spacing:.08em;padding:0 10px;width:auto}
 .layout{display:grid;grid-template-columns:280px 1fr;height:calc(100% - 64px - 168px)}
-.sidebar{
-  background:var(--panel); border-right:1px solid var(--line);
-  overflow-y:auto; padding:14px; display:flex; flex-direction:column; gap:14px;
-}
-.panel{
-  background:var(--panel2); border:1px solid var(--line); border-radius:14px; padding:14px;
-}
+.sidebar{background:var(--panel);border-right:1px solid var(--line);overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:14px}
+.panel{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:14px}
 .panel h2{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;font-weight:700}
 .year-list,.battle-list{display:flex;flex-direction:column;gap:6px}
-.year-item,.battle-item{
-  display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;
-  cursor:pointer;border:1px solid transparent;background:transparent;color:var(--text);
-  font-size:12px;text-align:left;width:100%;font-family:inherit;
-}
+.year-item,.battle-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;cursor:pointer;border:1px solid transparent;background:transparent;color:var(--text);font-size:12px;text-align:left;width:100%;font-family:inherit}
 .year-item:hover,.battle-item:hover{background:#152238}
 .year-item.active{border-color:#8a6a2e;background:#1a150c}
 .dot{width:10px;height:10px;border-radius:50%;flex:none}
@@ -82,88 +49,42 @@ a{color:var(--gold2);text-decoration:none}
 #map{width:100%;height:100%}
 .leaflet-container{background:#0a1520;font-family:'DM Sans',sans-serif}
 .leaflet-control-zoom a{background:#0d1524!important;color:var(--gold)!important;border-color:var(--line)!important}
-.map-float{
-  position:absolute;z-index:500;background:rgba(13,21,36,.92);backdrop-filter:blur(8px);
-  border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:11px;color:var(--muted);
-}
+.map-float{position:absolute;z-index:500;background:rgba(13,21,36,.92);backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:11px;color:var(--muted)}
 .map-float.capital{top:16px;right:16px}
 .map-float.legend-map{bottom:16px;right:16px;display:flex;flex-direction:column;gap:6px}
 .map-float b{color:var(--gold2);font-size:12px}
 .map-float .row{display:flex;align-items:center;gap:8px}
-.bottom{
-  height:168px; border-top:1px solid var(--line);
-  background:linear-gradient(180deg,#0d1524,#0a101c);
-  display:grid; grid-template-columns:280px 1fr; gap:0;
-}
-.bio{
-  display:flex; gap:14px; padding:14px 16px; border-right:1px solid var(--line); align-items:center;
-}
-.portrait{
-  width:88px;height:100px;border-radius:12px;flex:none;
-  background:linear-gradient(145deg,#3a2a12,#1a1208);
-  border:1px solid #8a6a2e; display:grid;place-items:center;overflow:hidden;
-}
-.portrait-inner{
-  width:100%;height:100%;
-  background:radial-gradient(circle at 50% 30%,#c9a050 0%,transparent 40%),linear-gradient(180deg,#2a1c0a 0%,#0e0a05 100%);
-  display:flex;align-items:flex-end;justify-content:center;padding-bottom:8px;font-size:42px;
-}
+.bottom{height:168px;border-top:1px solid var(--line);background:linear-gradient(180deg,#0d1524,#0a101c);display:grid;grid-template-columns:280px 1fr}
+.bio{display:flex;gap:14px;padding:14px 16px;border-right:1px solid var(--line);align-items:center}
+.portrait{width:88px;height:100px;border-radius:12px;flex:none;background:linear-gradient(145deg,#3a2a12,#1a1208);border:1px solid #8a6a2e;display:grid;place-items:center;overflow:hidden}
+.portrait-inner{width:100%;height:100%;background:radial-gradient(circle at 50% 30%,#c9a050 0%,transparent 40%),linear-gradient(180deg,#2a1c0a 0%,#0e0a05 100%);display:flex;align-items:flex-end;justify-content:center;padding-bottom:8px;font-size:42px}
 .bio-text h3{font-family:'Cinzel',serif;font-size:14px;color:var(--gold2);letter-spacing:.06em}
 .bio-text p{font-size:11px;color:var(--muted);line-height:1.55;margin:6px 0 10px;max-height:56px;overflow:hidden}
-.bio-btn{
-  display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:8px;border:1px solid #8a6a2e;
-  background:transparent;color:var(--gold2);font-size:11px;cursor:pointer;font-family:inherit;
-}
+.bio-btn{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:8px;border:1px solid #8a6a2e;background:transparent;color:var(--gold2);font-size:11px;cursor:pointer;font-family:inherit}
 .bio-btn:hover{background:#1a150c}
 .cards-wrap{padding:12px 16px;overflow:hidden;display:flex;flex-direction:column}
 .cards-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
 .cards-head h2{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold)}
 .cards-nav{display:flex;gap:6px}
-.cards-nav button{
-  width:28px;height:28px;border-radius:8px;border:1px solid var(--line);
-  background:var(--panel);color:var(--muted);cursor:pointer;
-}
+.cards-nav button{width:28px;height:28px;border-radius:8px;border:1px solid var(--line);background:var(--panel);color:var(--muted);cursor:pointer}
 .cards-nav button:hover{color:var(--gold);border-color:var(--gold)}
 .cards{display:flex;gap:10px;overflow-x:auto;scroll-behavior:smooth;padding-bottom:4px}
-.cards::-webkit-scrollbar{height:4px}
-.cards::-webkit-scrollbar-thumb{background:#2a3a55;border-radius:4px}
-.card{
-  min-width:160px;max-width:180px;flex:none;
-  background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px;
-  cursor:pointer;transition:.15s;
-}
+.card{min-width:160px;max-width:180px;flex:none;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px;cursor:pointer;transition:.15s}
 .card:hover{border-color:#8a6a2e;transform:translateY(-2px)}
 .card .cy{font-size:11px;font-weight:700;color:var(--gold)}
 .card h4{font-size:12px;margin:6px 0 4px;line-height:1.3}
 .card p{font-size:10px;color:var(--muted);line-height:1.4}
-dialog{
-  border:1px solid #526078;border-radius:16px;background:#0d1524;color:var(--text);
-  padding:24px;max-width:440px;width:calc(100% - 32px);box-shadow:0 30px 80px #000a;
-}
+dialog{border:1px solid #526078;border-radius:16px;background:#0d1524;color:var(--text);padding:24px;max-width:440px;width:calc(100% - 32px);box-shadow:0 30px 80px #000a}
 dialog::backdrop{background:#02060bd9;backdrop-filter:blur(4px)}
 dialog h3{font-family:'Cinzel',serif;color:var(--gold2);margin:8px 0 10px;font-size:18px}
 dialog p{font-size:13px;color:var(--muted);line-height:1.65;margin-bottom:12px}
 dialog .close-x{float:right;background:none;border:0;color:var(--muted);font-size:22px;cursor:pointer}
-@media(max-width:900px){
-  .layout{grid-template-columns:1fr;height:calc(100% - 64px - 200px)}
-  .sidebar{display:none}
-  .bottom{grid-template-columns:1fr;height:200px}
-  .bio{border-right:0;border-bottom:1px solid var(--line)}
-  .timeline .lb{display:none}
-  .logo{min-width:auto}
-  .logo small{display:none}
-}
+@media(max-width:900px){.layout{grid-template-columns:1fr;height:calc(100% - 64px - 200px)}.sidebar{display:none}.bottom{grid-template-columns:1fr;height:200px}.bio{border-right:0;border-bottom:1px solid var(--line)}.timeline .lb{display:none}.logo small{display:none}}
 </style>
 </head>
 <body>
 <header class="topbar">
-  <a class="logo" href="./">
-    <div class="logo-mark">⚔</div>
-    <div>
-      <h1>AMIR TEMUR<br>DAVLATI KENGAYISHI</h1>
-      <small>Buyuk imperiyaning yuksalish yo‘li</small>
-    </div>
-  </a>
+  <a class="logo" href="./"><div class="logo-mark">⚔</div><div><h1>AMIR TEMUR<br>DAVLATI KENGAYISHI</h1><small>Buyuk imperiyaning yuksalish yo‘li</small></div></a>
   <nav class="timeline" id="timeline"></nav>
   <div class="top-actions">
     <button class="icon-btn" title="Asosiy" onclick="location.href='./'">⌂</button>
@@ -172,18 +93,9 @@ dialog .close-x{float:right;background:none;border:0;color:var(--muted);font-siz
 </header>
 <div class="layout">
   <aside class="sidebar">
-    <section class="panel">
-      <h2>Yillar bo‘yicha xarita</h2>
-      <div class="year-list" id="yearList"></div>
-    </section>
-    <section class="panel">
-      <h2>Imperiya kengayishi</h2>
-      <div id="legendGrow"></div>
-    </section>
-    <section class="panel">
-      <h2>⚔ Janglar va muhim voqealar</h2>
-      <div class="battle-list" id="battleList"></div>
-    </section>
+    <section class="panel"><h2>Yillar bo‘yicha xarita</h2><div class="year-list" id="yearList"></div></section>
+    <section class="panel"><h2>Imperiya kengayishi</h2><div id="legendGrow"></div></section>
+    <section class="panel"><h2>⚔ Janglar va muhim voqealar</h2><div class="battle-list" id="battleList"></div></section>
   </aside>
   <div class="map-wrap">
     <div id="map"></div>
@@ -205,186 +117,114 @@ dialog .close-x{float:right;background:none;border:0;color:var(--muted);font-siz
     </div>
   </div>
   <div class="cards-wrap">
-    <div class="cards-head">
-      <h2>Janglar va muhim voqealar</h2>
-      <div class="cards-nav">
-        <button id="cardPrev">‹</button>
-        <button id="cardNext">›</button>
-      </div>
-    </div>
+    <div class="cards-head"><h2>Janglar va muhim voqealar</h2><div class="cards-nav"><button id="cardPrev">‹</button><button id="cardNext">›</button></div></div>
     <div class="cards" id="cards"></div>
   </div>
 </footer>
-<dialog id="dlg">
-  <button class="close-x" id="dlgClose">×</button>
-  <div class="cy" id="dlgYear" style="color:var(--gold);font-size:12px;font-weight:700"></div>
-  <h3 id="dlgTitle"></h3>
-  <p id="dlgText"></p>
-  <p id="dlgPlace" style="color:var(--gold2);font-size:12px"></p>
-</dialog>
+<dialog id="dlg"><button class="close-x" id="dlgClose">×</button><div id="dlgYear" style="color:var(--gold);font-size:12px;font-weight:700"></div><h3 id="dlgTitle"></h3><p id="dlgText"></p><p id="dlgPlace" style="color:var(--gold2);font-size:12px"></p></dialog>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 (() => {
 'use strict';
 const STAGES = [
-  {year:1336, key:'start', label:'Boshlanishi', color:'#3b82c4', short:'Boshlanishi'},
-  {year:1360, key:'early', label:'Dastlabki yurishlar', color:'#3d9b6a', short:'Dastlabki yurishlar'},
-  {year:1370, key:'expand', label:'Kengayish davri', color:'#d4a017', short:'Kengayish davri'},
-  {year:1380, key:'west', label:'Yevropa va Kavkaz', color:'#e07a2f', short:'Yevropa va Kavkaz'},
-  {year:1390, key:'peak', label:'Imperiyaning cho‘qqisi', color:'#5b6fd6', short:'Cho‘qqi davri'},
-  {year:1400, key:'late', label:'So‘nggi yurishlar', color:'#c93c3c', short:'So‘nggi yurishlar'},
-  {year:1405, key:'end', label:'Vafoti', color:'#8b3a3a', short:'Vafoti'}
+  {year:1336,label:'Boshlanishi',color:'#3b82c4',short:'Boshlanishi'},
+  {year:1360,label:'Dastlabki yurishlar',color:'#3d9b6a',short:'Dastlabki yurishlar'},
+  {year:1370,label:'Kengayish davri',color:'#d4a017',short:'Kengayish davri'},
+  {year:1380,label:'Yevropa va Kavkaz',color:'#e07a2f',short:'Yevropa va Kavkaz'},
+  {year:1390,label:'Imperiyaning cho‘qqisi',color:'#5b6fd6',short:'Cho‘qqi davri'},
+  {year:1400,label:'So‘nggi yurishlar',color:'#c93c3c',short:'So‘nggi yurishlar'},
+  {year:1405,label:'Vafoti',color:'#8b3a3a',short:'Vafoti'}
 ];
 const GROW_LEGEND = [
-  {c:'#3b82c4', t:'1336–1360: Moviy'},
-  {c:'#3d9b6a', t:'1360–1370: Yashil'},
-  {c:'#d4a017', t:'1370–1380: Sariq'},
-  {c:'#e07a2f', t:'1380–1390: To‘q sariq'},
-  {c:'#c93c3c', t:'1390–1405: Qizil'}
+  {c:'#3b82c4',t:'1336–1360: Moviy'},{c:'#3d9b6a',t:'1360–1370: Yashil'},
+  {c:'#d4a017',t:'1370–1380: Sariq'},{c:'#e07a2f',t:'1380–1390: To‘q sariq'},{c:'#c93c3c',t:'1390–1405: Qizil'}
 ];
 const AREAS = [
-  {from:1336, to:1360, center:[39.2, 66.5], radius:180000, color:'#3b82c4', label:'Movarounnahr — boshlang‘ich'},
-  {from:1360, to:1370, center:[40.0, 68.0], radius:280000, color:'#3d9b6a', label:'Shimoliy kengayish'},
-  {from:1370, to:1380, center:[37.5, 62.0], radius:450000, color:'#d4a017', label:'Xuroson yo‘nalishi'},
-  {from:1380, to:1390, center:[40.5, 45.0], radius:520000, color:'#e07a2f', label:'Kavkaz va G‘arb'},
-  {from:1390, to:1405, center:[36.0, 55.0], radius:700000, color:'#c93c3c', label:'Imperiya cho‘qqisi (sxematik)'}
+  {from:1336,to:1360,center:[39.2,66.5],radius:180000,color:'#3b82c4',label:'Movarounnahr'},
+  {from:1360,to:1370,center:[40.0,68.0],radius:280000,color:'#3d9b6a',label:'Shimoliy kengayish'},
+  {from:1370,to:1380,center:[37.5,62.0],radius:450000,color:'#d4a017',label:'Xuroson'},
+  {from:1380,to:1390,center:[40.5,45.0],radius:520000,color:'#e07a2f',label:'Kavkaz va G‘arb'},
+  {from:1390,to:1405,center:[36.0,55.0],radius:700000,color:'#c93c3c',label:'Imperiya cho‘qqisi (sxematik)'}
 ];
 const BATTLES = [
-  {year:1371, title:'Panjakent jangi', place:'Panjakent, Movarounnahr', coords:[39.49, 67.61],
-   summary:'Amir Temurning dastlabki g‘alabalaridan biri.',
-   detail:'Panjakent atrofidagi to‘qnashuvlar Temurning Movarounnahrdagi hokimiyatini mustahkamlash yo‘lidagi muhim qadam bo‘ldi.'},
-  {year:1378, title:'Xo‘jand jangi', place:'Xo‘jand', coords:[40.28, 69.62],
-   summary:'Movarounnahrning shimoliy chegaralari mustahkamlandi.',
-   detail:'Xo‘jand yo‘nalishidagi harakatlar Temur davlatining shimoliy qanotini mustahkamladi.'},
-  {year:1381, title:'Hirot jangi', place:'Hirot, Xuroson', coords:[34.35, 62.20],
-   summary:'Xuroson yo‘nalishidagi muhim g‘alaba.',
-   detail:'Hirotning olinishi Temur hokimiyatining Xuroson bo‘ylab kengayishiga yo‘l ochdi.'},
-  {year:1386, title:'Tbilisi yo‘nalishi', place:'Kavkaz', coords:[41.72, 44.79],
-   summary:'Kavkazdagi yurishlar boshlandi.',
-   detail:'1380-yillar o‘rtalarida Temur qo‘shinlari Kavkaz yo‘nalishida faol harakat qildi.'},
-  {year:1391, title:'To‘xtamish bilan jang', place:'Qunduzcha daryosi atrofi', coords:[53.2, 51.0],
-   summary:'Oltin O‘rda ustidan muhim g‘alaba.',
-   detail:'To‘xtamishxon bilan bo‘lgan jang Temurning shimoliy siyosatida muhim burilish bo‘ldi.'},
-  {year:1395, title:'Tabriz / Kavkaz', place:'Tabriz — Kavkaz', coords:[38.08, 46.29],
-   summary:'Eron va Kavkaz to‘liq nazoratga olindi.',
-   detail:'Tabriz va atrofidagi yurishlar g‘arbiy frontni mustahkamladi.'},
-  {year:1398, title:'Dehli yurishi', place:'Dehli, Hindiston', coords:[28.61, 77.21],
-   summary:'Shimoliy Hindistonga yurish.',
-   detail:'1398-yilda Temur Dehliga yurish qilib, mintaqa siyosiy manzarasini o‘zgartirdi.'},
-  {year:1402, title:'Anqara jangi', place:'Anqara atrofi', coords:[40.02, 32.85],
-   summary:'Usmonlilar ustidan muhim g‘alaba.',
-   detail:'1402-yilda Anqara yaqinida Boyazid I qo‘shinlari mag‘lub etildi. Bu Usmonlilar tarixiga katta ta’sir ko‘rsatdi.'}
+  {year:1371,title:'Panjakent jangi',place:'Panjakent',coords:[39.49,67.61],summary:'Dastlabki g‘alabalardan biri.',detail:'Panjakent atrofida Temur hokimiyati mustahkamlandi.'},
+  {year:1378,title:'Xo‘jand jangi',place:'Xo‘jand',coords:[40.28,69.62],summary:'Shimoliy chegaralar mustahkamlandi.',detail:'Xo‘jand yo‘nalishi Temur davlatining shimoliy qanotini mustahkamladi.'},
+  {year:1381,title:'Hirot jangi',place:'Hirot, Xuroson',coords:[34.35,62.20],summary:'Xuroson yo‘nalishidagi g‘alaba.',detail:'Hirotning olinishi Xuroson bo‘ylab kengayishga yo‘l ochdi.'},
+  {year:1386,title:'Tbilisi yo‘nalishi',place:'Kavkaz',coords:[41.72,44.79],summary:'Kavkazdagi yurishlar.',detail:'Temur qo‘shinlari Kavkaz yo‘nalishida faol harakat qildi.'},
+  {year:1391,title:'To‘xtamish bilan jang',place:'Qunduzcha atrofi',coords:[53.2,51.0],summary:'Oltin O‘rda ustidan g‘alaba.',detail:'To‘xtamishxon bilan jang shimoliy siyosatda muhim burilish bo‘ldi.'},
+  {year:1395,title:'Tabriz / Kavkaz',place:'Tabriz',coords:[38.08,46.29],summary:'Eron va Kavkaz nazorati.',detail:'Tabriz yo‘nalishi g‘arbiy frontni mustahkamladi.'},
+  {year:1398,title:'Dehli yurishi',place:'Dehli',coords:[28.61,77.21],summary:'Shimoliy Hindistonga yurish.',detail:'1398-yilda Temur Dehliga yurish qildi.'},
+  {year:1402,title:'Anqara jangi',place:'Anqara',coords:[40.02,32.85],summary:'Usmonlilar ustidan g‘alaba.',detail:'Boyazid I mag‘lubiyatga uchradi; Usmonlilar tarixiga katta ta’sir.'}
 ];
 const ROUTES = [
-  {from:1370, to:1405, latlngs:[[39.65,66.96],[34.35,62.20],[28.61,77.21]], color:'#52d5d0'},
-  {from:1380, to:1405, latlngs:[[39.65,66.96],[40.02,32.85]], color:'#52d5d0'},
-  {from:1390, to:1405, latlngs:[[39.65,66.96],[53.2,51.0]], color:'#7ec8e3'}
+  {from:1370,to:1405,latlngs:[[39.65,66.96],[34.35,62.20],[28.61,77.21]],color:'#52d5d0'},
+  {from:1380,to:1405,latlngs:[[39.65,66.96],[40.02,32.85]],color:'#52d5d0'},
+  {from:1390,to:1405,latlngs:[[39.65,66.96],[53.2,51.0]],color:'#7ec8e3'}
 ];
 let currentYear = 1390;
-const map = L.map('map', {worldCopyJump:false, zoomControl:true}).setView([38.5, 58], 4);
-L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-  maxZoom: 18, attribution: '&copy; OpenStreetMap &copy; CARTO'
-}).addTo(map);
-const areaLayer = L.layerGroup().addTo(map);
-const routeLayer = L.layerGroup().addTo(map);
-const battleLayer = L.layerGroup().addTo(map);
+const map = L.map('map',{worldCopyJump:false,zoomControl:true}).setView([38.5,58],4);
+L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',{maxZoom:16,attribution:'&copy; Esri'}).addTo(map);
+const areaLayer=L.layerGroup().addTo(map),routeLayer=L.layerGroup().addTo(map),battleLayer=L.layerGroup().addTo(map);
 function buildTimeline(){
-  const el = document.getElementById('timeline');
-  const main = [1336,1370,1380,1390,1405];
-  el.innerHTML = main.map(y => {
-    const s = STAGES.find(x => x.year === y) || {year:y, short:String(y)};
-    return `<button class="tl-item${y===currentYear?' active':''}" data-year="${y}">
-      <span class="yr">${y}</span><span class="lb">${s.short}</span></button>`;
-  }).join('');
-  el.querySelectorAll('.tl-item').forEach(b => b.onclick = () => setYear(+b.dataset.year));
+  const el=document.getElementById('timeline');
+  const main=[1336,1370,1380,1390,1405];
+  el.innerHTML=main.map(y=>{const s=STAGES.find(x=>x.year===y)||{year:y,short:String(y)};return `<button class="tl-item${y===currentYear?' active':''}" data-year="${y}"><span class="yr">${y}</span><span class="lb">${s.short}</span></button>`}).join('');
+  el.querySelectorAll('.tl-item').forEach(b=>b.onclick=()=>setYear(+b.dataset.year));
 }
 function buildYearList(){
-  const el = document.getElementById('yearList');
-  el.innerHTML = STAGES.map(s => `<button class="year-item${s.year===currentYear?' active':''}" data-year="${s.year}">
-    <i class="dot" style="background:${s.color}"></i>
-    <span>${s.year}</span>
-    <span>${s.label}</span>
-  </button>`).join('');
-  el.querySelectorAll('.year-item').forEach(b => b.onclick = () => setYear(+b.dataset.year));
+  const el=document.getElementById('yearList');
+  el.innerHTML=STAGES.map(s=>`<button class="year-item${s.year===currentYear?' active':''}" data-year="${s.year}"><i class="dot" style="background:${s.color}"></i><span>${s.year}</span><span>${s.label}</span></button>`).join('');
+  el.querySelectorAll('.year-item').forEach(b=>b.onclick=()=>setYear(+b.dataset.year));
 }
 function buildLegend(){
-  document.getElementById('legendGrow').innerHTML = GROW_LEGEND.map(g =>
-    `<div class="legend-row"><i class="swatch" style="background:${g.c}"></i>${g.t}</div>`
-  ).join('') + `<div class="legend-row"><i class="swatch dash"></i> Hozirgi davlat chegaralari</div>`;
+  document.getElementById('legendGrow').innerHTML=GROW_LEGEND.map(g=>`<div class="legend-row"><i class="swatch" style="background:${g.c}"></i>${g.t}</div>`).join('')+`<div class="legend-row"><i class="swatch dash"></i> Hozirgi davlat chegaralari</div>`;
 }
 function buildBattleList(){
-  const el = document.getElementById('battleList');
-  const list = BATTLES.filter(b => b.year <= currentYear);
-  el.innerHTML = list.map(b => `<button class="battle-item" data-year="${b.year}">
-    <span style="color:var(--gold);font-weight:700;min-width:36px">${b.year}</span>
-    <span>⚔ ${b.title}</span>
-  </button>`).join('') || '<p style="font-size:12px;color:var(--muted)">Bu yilgacha jang yo‘q</p>';
-  el.querySelectorAll('.battle-item').forEach(b => b.onclick = () => {
-    const battle = BATTLES.find(x => x.year === +b.dataset.year);
-    if(battle) openBattle(battle);
-  });
+  const el=document.getElementById('battleList');
+  const list=BATTLES.filter(b=>b.year<=currentYear);
+  el.innerHTML=list.map(b=>`<button class="battle-item" data-year="${b.year}"><span style="color:var(--gold);font-weight:700;min-width:36px">${b.year}</span><span>⚔ ${b.title}</span></button>`).join('')||'<p style="font-size:12px;color:var(--muted)">Bu yilgacha jang yo‘q</p>';
+  el.querySelectorAll('.battle-item').forEach(b=>b.onclick=()=>{const x=BATTLES.find(t=>t.year===+b.dataset.year);if(x)openBattle(x)});
 }
 function buildCards(){
-  const el = document.getElementById('cards');
-  const list = BATTLES.filter(b => b.year <= currentYear);
-  el.innerHTML = list.map(b => `<article class="card" data-year="${b.year}">
-    <div class="cy">${b.year}</div>
-    <h4>${b.title}</h4>
-    <p>${b.summary}</p>
-  </article>`).join('');
-  el.querySelectorAll('.card').forEach(c => c.onclick = () => {
-    const battle = BATTLES.find(x => x.year === +c.dataset.year);
-    if(battle) openBattle(battle);
-  });
+  const el=document.getElementById('cards');
+  const list=BATTLES.filter(b=>b.year<=currentYear);
+  el.innerHTML=list.map(b=>`<article class="card" data-year="${b.year}"><div class="cy">${b.year}</div><h4>${b.title}</h4><p>${b.summary}</p></article>`).join('');
+  el.querySelectorAll('.card').forEach(c=>c.onclick=()=>{const x=BATTLES.find(t=>t.year===+c.dataset.year);if(x)openBattle(x)});
 }
 function renderMap(){
-  areaLayer.clearLayers(); routeLayer.clearLayers(); battleLayer.clearLayers();
-  AREAS.filter(a => currentYear >= a.from).forEach(a => {
-    L.circle(a.center, {
-      radius: a.radius, color: a.color, weight: 1.5,
-      fillColor: a.color, fillOpacity: 0.12, dashArray: '4 6'
-    }).bindTooltip(a.label).addTo(areaLayer);
+  areaLayer.clearLayers();routeLayer.clearLayers();battleLayer.clearLayers();
+  AREAS.filter(a=>currentYear>=a.from).forEach(a=>{
+    L.circle(a.center,{radius:a.radius,color:a.color,weight:1.5,fillColor:a.color,fillOpacity:0.12,dashArray:'4 6'}).bindTooltip(a.label).addTo(areaLayer);
   });
-  ROUTES.filter(r => currentYear >= r.from && currentYear <= r.to).forEach(r => {
-    L.polyline(r.latlngs, {color:r.color, weight:2.5, dashArray:'6 10', opacity:0.85}).addTo(routeLayer);
+  ROUTES.filter(r=>currentYear>=r.from&&currentYear<=r.to).forEach(r=>{
+    L.polyline(r.latlngs,{color:r.color,weight:2.5,dashArray:'6 10',opacity:0.85}).addTo(routeLayer);
   });
-  BATTLES.filter(b => b.year <= currentYear).forEach(b => {
-    const m = L.circleMarker(b.coords, {
-      radius: 8, color:'#0a0e17', weight:2, fillColor:'#d4a84b', fillOpacity:1
-    }).addTo(battleLayer);
-    m.bindTooltip(`<b>${b.year}</b> · ${b.title}`, {direction:'top'});
-    m.on('click', () => openBattle(b));
+  BATTLES.filter(b=>b.year<=currentYear).forEach(b=>{
+    const m=L.circleMarker(b.coords,{radius:8,color:'#0a0e17',weight:2,fillColor:'#d4a84b',fillOpacity:1}).addTo(battleLayer);
+    m.bindTooltip(`<b>${b.year}</b> · ${b.title}`);m.on('click',()=>openBattle(b));
   });
-  L.circleMarker([39.65, 66.96], {
-    radius: 7, color:'#f0d078', weight:2, fillColor:'#d4a84b', fillOpacity:1
-  }).bindTooltip('Samarqand — poytaxt').addTo(battleLayer);
+  L.circleMarker([39.65,66.96],{radius:7,color:'#f0d078',weight:2,fillColor:'#d4a84b',fillOpacity:1}).bindTooltip('Samarqand — poytaxt').addTo(battleLayer);
 }
-function setYear(y){
-  currentYear = y;
-  buildTimeline(); buildYearList(); buildBattleList(); buildCards(); renderMap();
-}
+function setYear(y){currentYear=y;buildTimeline();buildYearList();buildBattleList();buildCards();renderMap()}
 function openBattle(b){
-  document.getElementById('dlgYear').textContent = b.year + ' · ' + b.place;
-  document.getElementById('dlgTitle').textContent = b.title;
-  document.getElementById('dlgText').textContent = b.detail;
-  document.getElementById('dlgPlace').textContent = b.place;
-  document.getElementById('dlg').showModal();
-  map.panTo(b.coords);
+  document.getElementById('dlgYear').textContent=b.year+' · '+b.place;
+  document.getElementById('dlgTitle').textContent=b.title;
+  document.getElementById('dlgText').textContent=b.detail;
+  document.getElementById('dlgPlace').textContent=b.place;
+  document.getElementById('dlg').showModal();map.panTo(b.coords);
 }
-document.getElementById('dlgClose').onclick = () => document.getElementById('dlg').close();
-document.getElementById('dlg').addEventListener('click', e => {
-  if(e.target === document.getElementById('dlg')) document.getElementById('dlg').close();
-});
-document.getElementById('bioMore').onclick = () => {
-  document.getElementById('dlgYear').textContent = '1336–1405';
-  document.getElementById('dlgTitle').textContent = 'Amir Temur';
-  document.getElementById('dlgText').textContent = 'Amir Temur (1336, Xo‘ja Ilg‘or — 1405, O‘trar) Markaziy Osiyo tarixidagi eng yirik davlat arboblaridan biri. Samarqandni poytaxt qilib, Movarounnahr, Xuroson, Eron, Kavkaz, Shimoliy Hindiston va Anadolugacha ta’sir doirasini kengaytirdi. Bu sahifa o‘quv demosi: sxematik hududlar aniq tarixiy chegaralar o‘rnini bosmaydi.';
-  document.getElementById('dlgPlace').textContent = 'Manbalar alohida tekshiriladi';
+document.getElementById('dlgClose').onclick=()=>document.getElementById('dlg').close();
+document.getElementById('dlg').addEventListener('click',e=>{if(e.target===document.getElementById('dlg'))document.getElementById('dlg').close()});
+document.getElementById('bioMore').onclick=()=>{
+  document.getElementById('dlgYear').textContent='1336–1405';
+  document.getElementById('dlgTitle').textContent='Amir Temur';
+  document.getElementById('dlgText').textContent='Amir Temur (1336–1405) Markaziy Osiyo tarixidagi eng yirik davlat arboblaridan biri. Samarqand poytaxt qilib, Movarounnahr, Xuroson, Eron, Kavkaz, Shimoliy Hindiston va Anadolugacha ta’sir doirasini kengaytirdi. Bu sahifa o‘quv demosi: sxematik hududlar aniq tarixiy chegaralar o‘rnini bosmaydi.';
+  document.getElementById('dlgPlace').textContent='Manbalar alohida tekshiriladi';
   document.getElementById('dlg').showModal();
 };
-document.getElementById('cardPrev').onclick = () => document.getElementById('cards').scrollBy({left:-180,behavior:'smooth'});
-document.getElementById('cardNext').onclick = () => document.getElementById('cards').scrollBy({left:180,behavior:'smooth'});
-buildTimeline(); buildYearList(); buildLegend(); buildBattleList(); buildCards(); renderMap();
+document.getElementById('cardPrev').onclick=()=>document.getElementById('cards').scrollBy({left:-180,behavior:'smooth'});
+document.getElementById('cardNext').onclick=()=>document.getElementById('cards').scrollBy({left:180,behavior:'smooth'});
+buildTimeline();buildYearList();buildLegend();buildBattleList();buildCards();renderMap();
 })();
 </script>
 </body>
