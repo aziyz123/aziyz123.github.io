@@ -16,7 +16,7 @@ button{font-family:inherit}
 .logo-mark{width:34px;height:34px;border-radius:9px;border:1px solid #8a6a2e;flex:none;background:radial-gradient(circle at 30% 30%,#3a2a12,#1a1408);display:grid;place-items:center;font-size:15px}
 .logo h1{font-family:'Cinzel',serif;font-size:11px;letter-spacing:.1em;line-height:1.2;color:var(--gold2)}
 .logo small{display:block;font-size:8px;color:var(--muted);font-weight:400;margin-top:1px}
-.timeline{flex:1;display:flex;align-items:center;justify-content:center;gap:2px;overflow-x:auto}
+.timeline{flex:1;display:flex;align-items:center;justify-content:safe center;gap:2px;overflow-x:auto}
 .tl-item{border:none;background:transparent;color:var(--muted);padding:5px 9px;border-radius:999px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:1px;flex:none}
 .tl-item .yr{font-size:12px;font-weight:700}.tl-item .lb{font-size:7px;text-transform:uppercase;opacity:.7}
 .tl-item.active{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#0a0e17;box-shadow:0 0 14px #d4a84b55}
@@ -53,6 +53,12 @@ dialog::backdrop{background:#02060bd9}dialog h3{font-family:'Cinzel',serif;color
 dialog p{font-size:13px;color:var(--muted);line-height:1.55}
 dialog .close-x{float:right;background:none;border:0;color:var(--muted);font-size:22px;cursor:pointer}
 @media(min-width:800px){.logo h1{font-size:13px}.bottom{height:160px}.portrait{width:64px;height:74px;font-size:32px}.bio-text p{-webkit-line-clamp:3;font-size:11px}.hotspot{width:32px;height:32px;margin-left:-16px;margin-top:-16px;font-size:13px}}
+.geo{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:100%;height:100%}
+.geo svg{position:absolute;inset:0;width:100%;height:100%}
+.geo #spots{position:absolute;inset:0}
+.hotspot .pl{position:absolute;top:100%;left:50%;transform:translateX(-50%);margin-top:3px;font-style:normal;font-size:9px;font-weight:600;color:var(--gold2);white-space:nowrap;text-shadow:0 0 4px #000,0 0 6px #000;pointer-events:none}
+.hotspot .yr{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);margin-bottom:2px;font-style:normal;font-size:9px;font-weight:700;color:#fff;background:#0a0e17cc;border:1px solid #8a6a2e;border-radius:999px;padding:0 5px;white-space:nowrap;pointer-events:none}
+.legend-stages{display:flex;gap:8px;flex-wrap:wrap}
 </style>
 </head>
 <body>
@@ -64,19 +70,7 @@ dialog .close-x{float:right;background:none;border:0;color:var(--muted);font-siz
 <div class="stage">
   <div class="map-frame">
     <img class="map-bg" id="mapBg" alt="Amir Temur davlati xaritasi">
-    <div class="tint y1336" data-from="1336"></div>
-    <div class="tint y1370" data-from="1370"></div>
-    <div class="tint y1380" data-from="1380"></div>
-    <div class="tint y1390" data-from="1390"></div>
-    <button class="hotspot capital" style="left:58%;top:42%" title="Samarqand">★</button>
-    <button class="hotspot" data-year="1371" style="left:55%;top:40%" data-title="Panjakent jangi" data-place="Panjakent" data-detail="Dastlabki g‘alabalardan biri. Temur hokimiyati mustahkamlandi.">⚔</button>
-    <button class="hotspot" data-year="1378" style="left:62%;top:36%" data-title="Xo‘jand jangi" data-place="Xo‘jand" data-detail="Shimoliy chegaralar mustahkamlandi.">⚔</button>
-    <button class="hotspot" data-year="1381" style="left:52%;top:55%" data-title="Hirot jangi" data-place="Hirot" data-detail="Xuroson yo‘nalishidagi muhim g‘alaba.">⚔</button>
-    <button class="hotspot" data-year="1386" style="left:38%;top:38%" data-title="Tbilisi yo‘nalishi" data-place="Kavkaz" data-detail="Kavkazdagi yurishlar boshlandi.">⚔</button>
-    <button class="hotspot" data-year="1391" style="left:48%;top:22%" data-title="To‘xtamish bilan jang" data-place="Qunduzcha" data-detail="Oltin O‘rda ustidan muhim g‘alaba.">⚔</button>
-    <button class="hotspot" data-year="1395" style="left:42%;top:48%" data-title="Tabriz jangi" data-place="Tabriz" data-detail="Eron va Kavkaz nazorati mustahkamlandi.">⚔</button>
-    <button class="hotspot" data-year="1398" style="left:78%;top:62%" data-title="Dehli yurishi" data-place="Dehli" data-detail="Shimoliy Hindistonga yurish.">⚔</button>
-    <button class="hotspot" data-year="1402" style="left:28%;top:40%" data-title="Anqara jangi" data-place="Anqara" data-detail="Usmonlilar ustidan g‘alaba. Boyazid I mag‘lub.">⚔</button>
+    <div class="geo" id="geo"><svg id="geoSvg" viewBox="0 0 1000 667" preserveAspectRatio="none" aria-label="Amir Temur davlati kengayishi xaritasi"><defs><marker id="arr" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#fff3c4"/></marker></defs><g id="grid"></g><g id="areas"></g><g id="routes"></g></svg><div id="spots"></div></div>
     <div class="float cap"><b>★ Poytaxt: Samarqand</b></div>
     <div class="float leg"><div class="row"><span class="dot"></span> Muhim janglar</div><div class="row"><span style="color:#f0d078">→</span> Yurish yo‘nalishlari</div></div>
   </div>
@@ -85,7 +79,7 @@ dialog .close-x{float:right;background:none;border:0;color:var(--muted);font-siz
   <div class="bio-row"><div class="portrait">👑</div><div class="bio-text"><h3>AMIR TEMUR (1336–1405)</h3><p>Dono siyosati, kuchli armiyasi va madaniyatga e’tibori bilan o‘z davrining eng buyuk hukmdorlaridan biri.</p></div></div>
   <div><div class="cards-head"><h2>Janglar va muhim voqealar</h2></div><div class="cards" id="cards"></div></div>
 </footer>
-<dialog id="dlg"><button class="close-x" id="dlgClose">×</button><div id="dlgYear" style="color:var(--gold);font-size:11px;font-weight:700"></div><h3 id="dlgTitle"></h3><p id="dlgText"></p><p id="dlgPlace" style="color:var(--gold2);font-size:12px;margin-top:6px"></p></dialog>
+<dialog id="dlg"><button class="close-x" id="dlgClose">×</button><div id="dlgYear" style="color:var(--gold);font-size:11px;font-weight:700"></div><h3 id="dlgTitle"></h3><p id="dlgText"></p><p id="dlgPlace" style="color:var(--gold2);font-size:12px;margin-top:6px"></p><p style="margin-top:8px"><a id="dlgSrc" href="#" target="_blank" rel="noopener" style="color:var(--gold2);font-size:12px">Manba ↗</a></p></dialog>
 <script>
 (()=>{
 'use strict';
@@ -93,26 +87,27 @@ dialog .close-x{float:right;background:none;border:0;color:var(--muted);font-siz
 const img=document.getElementById('mapBg');
 img.onerror=()=>{img.style.display='none';document.querySelector('.map-frame').style.background='radial-gradient(ellipse at 50% 45%,#1a2a3d,#0a121c)'};
 img.src='temur-map-bg.jpg';
-const YEARS=[{y:1336,short:'Boshlanishi'},{y:1370,short:'Kengayish'},{y:1380,short:'Kavkaz'},{y:1390,short:'Cho‘qqi'},{y:1405,short:'Vafoti'}];
-let current=1390;
-const BATTLES=[
-{year:1371,title:'Panjakent jangi',place:'Panjakent',summary:'Dastlabki g‘alaba',detail:'Temur hokimiyati mustahkamlandi.'},
-{year:1378,title:'Xo‘jand jangi',place:'Xo‘jand',summary:'Shimoliy chegaralar',detail:'Shimoliy qanot mustahkamlandi.'},
-{year:1381,title:'Hirot jangi',place:'Hirot',summary:'Xuroson g‘alabasi',detail:'Xuroson bo‘ylab kengayishga yo‘l ochildi.'},
-{year:1386,title:'Tbilisi yo‘nalishi',place:'Kavkaz',summary:'Kavkaz yurishlari',detail:'Kavkaz yo‘nalishida faol harakat.'},
-{year:1391,title:'To‘xtamish bilan jang',place:'Qunduzcha',summary:'Oltin O‘rda',detail:'Shimoliy siyosatda muhim burilish.'},
-{year:1395,title:'Tabriz jangi',place:'Tabriz',summary:'Eron–Kavkaz',detail:'G‘arbiy front mustahkamlandi.'},
-{year:1398,title:'Dehli yurishi',place:'Dehli',summary:'Hindiston',detail:'Shimoliy Hindistonga yurish.'},
-{year:1402,title:'Anqara jangi',place:'Anqara',summary:'Usmonlilar',detail:'Boyazid I mag‘lubiyatga uchradi.'}
-];
-function buildTimeline(){const el=document.getElementById('timeline');el.innerHTML=YEARS.map(t=>`<button class="tl-item${t.y===current?' active':''}" data-y="${t.y}"><span class="yr">${t.y}</span><span class="lb">${t.short}</span></button>`).join('');el.querySelectorAll('.tl-item').forEach(b=>b.onclick=()=>setYear(+b.dataset.y))}
-function setYear(y){current=y;buildTimeline();document.querySelectorAll('.tint').forEach(t=>t.classList.toggle('on',current>=+t.dataset.from));document.querySelectorAll('.hotspot[data-year]').forEach(h=>h.classList.toggle('hidden',current<+h.dataset.year));buildCards()}
-function buildCards(){const el=document.getElementById('cards');const list=BATTLES.filter(b=>b.year<=current);el.innerHTML=list.map(b=>`<article class="card" data-year="${b.year}"><div class="cy">${b.year}</div><h4>${b.title}</h4><p>${b.summary}</p></article>`).join('');el.querySelectorAll('.card').forEach(c=>c.onclick=()=>{const b=BATTLES.find(x=>x.year===+c.dataset.year);if(b)openDlg(b)})}
-function openDlg(b){document.getElementById('dlgYear').textContent=b.year+' · '+b.place;document.getElementById('dlgTitle').textContent=b.title;document.getElementById('dlgText').textContent=b.detail;document.getElementById('dlgPlace').textContent=b.place;document.getElementById('dlg').showModal()}
-document.querySelectorAll('.hotspot[data-year]').forEach(h=>h.addEventListener('click',()=>openDlg({year:+h.dataset.year,title:h.dataset.title,place:h.dataset.place,detail:h.dataset.detail})));
-document.getElementById('dlgClose').onclick=()=>document.getElementById('dlg').close();
-document.getElementById('dlg').addEventListener('click',e=>{if(e.target.id==='dlg')document.getElementById('dlg').close()});
-buildTimeline();setYear(1390);
+const $=id=>document.getElementById(id);
+const LAT=[22,56],LNG=[22,88],W=1000,H=667;
+const px=(lat,lng)=>[(lng-LNG[0])/(LNG[1]-LNG[0])*W,(LAT[1]-lat)/(LAT[1]-LAT[0])*H];
+const pct=(lat,lng)=>{const [x,y]=px(lat,lng);return [x/W*100,y/H*100]};
+let D=null,current=1390;
+// Keep 3:2 geographic frame centered inside the stage
+function fit(){const f=document.querySelector('.map-frame'),g=$('geo');const fw=f.clientWidth,fh=f.clientHeight;const w=Math.min(fw,fh*1.5),h=w/1.5;g.style.width=w+'px';g.style.height=h+'px'}
+addEventListener('resize',fit);
+function drawGrid(){let h='';for(let lng=30;lng<=80;lng+=10){const [x]=px(0,lng);h+=`<line x1="${x}" y1="0" x2="${x}" y2="${H}" stroke="#ffffff14" stroke-width="1"/><text x="${x+3}" y="${H-5}" fill="#ffffff44" font-size="11">${lng}°E</text>`}for(let lat=25;lat<=55;lat+=10){const [,y]=px(lat,0);h+=`<line x1="0" y1="${y}" x2="${W}" y2="${y}" stroke="#ffffff14" stroke-width="1"/><text x="4" y="${y-3}" fill="#ffffff44" font-size="11">${lat}°N</text>`}$('grid').innerHTML=h}
+function stageIdx(y){let k=-1;D.stages.forEach((s,i)=>{if(y>=s.year)k=i});return k}
+function buildTimeline(){const el=$('timeline');el.innerHTML=D.stages.map(t=>`<button class="tl-item${t.year===current?' active':''}" data-y="${t.year}"><span class="yr">${t.year}</span><span class="lb">${t.short}</span></button>`).join('');el.querySelectorAll('.tl-item').forEach(b=>b.onclick=()=>setYear(+b.dataset.y));const act=el.querySelector('.active');if(act&&act.scrollIntoView)act.scrollIntoView({inline:'center',block:'nearest'})}
+function drawAreas(){const k=stageIdx(current);let h='';for(let i=k;i>=0;i--){const st=D.stages[i];const pts=st.polygon.map(([la,lo])=>px(la,lo).map(v=>v.toFixed(1)).join(',')).join(' ');h+=`<polygon points="${pts}" fill="${st.color}" fill-opacity=".38" stroke="${st.color}" stroke-width="1.6" stroke-linejoin="round"><title>${st.year} • ${st.areaName} (sxematik)</title></polygon>`}$('areas').innerHTML=h}
+function drawRoutes(){$('routes').innerHTML=D.routes.filter(r=>current>=r.from).map(r=>{const pts=r.path.map(([la,lo])=>px(la,lo).map(v=>v.toFixed(1)).join(',')).join(' ');return `<polyline points="${pts}" fill="none" stroke="#fff3c4" stroke-width="2.2" stroke-dasharray="7 7" stroke-linecap="round" stroke-linejoin="round" opacity=".9" marker-end="url(#arr)" vector-effect="non-scaling-stroke"><title>${r.label} (${r.from}${r.to>r.from?'–'+r.to:''})</title></polyline>`}).join('')}
+function buildSpots(){const cap=D.capital;const [cx,cy]=pct(cap.coords[0],cap.coords[1]);let h=`<button class="hotspot capital" style="left:${cx}%;top:${cy}%" title="${cap.name}">★<i class="pl">${cap.name}</i></button>`;D.battles.forEach(b=>{const [x,y]=pct(b.coords[0],b.coords[1]);h+=`<button class="hotspot" data-id="${b.id}" data-year="${b.year}" style="left:${x}%;top:${y}%" title="${b.title}">⚔<i class="yr">${b.year}</i></button>`});$('spots').innerHTML=h;$('spots').querySelectorAll('.hotspot[data-id]').forEach(h=>h.onclick=()=>openDlg(D.battles.find(b=>b.id===h.dataset.id)))}
+function buildCards(){const el=$('cards');const list=D.battles.filter(b=>b.year<=current);el.innerHTML=list.map(b=>`<article class="card" data-id="${b.id}"><div class="cy">${b.year}</div><h4>${b.title}</h4><p>${b.place}</p></article>`).join('')||'<p style="font-size:11px;color:var(--muted)">Bu bosqichgacha muhim jang qayd etilmagan.</p>';el.querySelectorAll('.card').forEach(c=>c.onclick=()=>openDlg(D.battles.find(b=>b.id===c.dataset.id)))}
+function setYear(y){current=y;buildTimeline();drawAreas();drawRoutes();document.querySelectorAll('.hotspot[data-year]').forEach(h=>h.classList.toggle('hidden',current<+h.dataset.year));buildCards()}
+function openDlg(b){$('dlgYear').textContent=b.year+' · '+b.place;$('dlgTitle').textContent=b.title;$('dlgText').textContent=b.detail;$('dlgPlace').textContent=b.summary;$('dlgSrc').href=b.source;$('dlg').showModal()}
+$('dlgClose').onclick=()=>$('dlg').close();
+$('dlg').addEventListener('click',e=>{if(e.target.id==='dlg')$('dlg').close()});
+fit();drawGrid();
+fetch('data/campaigns/timur.json').then(r=>{if(!r.ok)throw 0;return r.json()}).then(d=>{D=d;buildSpots();setYear(1390);fit()}).catch(()=>{$('cards').innerHTML='<p style="font-size:11px;color:var(--muted)">Ma’lumot yuklanmadi (data/campaigns/timur.json). Sahifani server orqali oching.</p>'});
 })();
 </script>
 </body>
