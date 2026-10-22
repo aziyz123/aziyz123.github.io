@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#020914">
+<title>Amir Temur — Interaktiv atlas</title>
+<style>
+:root{--g:#e8bd5b;--p:#061322ed;--l:#b98b3d66}
+*{box-sizing:border-box}
+body{margin:0;background:#020914;color:#f4efdf;font-family:Arial,Helvetica,sans-serif}
+.app{padding:16px;background:radial-gradient(ellipse at top,#17334b,#020914 70%);min-height:100vh}
+header,.panel,.timeline{background:var(--p);border:1px solid var(--l);border-radius:14px;padding:14px}
+header{display:flex;justify-content:space-between;align-items:center;gap:12px}
+h1{font:clamp(20px,3vw,32px) Georgia,serif;color:var(--g);margin:0}
+.sub{font-size:12px;color:#bbb;margin-top:5px}
+button{cursor:pointer;background:#0b1c2e;color:#f7d987;border:1px solid var(--l);border-radius:8px;padding:9px;font-family:inherit}
+button:hover,.active{background:#34265f!important}
+.timeline{display:flex;gap:7px;margin:10px 0;overflow:auto}
+.era{min-width:105px;flex:1;background:transparent;border-color:transparent}
+.era strong{display:block;font:20px Georgia,serif;color:var(--g)}
+.era span{font-size:11px;color:#ddd}
+.layout{display:grid;grid-template-columns:245px minmax(0,1fr);gap:10px}
+.side{display:flex;flex-direction:column;gap:10px}
+.panel h3{font-size:14px;color:#f4d17b;margin:0 0 10px}
+.yearlist,.battles{display:grid;gap:5px}
+.yearbtn{display:flex;gap:8px;text-align:left;align-items:center;color:#eee;background:transparent;border-color:transparent;width:100%;font-size:12px}
+.yearbtn.off{opacity:.35}
+.yearbtn span.by{background:#3a2530;color:#ffb3b3;border-radius:5px;padding:2px 6px;font-size:10px;font-weight:700;min-width:38px;text-align:center}
+.dot{width:11px;height:11px;border-radius:50%;flex:none}
+.legend{font-size:12px;line-height:1.9;color:#ddd;display:grid;gap:2px}
+.legend div{display:flex;align-items:center;gap:8px;transition:opacity .4s}
+.legend div.off{opacity:.3}
+.legend i{width:13px;height:10px;border-radius:3px;flex:none}
+.map{position:relative;aspect-ratio:1400/788;overflow:hidden;border:1px solid #9a7439;border-radius:14px;background:#07121e;touch-action:none;user-select:none}
+.zoomer{position:absolute;inset:0;transform-origin:0 0;will-change:transform}
+.zoomer svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+.mask-poly{fill:#fff;opacity:0;transition:opacity 1.1s ease}
+.mask-poly.on{opacity:1}
+.edge{fill:none;stroke-width:2.2;stroke-linejoin:round;opacity:0;transition:opacity 1.1s ease;filter:drop-shadow(0 0 4px currentColor)}
+.edge.on{opacity:.85}
+.edge.new{animation:pulse 1.6s ease-out 1}
+@keyframes pulse{0%{stroke-width:7;opacity:1}100%{stroke-width:2.2;opacity:.85}}
+.hs{position:absolute;width:30px;height:30px;margin:-15px 0 0 -15px;border-radius:50%;border:2px solid var(--g);background:radial-gradient(circle at 35% 30%,#2a3346,#0a0e17);color:#fff;display:grid;place-items:center;font-size:13px;padding:0;z-index:5;box-shadow:0 0 0 2px #0a0e17,0 0 14px #000c;transform:scale(calc(1/var(--k,1)));transition:opacity .5s}
+.hs.hidden{opacity:0;pointer-events:none}
+.hs.sel{box-shadow:0 0 0 2px #0a0e17,0 0 0 5px #f0d07899,0 0 22px #f0d078}
+.hs .yr{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);margin-bottom:3px;font:700 10px Arial,sans-serif;color:#ffe2a0;background:#0a0e17ee;border:1px solid #8a6a2e;border-radius:999px;padding:0 6px;white-space:nowrap;pointer-events:none}
+.hs.cap{background:radial-gradient(circle,#f6d995,#d4a84b);color:#1a1204;border-color:#fff3c4;width:24px;height:24px;margin:-12px 0 0 -12px}
+.tools{position:absolute;right:10px;top:10px;display:grid;gap:6px;z-index:9}
+.tools button{width:36px;height:36px;padding:0;background:#061322e8}
+.note{position:absolute;bottom:10px;left:10px;background:#061322e8;padding:10px;border-radius:8px;border:1px solid var(--l);font-size:11px;max-width:270px;z-index:8}
+.note b{color:#ffdb79}
+.titlecard{position:absolute;left:14px;top:12px;z-index:8;pointer-events:none;text-shadow:0 2px 14px #000,0 0 8px #000}
+.titlecard b{display:block;font:bold clamp(14px,2.4vw,26px) Georgia,serif;color:#f6d995;letter-spacing:.04em}
+.titlecard span{font:clamp(11px,1.5vw,15px) Georgia,serif;color:#fff}
+.range{display:flex;gap:12px;align-items:center;margin:10px 0}
+.range input{flex:1;accent-color:var(--g)}
+output{font:22px Georgia,serif;color:var(--g);min-width:52px;text-align:right}
+.lower{display:grid;grid-template-columns:1fr 2fr;gap:10px}
+.profile{display:flex;gap:12px;align-items:center}
+.portrait{width:104px;height:126px;border-radius:12px;border:1px solid #8a6a2e;object-fit:cover;object-position:top;flex:none}
+.profile p,.event p{font-size:11px;line-height:1.5;color:#d2d1ce;margin:0 0 8px}
+.events{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+.event{background:#0a1a2a;border:1px solid #ffffff20;border-radius:8px;overflow:hidden;cursor:pointer;transition:border-color .2s,transform .2s;padding:0;text-align:left;color:inherit;display:block}
+.event:hover{border-color:#9c7a43;transform:translateY(-2px);background:#0a1a2a}
+.event .th{height:62px;background-size:cover;background-position:center;position:relative}
+.event .th span{position:absolute;left:6px;top:6px;background:#76572a;padding:3px 6px;border-radius:4px;font-size:11px;color:#ffe6a4}
+.event .tx{padding:8px 9px 9px}
+.event h4{font-size:12px;margin:0 0 3px}
+.event p{margin:0}
+.foot{font-size:10px;line-height:1.5;color:#aab2bc;margin-top:10px}
+dialog{border:1px solid #526078;border-radius:16px;background:#0d1524;color:#f4efdf;padding:20px;max-width:400px;width:calc(100% - 24px)}
+dialog::backdrop{background:#02060bd9}
+dialog h3{font:17px Georgia,serif;color:#f6d995;margin:6px 0 8px}
+dialog p{font-size:13px;color:#b8c6da;line-height:1.6;margin:0}
+dialog img{width:100%;border-radius:10px;margin-bottom:10px;max-height:160px;object-fit:cover}
+dialog .x{float:right;background:none;border:0;font-size:24px;color:#8fa0b8;padding:0 4px}
+dialog a{color:#f0d078;font-size:12px}
+@media(max-width:850px){.layout{grid-template-columns:minmax(0,1fr)}main{order:-1}.side{display:grid;grid-template-columns:repeat(2,1fr)}.lower{grid-template-columns:1fr}.events{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:540px){.app{padding:7px}.side{grid-template-columns:1fr}.map{aspect-ratio:4/3}.note{font-size:10px;padding:6px;max-width:200px}.events{grid-template-columns:1fr 1fr}.top button:nth-child(2){display:none}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <div><h1>♜ AMIR TEMUR</h1><div style="color:var(--g);font:bold 13px Georgia,serif">DAVLATI KENGAYISHI</div><div class="sub">Buyuk imperiyaning yuksalish yo‘li</div></div>
+  <div class="top"><button id="play">▶ Animatsiya</button> <button id="reset">⌖ Markazlash</button> <a href="./" style="color:#f7d987;font-size:12px;margin-left:6px">← Bosh sahifa</a></div>
+</header>
+<nav class="timeline" id="eras"></nav>
+<div class="layout">
+<aside class="side">
+  <section class="panel"><h3>▦ Yillar bo‘yicha xarita</h3><div class="yearlist" id="yearlist"></div></section>
+  <section class="panel"><h3>Imperiya kengayishi</h3><div class="legend" id="legend"></div></section>
+  <section class="panel"><h3>⚔ Janglar va muhim voqealar</h3><div class="battles" id="battles"></div></section>
+</aside>
+<main>
+  <div class="map" id="map">
+    <div class="zoomer" id="zoomer">
+      <svg id="svg" viewBox="0 0 1400 788" preserveAspectRatio="none" aria-label="Amir Temur davri badiiy tarixiy xaritasi">
+        <defs>
+          <filter id="soft" x="-5%" y="-5%" width="110%" height="110%"><feGaussianBlur stdDeviation="6"/></filter>
+          <radialGradient id="corner" gradientUnits="userSpaceOnUse" cx="0" cy="0" r="400"><stop offset="0" stop-color="#030b16"/><stop offset=".7" stop-color="#030b16" stop-opacity="1"/><stop offset="1" stop-color="#030b16" stop-opacity="0"/></radialGradient>
+          <mask id="reveal" maskUnits="userSpaceOnUse" x="0" y="0" width="1400" height="788"><g id="maskG" filter="url(#soft)"></g></mask>
+        </defs>
+        <image href="assets/atlas-map.jpg" width="1400" height="788" preserveAspectRatio="none" style="filter:brightness(.52) saturate(.45)"/>
+        <image href="assets/atlas-map.jpg" width="1400" height="788" preserveAspectRatio="none" mask="url(#reveal)"/>
+        <g id="edges"></g>
+        <rect x="0" y="0" width="420" height="260" fill="url(#corner)"/>
+      </svg>
+      <div id="hot"></div>
+    </div>
+    <div class="titlecard"><b>AMIR TEMUR DAVLATI</b><span id="titleYear">1390-yil</span></div>
+    <div class="tools"><button id="plus" aria-label="Kattalashtirish">＋</button><button id="minus" aria-label="Kichraytirish">－</button><button id="labels" aria-label="Belgilarni yashirish">▤</button></div>
+    <div class="note"><b id="mapyear">1390-yil</b><br><span id="desc"></span></div>
+  </div>
+  <div class="range"><span style="font-size:12px">Yilni tanlang</span><input id="slider" type="range" min="1336" max="1405" value="1390"><output id="out">1390</output></div>
+  <div class="lower">
+    <section class="panel profile"><img class="portrait" src="assets/temur-portrait.jpg" alt="Amir Temur"><div><h3>AMIR TEMUR (1336–1405)</h3><p>XIV asrning yirik sarkardasi va davlat arbobi. 1370-yilda Movarounnahrda hokimiyatni qo‘lga olib, Samarqandni davlat markaziga aylantirdi.</p><button id="more">Batafsil ma’lumot →</button></div></section>
+    <section class="panel"><h3>Janglar va muhim voqealar</h3><div class="events" id="events"></div></section>
+  </div>
+  <div class="foot">Eslatma: fon xaritasi badiiy tasvir. Hududlar va yurish yo‘nalishlari sxematik, aniq tarixiy GIS chegaralari emas. Tarixiy aniqlik uchun voqealar ishonchli manbalar bilan tekshirilishi lozim.</div>
+</main>
+</div>
+</div>
+<dialog id="dlg"><button class="x" id="dlgX">×</button><img id="dImg" alt="" hidden><div id="dYear" style="color:#e8bd5b;font-size:11px;font-weight:700"></div><h3 id="dTitle"></h3><p id="dText"></p><p id="dSum" style="color:#f0d078;font-size:12px;margin-top:6px"></p><p style="margin-top:8px"><a id="dSrc" href="#" target="_blank" rel="noopener">Manba ↗</a></p></dialog>
+<script>
+(()=>{
+'use strict';
+const $=id=>document.getElementById(id);
+const years=[1336,1360,1370,1380,1390,1400,1405];
+const labels=['Boshlanishi','Dastlabki yurishlar','Hokimiyatni egallash','Kengayish davri','Yuksalish davri','So‘nggi yurishlar','Vafoti'];
+const desc={1336:'Temur Kesh vohasida tavallud topdi.',1360:'Movarounnahrda siyosiy kurashlar davri.',1370:'Temur Samarqandda hokimiyatni mustahkamladi.',1380:'Eron va Xuroson tomon yurishlar kuchaydi.',1390:'G‘arbiy va janubiy yo‘nalishlarda yurishlar davom etdi.',1400:'Kichik Osiyo va Yaqin Sharqdagi yurishlar davri.',1405:'Temur O‘trorda vafot etdi.'};
+const eraColors=['#aab4bd','#42a9c8','#e5c04b','#d87936','#c74847','#45b56e','#e34343'];
+/* Hudud konturlari: xarita rasmi koordinatalarida (1400x788). Sxematik. */
+const REGIONS=[
+{id:'kesh',year:1336,name:'Kesh vohasi',color:'#ffffff',p:[[740,250],[790,225],[850,235],[885,275],[880,330],[840,360],[790,355],[745,320]]},
+{id:'movar',year:1360,name:'Movarounnahr',color:'#4aa8ff',p:[[560,160],[600,150],[650,120],[700,100],[760,70],[850,60],[930,75],[1000,120],[1030,170],[1010,200],[1000,260],[975,330],[950,390],[890,395],[870,372],[820,375],[780,385],[720,365],[660,330],[640,290],[600,255],[575,200]]},
+{id:'ne',year:1370,name:'Sharqiy hududlar (Toroz, Qashqar)',color:'#3ddc84',p:[[1030,170],[1060,130],[1110,115],[1150,125],[1170,190],[1172,260],[1130,310],[1080,350],[1050,400],[990,395],[960,350],[975,330],[1000,260],[1010,200]]},
+{id:'xuroson',year:1381,name:'Xuroson (Hirot, Nishopur)',color:'#8be04a',p:[[585,370],[620,345],[680,345],[740,355],[780,385],[805,420],[805,500],[760,560],[720,590],[690,560],[640,510],[600,440],[585,400]]},
+{id:'kavkaz',year:1386,name:'Kavkaz',color:'#c26bff',p:[[290,205],[345,135],[410,115],[470,120],[500,150],[530,170],[470,200],[450,225],[410,240],[385,270],[330,275],[300,240]]},
+{id:'eron',year:1387,name:'Eron',color:'#ff5a4d',p:[[335,395],[385,385],[430,370],[480,370],[550,350],[595,380],[600,440],[640,510],[700,570],[690,600],[620,570],[560,540],[500,520],[430,480],[370,440]]},
+{id:'tiflis',year:1395,name:'Tiflis atrofi',color:'#ffa43a',p:[[385,270],[410,240],[450,225],[470,260],[500,300],[540,350],[480,370],[430,370],[385,330]]},
+{id:'gazna',year:1398,name:'G‘azna',color:'#ffd23a',p:[[790,390],[830,372],[870,375],[895,392],[900,440],[880,480],[830,520],[800,520],[780,470],[785,420]]},
+{id:'hind',year:1398,name:'Shimoliy Hindiston',color:'#ff7a33',p:[[895,392],[960,385],[1015,410],[1020,460],[1065,520],[1075,590],[1040,640],[990,700],[960,780],[940,740],[900,660],[860,620],[820,580],[795,540],[805,520],[830,520],[880,480],[900,440]]},
+{id:'anadolu',year:1402,name:'Anadolu',color:'#ffb27a',p:[[20,275],[80,265],[150,250],[230,235],[290,245],[330,290],[385,330],[335,395],[300,430],[200,420],[120,385],[50,340]]}
+];
+/* Jang belgilari: rasmdagi joylashuv (1400x788 ga nisbatan) */
+const SPOT={'t-balx':[800,358],'t-herat':[735,455],'t-isfahan':[543,521],'t-kondurcha':[590,95],'t-terek':[503,356],'t-delhi':[1012,572],'t-damascus':[205,470],'t-ankara':[298,350]};
+const CAP=[800,270];
+const THUMBS=['assets/battle-1.jpg','assets/battle-2.jpg','assets/battle-3.jpg','assets/battle-4.jpg','assets/battle-5.jpg'];
+let battles=[],cur=1390,timer=null,sel=null,hide=false;
+const pts=p=>p.map(q=>q.join(',')).join(' ');
+/* --- tayyorlash --- */
+$('maskG').innerHTML=REGIONS.map(r=>`<polygon class="mask-poly" id="m-${r.id}" points="${pts(r.p)}"/>`).join('');
+$('edges').innerHTML=REGIONS.map(r=>`<polygon class="edge" id="e-${r.id}" points="${pts(r.p)}" stroke="${r.color}" style="color:${r.color}"><title>${r.name} (sxematik)</title></polygon>`).join('');
+$('legend').innerHTML=REGIONS.map(r=>`<div id="l-${r.id}"><i style="background:${r.color}"></i>${r.year}: ${r.name}</div>`).join('');
+years.forEach((y,i)=>{$('eras').innerHTML+=`<button class="era" data-y="${y}"><strong>${y}</strong><span>${labels[i]}</span></button>`;$('yearlist').innerHTML+=`<button class="yearbtn" data-y="${y}"><i class="dot" style="background:${eraColors[i]}"></i><b>${y}</b> ${labels[i]}</button>`});
+/* --- zoom/pan --- */
+const K={k:1,x:0,y:0};
+function clamp(){const m=$('map');K.x=Math.min(0,Math.max(m.clientWidth*(1-K.k),K.x));K.y=Math.min(0,Math.max(m.clientHeight*(1-K.k),K.y))}
+function apply(){clamp();const z=$('zoomer');z.style.transform=`translate(${K.x}px,${K.y}px) scale(${K.k})`;z.style.setProperty('--k',K.k)}
+function zoomAt(f,cx,cy){const r=$('map').getBoundingClientRect(),nk=Math.max(1,Math.min(4,K.k*f)),px=cx-r.left,py=cy-r.top,q=nk/K.k;K.x=px-(px-K.x)*q;K.y=py-(py-K.y)*q;K.k=nk;apply()}
+const mc=()=>{const r=$('map').getBoundingClientRect();return [r.left+r.width/2,r.top+r.height/2]};
+$('plus').onclick=()=>zoomAt(1.35,...mc());$('minus').onclick=()=>zoomAt(1/1.35,...mc());
+$('map').addEventListener('wheel',e=>{e.preventDefault();zoomAt(e.deltaY<0?1.15:1/1.15,e.clientX,e.clientY)},{passive:false});
+let drag=null;
+$('map').addEventListener('pointerdown',e=>{if(e.target.closest('.hs,.tools'))return;drag={x:e.clientX,y:e.clientY,kx:K.x,ky:K.y};$('map').setPointerCapture(e.pointerId)});
+$('map').addEventListener('pointermove',e=>{if(!drag||K.k===1)return;K.x=drag.kx+e.clientX-drag.x;K.y=drag.ky+e.clientY-drag.y;apply()});
+['pointerup','pointercancel'].forEach(t=>$('map').addEventListener(t,()=>{drag=null}));
+addEventListener('resize',apply);
+$('reset').onclick=()=>{K.k=1;K.x=0;K.y=0;apply();render(1390)};
+$('labels').onclick=()=>{hide=!hide;$('hot').style.display=hide?'none':''};
+/* --- chizish --- */
+let prevOn=new Set();
+function render(y){
+ cur=y;$('slider').value=y;$('out').value=y;$('mapyear').textContent=y+'-yil';$('titleYear').textContent=y+'-yil';
+ const closest=years.reduce((a,b)=>Math.abs(b-y)<Math.abs(a-y)?b:a);$('desc').textContent=desc[closest];
+ document.querySelectorAll('[data-y]').forEach(e=>e.classList.toggle('active',+e.dataset.y===y));
+ const now=new Set();
+ REGIONS.forEach(r=>{const on=y>=r.year;if(on)now.add(r.id);$('m-'+r.id).classList.toggle('on',on);const e=$('e-'+r.id);e.classList.toggle('on',on);e.classList.toggle('new',on&&!prevOn.has(r.id)&&prevOn.size>0);$('l-'+r.id).classList.toggle('off',!on)});
+ prevOn=now;
+ document.querySelectorAll('.hs[data-year]').forEach(h=>h.classList.toggle('hidden',y<+h.dataset.year));
+ document.querySelectorAll('#battles .yearbtn').forEach(b=>b.classList.toggle('off',+b.dataset.by>y));
+ const list=battles.filter(b=>b.year<=y).slice(-4);
+ $('events').innerHTML=list.map(b=>{const n=battles.indexOf(b)%THUMBS.length;return `<button class="event" data-id="${b.id}"><div class="th" style="background-image:url(${THUMBS[n]})"><span>${b.year}</span></div><div class="tx"><h4>${b.title}</h4><p>${b.place}</p></div></button>`}).join('')||'<p>Bu davr uchun voqealar ro‘yxati tayyorlanmoqda.</p>';
+ $('events').querySelectorAll('.event').forEach(e=>e.onclick=()=>open(e.dataset.id));
+}
+function open(id){const b=battles.find(x=>x.id===id);if(!b)return;sel=id;document.querySelectorAll('.hs').forEach(h=>h.classList.toggle('sel',h.dataset.id===id));const n=battles.indexOf(b)%THUMBS.length;$('dImg').src=THUMBS[n];$('dImg').hidden=false;$('dYear').textContent=b.year+' · '+b.place;$('dTitle').textContent=b.title;$('dText').textContent=b.detail;$('dSum').textContent=b.summary;$('dSrc').href=b.source;$('dlg').showModal()}
+$('dlgX').onclick=()=>$('dlg').close();$('dlg').addEventListener('click',e=>{if(e.target.id==='dlg')$('dlg').close()});
+$('more').onclick=()=>{$('dImg').hidden=true;$('dYear').textContent='AMIR TEMUR';$('dTitle').textContent='Amir Temur (1336–1405)';$('dText').textContent='Amir Temur 1336-yilda Kesh vohasida tug‘ilgan. 1370-yilda hokimiyatni qo‘lga kiritib, Samarqandni poytaxtga aylantirgan. Eron, Kavkaz, Hindiston va Old Osiyoga yurishlar qilgan, 1405-yilda O‘trorda vafot etgan.';$('dSum').textContent='';$('dSrc').href='https://www.britannica.com/biography/Timur';$('dlg').showModal()};
+document.querySelectorAll('[data-y]').forEach(e=>e.onclick=()=>{stop();render(+e.dataset.y)});
+$('slider').oninput=e=>{stop();render(+e.target.value)};
+function stop(){if(timer){clearInterval(timer);timer=null;$('play').textContent='▶ Animatsiya'}}
+$('play').onclick=()=>{if(timer){stop();return}$('play').textContent='Ⅱ To‘xtatish';let y=+$('slider').value;if(y>=1405)y=1335;timer=setInterval(()=>{y=y>=1405?1336:y+1;render(y)},320)};
+/* --- ma'lumot --- */
+fetch('data/campaigns/timur.json').then(r=>{if(!r.ok)throw 0;return r.json()}).then(d=>{
+ battles=d.battles;
+ let h=`<button class="hs cap" style="left:${CAP[0]/14}%;top:${CAP[1]/7.88}%" title="Samarqand">★</button>`;
+ battles.forEach(b=>{const p=SPOT[b.id];if(!p)return;h+=`<button class="hs" data-id="${b.id}" data-year="${b.year}" style="left:${p[0]/14}%;top:${p[1]/7.88}%" title="${b.title}">⚔<i class="yr">${b.year}</i></button>`});
+ $('hot').innerHTML=h;$('hot').querySelectorAll('.hs[data-id]').forEach(b=>b.onclick=()=>open(b.dataset.id));
+ $('battles').innerHTML=battles.map(b=>`<button class="yearbtn" data-id="${b.id}" data-by="${b.year}"><span class="by">${b.year}</span> ⚔ ${b.title}</button>`).join('');
+ $('battles').querySelectorAll('.yearbtn').forEach(b=>b.onclick=()=>{const y=+b.dataset.by;if(y>cur)render(y);open(b.dataset.id)});
+ render(cur);
+}).catch(()=>{$('events').innerHTML='<p>Ma’lumot yuklanmadi (data/campaigns/timur.json). Sahifani server orqali oching.</p>'});
+render(1390);apply();
+})();
+</script>
+</body>
+</html>
