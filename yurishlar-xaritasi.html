@@ -59,6 +59,7 @@ dialog .close-x{float:right;background:none;border:0;color:var(--muted);font-siz
 .hotspot .pl{position:absolute;top:100%;left:50%;transform:translateX(-50%);margin-top:3px;font-style:normal;font-size:9px;font-weight:600;color:var(--gold2);white-space:nowrap;text-shadow:0 0 4px #000,0 0 6px #000;pointer-events:none}
 .hotspot .yr{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);margin-bottom:2px;font-style:normal;font-size:9px;font-weight:700;color:#fff;background:#0a0e17cc;border:1px solid #8a6a2e;border-radius:999px;padding:0 5px;white-space:nowrap;pointer-events:none}
 .legend-stages{display:flex;gap:8px;flex-wrap:wrap}
+.geo .sea{font-style:italic}
 </style>
 </head>
 <body>
@@ -70,7 +71,7 @@ dialog .close-x{float:right;background:none;border:0;color:var(--muted);font-siz
 <div class="stage">
   <div class="map-frame">
     <img class="map-bg" id="mapBg" alt="Amir Temur davlati xaritasi">
-    <div class="geo" id="geo"><svg id="geoSvg" viewBox="0 0 1000 667" preserveAspectRatio="none" aria-label="Amir Temur davlati kengayishi xaritasi"><defs><marker id="arr" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#fff3c4"/></marker></defs><g id="grid"></g><g id="areas"></g><g id="routes"></g></svg><div id="spots"></div></div>
+    <div class="geo" id="geo"><svg id="geoSvg" viewBox="0 0 1000 667" preserveAspectRatio="none" aria-label="Amir Temur davlati kengayishi xaritasi"><defs><marker id="arr" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#fff3c4"/></marker></defs><rect width="1000" height="667" fill="#0b1b2e"/><g id="base"></g><g id="grid"></g><g id="areas"></g><g id="routes"></g><g id="labels"></g></svg><div id="spots"></div></div>
     <div class="float cap"><b>★ Poytaxt: Samarqand</b></div>
     <div class="float leg"><div class="row"><span class="dot"></span> Muhim janglar</div><div class="row"><span style="color:#f0d078">→</span> Yurish yo‘nalishlari</div></div>
   </div>
@@ -106,6 +107,10 @@ function setYear(y){current=y;buildTimeline();drawAreas();drawRoutes();document.
 function openDlg(b){$('dlgYear').textContent=b.year+' · '+b.place;$('dlgTitle').textContent=b.title;$('dlgText').textContent=b.detail;$('dlgPlace').textContent=b.summary;$('dlgSrc').href=b.source;$('dlg').showModal()}
 $('dlgClose').onclick=()=>$('dlg').close();
 $('dlg').addEventListener('click',e=>{if(e.target.id==='dlg')$('dlg').close()});
+const LABELS=[['Qora dengiz',43.3,34.2,'sea'],['Kaspiy dengizi',41.2,51.2,'sea'],['Fors ko‘rfazi',27.2,51.6,'sea'],['Arabiston dengizi',23.5,62,'sea'],['O‘rta yer dengizi',34.2,28.5,'sea'],['Eron',32.5,55,'land'],['Hindiston',24.8,78,'land'],['Anadolu',39.2,33,'land'],['Kavkaz',42.2,44.5,'land'],['Oltin O‘rda',49.5,50,'land'],['Movarounnahr',41.6,64,'land'],['Arabiston',25.5,44,'land'],['Xitoy',37.5,84,'land'],['Rus yerlari',54.2,36,'land']];
+function drawLabels(){$('labels').innerHTML=LABELS.map(([t,la,lo,k])=>{const [x,y]=px(la,lo);return `<text x="${x.toFixed(1)}" y="${y.toFixed(1)}" text-anchor="middle" font-size="${k==='sea'?11:12}" letter-spacing="${k==='sea'?1.5:1}" fill="${k==='sea'?'#5f8bb0':'#c9d5e4'}" fill-opacity="${k==='sea'?.75:.55}" class="${k}" font-family="DM Sans,sans-serif">${k==='land'?t.toUpperCase():t}</text>`}).join('')}
+fetch('data/basemap-asia.json').then(r=>r.json()).then(m=>{$('base').innerHTML=`<path d="${m.land}" fill="#1d2b27" stroke="#4c6a62" stroke-width="1" stroke-linejoin="round"/><path d="${m.lakes}" fill="#0b1b2e" stroke="#4c6a62" stroke-width=".8"/>`}).catch(()=>{});
+drawLabels();
 fit();drawGrid();
 fetch('data/campaigns/timur.json').then(r=>{if(!r.ok)throw 0;return r.json()}).then(d=>{D=d;buildSpots();setYear(1390);fit()}).catch(()=>{$('cards').innerHTML='<p style="font-size:11px;color:var(--muted)">Ma’lumot yuklanmadi (data/campaigns/timur.json). Sahifani server orqali oching.</p>'});
 })();
