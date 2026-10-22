@@ -1,0 +1,777 @@
+{
+ "schemaVersion": 1,
+ "note": "Hudud konturlari sxematik va taxminiy; bosqichlar jang va voqealar sanalariga bog‘langan.",
+ "capital": {
+  "name": "Samarqand",
+  "coords": [
+   39.65,
+   66.96
+  ]
+ },
+ "projection": {
+  "lat": [
+   22,
+   56
+  ],
+  "lng": [
+   22,
+   88
+  ],
+  "note": "Equirectangular: x=(lng-22)/66, y=(56-lat)/34"
+ },
+ "panels": [
+  {
+   "year": 1336,
+   "title": "Boshlanishi",
+   "caption": "Temur 1336-yilda Kesh (Shahrisabz) yaqinida tug‘ildi.",
+   "polygon": [
+    [
+     41.5,
+     64
+    ],
+    [
+     41.5,
+     69.5
+    ],
+    [
+     39.5,
+     71
+    ],
+    [
+     37.5,
+     69
+    ],
+    [
+     37.5,
+     65.5
+    ],
+    [
+     38.5,
+     63.5
+    ],
+    [
+     40,
+     62.5
+    ]
+   ],
+   "battles": [],
+   "cities": [
+    [
+     "Kesh",
+     39.05,
+     66.83
+    ]
+   ],
+   "arrows": []
+  },
+  {
+   "year": 1360,
+   "title": "Dastlabki yurishlar",
+   "caption": "Dastlabki yurishlar: Movarounnahrdagi siyosiy kurash va qo‘shin to‘plash davri.",
+   "polygon": [
+    [
+     43,
+     60.5
+    ],
+    [
+     43,
+     70
+    ],
+    [
+     41,
+     72.5
+    ],
+    [
+     37,
+     71.5
+    ],
+    [
+     35.5,
+     67
+    ],
+    [
+     36,
+     64
+    ],
+    [
+     38.5,
+     62
+    ],
+    [
+     41,
+     59.5
+    ]
+   ],
+   "battles": [],
+   "cities": [
+    [
+     "Toshkent",
+     41.3,
+     69.24
+    ],
+    [
+     "Buxoro",
+     39.77,
+     64.43
+    ]
+   ],
+   "arrows": [
+    [
+     [
+      39.65,
+      66.96
+     ],
+     [
+      41.3,
+      69.24
+     ]
+    ],
+    [
+     [
+      39.65,
+      66.96
+     ],
+     [
+      39.77,
+      64.43
+     ]
+    ]
+   ]
+  },
+  {
+   "year": 1370,
+   "title": "Movarounnahr birlashuvi",
+   "caption": "Balx olindi, Samarqand poytaxt bo‘ldi: Movarounnahr yagona hokimiyat ostida birlashtirildi.",
+   "polygon": [
+    [
+     45,
+     58
+    ],
+    [
+     46,
+     72
+    ],
+    [
+     43,
+     78
+    ],
+    [
+     39,
+     75
+    ],
+    [
+     37,
+     72
+    ],
+    [
+     35.5,
+     67
+    ],
+    [
+     36.5,
+     64
+    ],
+    [
+     38.5,
+     60.5
+    ],
+    [
+     41,
+     58
+    ]
+   ],
+   "battles": [
+    "t-balx"
+   ],
+   "cities": [],
+   "arrows": [
+    [
+     [
+      39.65,
+      66.96
+     ],
+     [
+      36.76,
+      66.9
+     ]
+    ]
+   ]
+  },
+  {
+   "year": 1380,
+   "title": "Xorazm va Xuroson tomon",
+   "caption": "Xorazm yurishlari boshlandi, 1381-yilda Hirot bo‘ysundirildi.",
+   "polygon": [
+    [
+     45,
+     59
+    ],
+    [
+     45,
+     75
+    ],
+    [
+     42,
+     78.5
+    ],
+    [
+     37,
+     72
+    ],
+    [
+     34.5,
+     69
+    ],
+    [
+     31,
+     62
+    ],
+    [
+     30,
+     57
+    ],
+    [
+     34,
+     53.5
+    ],
+    [
+     37,
+     53.5
+    ],
+    [
+     39,
+     55.5
+    ],
+    [
+     41,
+     56.5
+    ]
+   ],
+   "battles": [
+    "t-herat"
+   ],
+   "cities": [
+    [
+     "Urganch",
+     41.55,
+     60.6
+    ]
+   ],
+   "arrows": [
+    [
+     [
+      39.65,
+      66.96
+     ],
+     [
+      41.55,
+      60.6
+     ]
+    ],
+    [
+     [
+      39.65,
+      66.96
+     ],
+     [
+      34.35,
+      62.2
+     ]
+    ]
+   ]
+  },
+  {
+   "year": 1386,
+   "title": "Kavkaz va Eron tomon",
+   "caption": "Kavkaz yo‘nalishidagi yurishlar, 1387-yilda Isfahon va Fors hududlari.",
+   "polygon": [
+    [
+     47,
+     48
+    ],
+    [
+     47,
+     76
+    ],
+    [
+     43,
+     80
+    ],
+    [
+     37,
+     73
+    ],
+    [
+     33,
+     68
+    ],
+    [
+     29,
+     62
+    ],
+    [
+     27,
+     56
+    ],
+    [
+     30,
+     48
+    ],
+    [
+     33,
+     44
+    ],
+    [
+     37,
+     43.5
+    ],
+    [
+     40,
+     43.5
+    ],
+    [
+     42,
+     44
+    ],
+    [
+     44,
+     46
+    ]
+   ],
+   "battles": [
+    "t-isfahan"
+   ],
+   "cities": [
+    [
+     "Tiflis",
+     41.72,
+     44.8
+    ]
+   ],
+   "arrows": [
+    [
+     [
+      39.65,
+      66.96
+     ],
+     [
+      35.7,
+      51.4
+     ],
+     [
+      32.65,
+      51.67
+     ]
+    ],
+    [
+     [
+      35.7,
+      51.4
+     ],
+     [
+      41.72,
+      44.8
+     ]
+    ]
+   ]
+  },
+  {
+   "year": 1391,
+   "title": "Oltin O‘rdaga yurish",
+   "caption": "Kondurcha daryosi bo‘yida Toxtamish qo‘shini mag‘lub etildi.",
+   "polygon": [
+    [
+     47,
+     48
+    ],
+    [
+     47,
+     76
+    ],
+    [
+     43,
+     80
+    ],
+    [
+     37,
+     73
+    ],
+    [
+     33,
+     68
+    ],
+    [
+     29,
+     62
+    ],
+    [
+     27,
+     56
+    ],
+    [
+     30,
+     48
+    ],
+    [
+     33,
+     44
+    ],
+    [
+     37,
+     43.5
+    ],
+    [
+     40,
+     43.5
+    ],
+    [
+     42,
+     44
+    ],
+    [
+     44,
+     46
+    ]
+   ],
+   "battles": [
+    "t-kondurcha"
+   ],
+   "cities": [],
+   "arrows": [
+    [
+     [
+      39.65,
+      66.96
+     ],
+     [
+      43.3,
+      68.3
+     ],
+     [
+      48.5,
+      57
+     ],
+     [
+      53.0,
+      50.0
+     ]
+    ]
+   ]
+  },
+  {
+   "year": 1395,
+   "title": "Terek jangi",
+   "caption": "Terek daryosi bo‘yida Oltin O‘rda kuchi sindirildi.",
+   "polygon": [
+    [
+     47,
+     48
+    ],
+    [
+     47,
+     76
+    ],
+    [
+     43,
+     80
+    ],
+    [
+     37,
+     73
+    ],
+    [
+     33,
+     68
+    ],
+    [
+     29,
+     62
+    ],
+    [
+     27,
+     56
+    ],
+    [
+     30,
+     48
+    ],
+    [
+     33,
+     44
+    ],
+    [
+     37,
+     43.5
+    ],
+    [
+     40,
+     43.5
+    ],
+    [
+     42,
+     44
+    ],
+    [
+     44,
+     46
+    ]
+   ],
+   "battles": [
+    "t-terek"
+   ],
+   "cities": [],
+   "arrows": [
+    [
+     [
+      39.65,
+      66.96
+     ],
+     [
+      43.3,
+      68.3
+     ],
+     [
+      48.5,
+      57
+     ],
+     [
+      47,
+      44
+     ],
+     [
+      43.6,
+      45.7
+     ]
+    ]
+   ]
+  },
+  {
+   "year": 1398,
+   "title": "Hindiston yurishi",
+   "caption": "Shimoliy Hindistonga yurish: Dehli olindi.",
+   "polygon": [
+    [
+     47,
+     48
+    ],
+    [
+     47,
+     76
+    ],
+    [
+     43,
+     81
+    ],
+    [
+     36,
+     76
+    ],
+    [
+     31,
+     78.5
+    ],
+    [
+     28,
+     77.5
+    ],
+    [
+     27,
+     70
+    ],
+    [
+     25,
+     63
+    ],
+    [
+     26,
+     56
+    ],
+    [
+     30,
+     48
+    ],
+    [
+     33,
+     44
+    ],
+    [
+     37,
+     43.5
+    ],
+    [
+     40,
+     43.5
+    ],
+    [
+     42,
+     44
+    ],
+    [
+     44,
+     46
+    ]
+   ],
+   "battles": [
+    "t-delhi"
+   ],
+   "cities": [],
+   "arrows": [
+    [
+     [
+      39.65,
+      66.96
+     ],
+     [
+      36.76,
+      66.9
+     ],
+     [
+      34.5,
+      69.2
+     ],
+     [
+      30.2,
+      71.5
+     ],
+     [
+      28.61,
+      77.21
+     ]
+    ]
+   ]
+  },
+  {
+   "year": 1402,
+   "title": "Eng katta hudud",
+   "caption": "Suriya va Anadoluda g‘alabalar (Anqara, 1402). 1405-yilda Temur O‘trorda vafot etdi.",
+   "polygon": [
+    [
+     47,
+     48
+    ],
+    [
+     47,
+     76
+    ],
+    [
+     43,
+     81
+    ],
+    [
+     36,
+     76
+    ],
+    [
+     31,
+     78.5
+    ],
+    [
+     28,
+     77.5
+    ],
+    [
+     27,
+     70
+    ],
+    [
+     25,
+     63
+    ],
+    [
+     26,
+     56
+    ],
+    [
+     29,
+     49
+    ],
+    [
+     31,
+     46
+    ],
+    [
+     33.5,
+     36
+    ],
+    [
+     36.5,
+     35.8
+    ],
+    [
+     38.4,
+     27
+    ],
+    [
+     39.5,
+     27.5
+    ],
+    [
+     40,
+     32
+    ],
+    [
+     41,
+     36
+    ],
+    [
+     41,
+     41
+    ],
+    [
+     42,
+     44
+    ],
+    [
+     44,
+     46
+    ]
+   ],
+   "battles": [
+    "t-damascus",
+    "t-ankara"
+   ],
+   "cities": [],
+   "arrows": [
+    [
+     [
+      39.65,
+      66.96
+     ],
+     [
+      35.7,
+      51.4
+     ],
+     [
+      38.1,
+      46.3
+     ],
+     [
+      36.2,
+      37.1
+     ],
+     [
+      33.51,
+      36.29
+     ],
+     [
+      33.31,
+      44.36
+     ],
+     [
+      39.9,
+      41.3
+     ],
+     [
+      40.02,
+      32.85
+     ],
+     [
+      38.42,
+      27.14
+     ]
+    ]
+   ],
+   "last": true
+  }
+ ]
+}

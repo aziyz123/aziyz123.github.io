@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#050912">
+<title>Amir Temur davlati kengayishi</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap');
+:root{--bg:#050912;--gold:#e0b255;--gold2:#f6d995;--line:#6b5326;--panel:#0a1322;--text:#eef3fb;--muted:#9aabc2;--teal:#1fb5a8;--blue:#2447a8}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:radial-gradient(ellipse at 50% 0,#14233a,#050912 65%);color:var(--text);font-family:'DM Sans',system-ui,sans-serif;min-height:100vh}
+a{color:var(--gold2)}
+.wrap{max-width:1560px;margin:0 auto;padding:14px 18px 28px}
+.frame{border:1px solid var(--line);border-radius:14px;padding:16px;background:linear-gradient(180deg,#0a1220cc,#060a14cc);box-shadow:0 0 0 1px #000,inset 0 0 40px #0008}
+/* header */
+.head{display:grid;grid-template-columns:auto 1fr auto;gap:18px;align-items:center;padding-bottom:10px}
+.crest{width:70px;height:78px;display:grid;place-items:center;font-size:34px;color:var(--gold);border:2px solid var(--gold);border-radius:14px 14px 34px 34px;background:radial-gradient(circle at 50% 30%,#3a2a12,#120d05)}
+.head h1{font:800 clamp(24px,4vw,58px)/1.05 'Cinzel',serif;color:var(--gold);text-align:center;letter-spacing:.03em;text-shadow:0 2px 14px #000}
+.head .yr{text-align:center;font:600 clamp(16px,2vw,28px) 'Cinzel',serif;color:var(--gold2);margin-top:6px;display:flex;align-items:center;justify-content:center;gap:14px}
+.head .yr::before,.head .yr::after{content:'';height:1px;flex:1;max-width:240px;background:linear-gradient(90deg,transparent,var(--gold))}
+.head .yr::after{transform:scaleX(-1)}
+.quote{font:600 clamp(11px,1.2vw,16px)/1.5 'Cinzel',serif;color:var(--gold2);text-align:right;max-width:260px}
+.quote small{display:block;margin-top:8px;letter-spacing:.1em}
+/* layout */
+.main{display:grid;grid-template-columns:minmax(0,1fr) 290px;gap:14px;margin-top:6px}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:26px 30px}
+.pn{position:relative;border:1px solid var(--line);border-radius:10px;background:#07101d;overflow:visible;scroll-margin-top:12px;transition:box-shadow .3s,border-color .3s}
+.pn.flash{border-color:var(--gold2);box-shadow:0 0 0 2px #e0b25577,0 0 28px #e0b255aa}
+.pn .num{position:absolute;left:-10px;top:-10px;width:34px;height:34px;display:grid;place-items:center;font:700 17px 'Cinzel',serif;color:var(--gold2);background:#0b1426;border:1.5px solid var(--gold);transform:rotate(45deg);z-index:6;border-radius:6px}
+.pn .num i{transform:rotate(-45deg);font-style:normal}
+.pn .ph{text-align:center;padding:7px 8px 6px;border-bottom:1px solid #3a2f17;background:linear-gradient(180deg,#0d1830,#07101d);border-radius:10px 10px 0 0}
+.pn .ph b{display:block;font:700 clamp(15px,1.6vw,22px) 'Cinzel',serif;color:var(--gold2)}
+.pn .ph span{font:600 clamp(10px,.95vw,13px) 'DM Sans',sans-serif;color:#fff}
+.mapbox{position:relative;aspect-ratio:3/2;overflow:hidden}
+.mapbox svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+.cap{border-top:1px solid #3a2f17;background:#050912;border-radius:0 0 10px 10px;padding:8px 12px;min-height:46px;display:grid;place-items:center;text-align:center;font:500 clamp(10px,.95vw,13px)/1.35 'DM Sans',sans-serif;color:#f1e6c7}
+.next{position:absolute;right:-27px;top:42%;z-index:7;width:24px;color:var(--gold);font-size:26px;line-height:1;text-shadow:0 0 8px #000}
+.pn:nth-child(3n) .next,.pn:last-child .next{display:none}
+.lbl{font:600 22px 'DM Sans',sans-serif;fill:#fff;paint-order:stroke;stroke:#000;stroke-width:5px;stroke-linejoin:round}
+.lbl.sea{fill:#9ec0e0;font-style:italic;font-weight:500;font-size:20px}
+.lbl.ct{fill:#f3e3b4;font-size:19px;letter-spacing:.05em}
+/* sidebar */
+.sbar{display:flex;flex-direction:column;gap:12px}
+.box{border:1px solid var(--line);border-radius:10px;padding:12px 14px;background:linear-gradient(180deg,#0b1424,#070d19)}
+.box h2{font:700 15px 'Cinzel',serif;color:var(--gold);text-align:center;margin-bottom:10px;letter-spacing:.04em}
+.lg{display:grid;gap:9px;font-size:13px;color:#dbe6f6}
+.lg div{display:flex;align-items:center;gap:10px}
+.lg .sw{width:22px;height:22px;border-radius:4px;flex:none;display:grid;place-items:center}
+.stl{display:grid;gap:7px}
+.stl button{display:flex;align-items:center;gap:10px;background:none;border:0;color:#dbe6f6;font:500 13px 'DM Sans',sans-serif;text-align:left;cursor:pointer;padding:2px 0}
+.stl button:hover{color:var(--gold2)}
+.stl .c{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font:700 11px 'DM Sans',sans-serif;flex:none;color:#fff;box-shadow:0 0 8px currentColor}
+.stl b{font-weight:700;min-width:34px;color:#f2f6ff}
+.bl{display:grid;gap:8px}
+.bl button{display:flex;align-items:center;gap:9px;background:none;border:0;color:#dbe6f6;font:500 13px 'DM Sans',sans-serif;text-align:left;cursor:pointer}
+.bl button:hover{color:var(--gold2)}
+.bl .by{color:#ff8c6a;font-weight:700;min-width:36px}
+/* stats */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:14px;border:1px solid var(--line);border-radius:10px;background:linear-gradient(180deg,#0b1424,#070d19)}
+.stats div{display:flex;align-items:center;gap:14px;padding:14px 18px;border-right:1px solid #3a2f17}
+.stats div:last-child{border-right:0}
+.stats i{font-style:normal;font-size:30px;color:var(--gold)}
+.stats small{display:block;font:600 11px 'DM Sans',sans-serif;color:var(--gold2);letter-spacing:.06em;text-transform:uppercase}
+.stats b{font:700 clamp(15px,1.6vw,22px) 'Cinzel',serif;color:#fff}
+.links{margin-top:10px;display:flex;gap:14px;font-size:12px;flex-wrap:wrap}
+.note{font-size:11px;color:var(--muted);margin-top:8px;line-height:1.5}
+dialog{border:1px solid #526078;border-radius:16px;background:#0d1524;color:var(--text);padding:20px;max-width:400px;width:calc(100% - 24px);margin:auto}
+dialog::backdrop{background:#02060bd9}
+dialog h3{font:17px 'Cinzel',serif;color:var(--gold2);margin:6px 0 8px}
+dialog p{font-size:13px;color:#b8c6da;line-height:1.6}
+dialog .x{float:right;background:none;border:0;color:var(--muted);font-size:24px;cursor:pointer}
+@media(max-width:1180px){.main{grid-template-columns:1fr}.sbar{display:grid;grid-template-columns:repeat(3,1fr)}.grid{gap:22px 22px}}
+@media(max-width:900px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.pn:nth-child(3n) .next{display:block}.pn:nth-child(2n) .next{display:none}.sbar{grid-template-columns:1fr}.stats{grid-template-columns:1fr 1fr}.stats div:nth-child(2){border-right:0}.head{grid-template-columns:auto 1fr}.quote{display:none}}
+@media(max-width:600px){.wrap{padding:8px}.grid{grid-template-columns:1fr;gap:20px}.next{display:none!important}.crest{width:46px;height:52px;font-size:22px}.stats{grid-template-columns:1fr}.stats div{border-right:0;border-bottom:1px solid #3a2f17}.pn .num{left:-4px;top:-8px}}
+</style>
+</head>
+<body>
+<div class="wrap"><div class="frame">
+<header class="head">
+  <div class="crest">♜</div>
+  <div><h1>AMIR TEMUR DAVLATI KENGAYISHI</h1><div class="yr">1336–1405</div></div>
+  <div class="quote">“KUCH – ADOLATDA,<br>BUYUKLIK – BIRLIKTADA.”<small>AMIR TEMUR</small></div>
+</header>
+<div class="main">
+  <div class="grid" id="grid"></div>
+  <aside class="sbar">
+    <section class="box"><h2>SONLAR MA’NOSI</h2><div class="lg">
+      <div><span class="sw" style="background:#1fb5a8aa;border:1px solid #1fb5a8"></span>Temur davlati hududi</div>
+      <div><span class="sw" style="background:#2447a8cc;border:1px solid #5b7be0"></span>Oldingi bosqichdagi hudud</div>
+      <div><span class="sw" style="color:#ffd24a;font-size:18px">⇢</span>Yurish yo‘nalishlari</div>
+      <div><span class="sw" style="font-size:16px">⚔</span>Muhim janglar</div>
+      <div><span class="sw"><i style="width:11px;height:11px;border:2px solid #fff;border-radius:50%"></i></span>Muhim shaharlar</div>
+    </div></section>
+    <section class="box"><h2>DAVLAT KENGAYISHI BOSQICHLARI</h2><div class="stl" id="stl"></div></section>
+    <section class="box"><h2>MUHIM JANGLAR</h2><div class="bl" id="bl"></div></section>
+  </aside>
+</div>
+<div class="stats">
+  <div><i>♛</i><span><small>Hayot yillari</small><b>1336–1405</b></span></div>
+  <div><i>🕌</i><span><small>Poytaxt</small><b>Samarqand</b></span></div>
+  <div><i>⚔</i><span><small>Xaritadagi janglar</small><b id="stB">8 ta</b></span></div>
+  <div><i>▦</i><span><small>Kengayish bosqichlari</small><b id="stP">9 ta</b></span></div>
+</div>
+<p class="note" id="note"></p>
+<div class="links"><a href="yurishlar-xaritasi.html">→ Interaktiv atlas (yil bo‘yicha)</a><a href="./">← Bosh sahifa</a></div>
+</div></div>
+<dialog id="dlg"><button class="x" id="dx">×</button><div id="dy" style="color:var(--gold);font-size:11px;font-weight:700"></div><h3 id="dt"></h3><p id="dd"></p><p style="margin-top:8px"><a id="ds" href="#" target="_blank" rel="noopener" style="font-size:12px">Manba ↗</a></p></dialog>
+<script>
+(()=>{
+'use strict';
+const $=id=>document.getElementById(id);
+const LAT=[22,56],LNG=[22,88],W=1000,H=667;
+const px=(la,lo)=>[(lo-LNG[0])/(LNG[1]-LNG[0])*W,(LAT[1]-la)/(LAT[1]-LAT[0])*H];
+const P=p=>p.map(([la,lo])=>px(la,lo).map(v=>v.toFixed(1)).join(',')).join(' ');
+const CH=['#8a5cf0','#3b82f6','#14b8a6','#4caf50','#c9b21d','#d9822b','#e0652b','#e04a4a','#b4467e'];
+const SEAS=[['Qora dengiz',43.4,34.5],['Kaspiy dengizi',41,51.3],['Arabiston dengizi',24,62.5]];
+const CITIES=[['Xitoy',36.5,83],['Hindiston',25.5,76],['Arabiston',26,45],['Kavkaz',43.2,41.5]];
+const VB='121 40 849 566';
+let battles=[],S=null;
+function arrow(path){
+ const pts=path.map(([la,lo])=>px(la,lo));const d='M'+pts.map(p=>p.map(v=>v.toFixed(1)).join(' ')).join(' L');
+ const [x1,y1]=pts[pts.length-2],[x2,y2]=pts[pts.length-1];const a=Math.atan2(y2-y1,x2-x1),L=26,Wd=14;
+ const bx=x2-L*Math.cos(a),by=y2-L*Math.sin(a),nx=-Math.sin(a)*Wd,ny=Math.cos(a)*Wd;
+ return `<path d="${d}" fill="none" stroke="#ffd24a" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" opacity=".95"/><polygon points="${x2.toFixed(1)},${y2.toFixed(1)} ${(bx+nx).toFixed(1)},${(by+ny).toFixed(1)} ${(bx-nx).toFixed(1)},${(by-ny).toFixed(1)}" fill="#ffd24a" stroke="#6b4a0a" stroke-width="1.5"/>`}
+function mini(p,i){
+ const prev=i>0?S.panels[i-1]:null;
+ let h=`<image href="temur-map-bg.jpg" width="${W}" height="${H}" preserveAspectRatio="none"/><rect width="${W}" height="${H}" fill="#04101e" opacity=".18"/>`;
+ h+=`<polygon points="${P(p.polygon)}" fill="#1fb5a8" fill-opacity=".62" stroke="#5be3d6" stroke-width="4" stroke-linejoin="round"/>`;
+ if(prev&&JSON.stringify(prev.polygon)!==JSON.stringify(p.polygon))h+=`<polygon points="${P(prev.polygon)}" fill="#2447a8" fill-opacity=".78" stroke="#7d9bff" stroke-width="3.5" stroke-linejoin="round"/>`;
+ SEAS.forEach(([t,la,lo])=>{const [x,y]=px(la,lo);h+=`<text class="lbl sea" x="${x}" y="${y}" text-anchor="middle">${t}</text>`});
+ CITIES.forEach(([t,la,lo])=>{const [x,y]=px(la,lo);h+=`<text class="lbl ct" x="${x}" y="${y}" text-anchor="middle">${t.toUpperCase()}</text>`});
+ p.arrows.forEach(a=>{h+=arrow(a,i)});
+ const [sx,sy]=px(S.capital.coords[0],S.capital.coords[1]);
+ h+=`<circle cx="${sx}" cy="${sy}" r="11" fill="#0a1322" stroke="#fff" stroke-width="4.5"/><text class="lbl" x="${sx+18}" y="${sy-12}">Samarqand</text>`;
+ p.cities.forEach(([t,la,lo])=>{const [x,y]=px(la,lo);h+=`<circle cx="${x}" cy="${y}" r="8" fill="#0a1322" stroke="#fff" stroke-width="4"/><text class="lbl" x="${x-14}" y="${y+7}" text-anchor="end">${t}</text>`});
+ p.battles.forEach(id=>{const b=battles.find(x=>x.id===id);if(!b)return;const [x,y]=px(b.coords[0],b.coords[1]);
+  h+=`<g class="bm" data-id="${id}" style="cursor:pointer"><circle cx="${x}" cy="${y}" r="30" fill="#0a0e17" stroke="#e0b255" stroke-width="5"/><text x="${x}" y="${y+11}" text-anchor="middle" font-size="30" fill="#fff">⚔</text><rect x="${x-42}" y="${y+34}" width="84" height="30" rx="8" fill="#7a1f18" stroke="#e0b255" stroke-width="2"/><text x="${x}" y="${y+56}" text-anchor="middle" font-size="22" font-weight="700" fill="#fff" font-family="DM Sans,sans-serif">${b.year}</text></g>`});
+ const north=p.battles.some(id=>{const b=battles.find(x=>x.id===id);return b&&px(b.coords[0],b.coords[1])[1]<100});const vb=north?'121 5 849 566':VB;
+ return `<svg viewBox="${vb}" preserveAspectRatio="none" role="img" aria-label="${p.year} — ${p.title}">${h}</svg>`}
+function openB(id){const b=battles.find(x=>x.id===id);if(!b)return;$('dy').textContent=b.year+' · '+b.place;$('dt').textContent=b.title;$('dd').textContent=b.detail;$('ds').href=b.source;$('dlg').showModal()}
+function goPanel(i){const el=$('p'+i);el.scrollIntoView({behavior:'smooth',block:'center'});el.classList.add('flash');setTimeout(()=>el.classList.remove('flash'),1600)}
+function build(){
+ $('grid').innerHTML=S.panels.map((p,i)=>`<article class="pn" id="p${i}"><div class="num"><i>${i+1}</i></div><div class="ph"><b>${p.year}</b><span>${p.title}</span></div><div class="mapbox">${mini(p,i)}</div><div class="cap">${p.caption}</div><div class="next">➤</div></article>`).join('');
+ document.querySelectorAll('.bm').forEach(g=>g.onclick=()=>openB(g.dataset.id));
+ $('stl').innerHTML=S.panels.map((p,i)=>`<button data-i="${i}"><span class="c" style="background:${CH[i]};color:${CH[i]}"><span style="color:#fff">${i+1}</span></span><b>${p.year}</b>${p.title}</button>`).join('');
+ $('stl').querySelectorAll('button').forEach(b=>b.onclick=()=>goPanel(+b.dataset.i));
+ $('bl').innerHTML=battles.map(b=>`<button data-id="${b.id}"><span style="color:#ffd24a">⚔</span><span class="by">${b.year}</span>${b.title}</button>`).join('');
+ $('bl').querySelectorAll('button').forEach(b=>b.onclick=()=>{const i=S.panels.findIndex(p=>p.battles.includes(b.dataset.id));if(i>=0)goPanel(i);openB(b.dataset.id)});
+ $('stB').textContent=battles.length+' ta';$('stP').textContent=S.panels.length+' ta';
+ $('note').textContent=S.note+' Fon: Natural Earth (ochiq ma’lumot). Janglar manbalari: Encyclopaedia Britannica.';
+}
+$('dx').onclick=()=>$('dlg').close();$('dlg').addEventListener('click',e=>{if(e.target.id==='dlg')$('dlg').close()});
+Promise.all([fetch('data/campaigns/timur.json').then(r=>r.json()),fetch('data/campaigns/timur-storyboard.json').then(r=>r.json())]).then(([t,s])=>{battles=t.battles;S=s;build()}).catch(()=>{$('grid').innerHTML='<p style="color:#9aabc2">Ma’lumot yuklanmadi. Sahifani server orqali oching.</p>'});
+})();
+</script>
+</body>
+</html>
