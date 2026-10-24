@@ -24,7 +24,7 @@ cd telegram-bot
 npm install -g wrangler
 wrangler login
 
-wrangler kv namespace create FAYL_KV      # chiqqan id ni wrangler.toml dagi BU_YERGA_KV_ID_NI_QOYING o'rniga qo'ying
+# (KV "FAYL_KV" allaqachon yaratilgan va wrangler.toml ga yozilgan — qayta yaratish shart emas)
 wrangler secret put BOT_TOKEN             # BotFather tokenini kiriting
 wrangler secret put WEBHOOK_SECRET        # o'zingiz o'ylab topgan uzun matn (harf, raqam, _ va -)
 wrangler deploy                           # oxirida https://fayl-uzatish-bot.<nom>.workers.dev chiqadi

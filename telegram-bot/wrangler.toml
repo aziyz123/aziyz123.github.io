@@ -6,10 +6,10 @@ compatibility_date = "2024-11-01"
 # Sayt manzili (CORS). Bir nechta bo'lsa vergul bilan: https://a.github.io,https://mening-domen.uz
 ALLOWED_ORIGIN = "https://aziyz123.github.io"
 
-# `wrangler kv namespace create FAYL_KV` buyrug'i chiqargan id ni shu yerga qo'ying:
+# KV namespace "FAYL_KV" Cloudflare hisobingizda yaratilgan (id maxfiy emas):
 [[kv_namespaces]]
 binding = "FAYL_KV"
-id = "BU_YERGA_KV_ID_NI_QOYING"
+id = "e2581298a6584dbe93c74ad7d77bdc3f"
 
 # Maxfiy qiymatlar faylga yozilmaydi:
 #   wrangler secret put BOT_TOKEN        (BotFather bergan token)
