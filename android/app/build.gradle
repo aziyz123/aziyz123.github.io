@@ -10,8 +10,8 @@ android {
         applicationId 'uz.oquv.vositalari'
         minSdk 24
         targetSdk 34
-        versionCode 1
-        versionName '1.0'
+        versionCode 2
+        versionName '1.1'
     }
 
     // Barqaror imzo: yangilanganda ilovani o'chirib qayta o'rnatish shart emas
@@ -28,6 +28,7 @@ android {
         debug { signingConfig signingConfigs.debug }
         release {
             minifyEnabled false
+            debuggable false
             signingConfig signingConfigs.debug
         }
     }

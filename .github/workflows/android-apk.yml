@@ -29,12 +29,25 @@ jobs:
       - name: Android SDK litsenziyalari
         run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null || true
 
-      - name: APK yig'ish
+      - name: APK yig'ish (release)
         working-directory: android
-        run: gradle assembleDebug --no-daemon --stacktrace
+        run: gradle assembleRelease --no-daemon --stacktrace
 
-      - name: APK nomini tayyorlash
-        run: cp android/app/build/outputs/apk/debug/app-debug.apk Oquv-Vositalari.apk
+      - name: APK nomini tayyorlash va imzoni tekshirish
+        run: |
+          cp android/app/build/outputs/apk/release/app-release.apk Oquv-Vositalari.apk
+          BT=$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -1)
+          {
+            echo "O'quv Vositalari — Android uchun APK. Telefoningizda yuklab olib o'rnating."
+            echo
+            echo '```'
+            "$BT/apksigner" verify --verbose --print-certs Oquv-Vositalari.apk 2>&1 | head -12
+            "$BT/aapt2" dump badging Oquv-Vositalari.apk 2>&1 | grep -E "^(package|sdkVersion|targetSdkVersion|application-debuggable|launchable)" 
+            "$BT/zipalign" -c 4 Oquv-Vositalari.apk && echo "zipalign: OK"
+            sha256sum Oquv-Vositalari.apk
+            echo '```'
+          } > notes.md
+          cat notes.md
 
       - uses: actions/upload-artifact@v4
         with:
@@ -48,4 +61,4 @@ jobs:
           gh release delete apk-latest --yes --cleanup-tag || true
           gh release create apk-latest Oquv-Vositalari.apk \
             --title "Android ilova (APK)" \
-            --notes "O'quv Vositalari — Android uchun APK. Telefoningizda yuklab olib o'rnating."
+            --notes-file notes.md
