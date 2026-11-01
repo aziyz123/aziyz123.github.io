@@ -136,6 +136,8 @@ function showReceivedFile(val) {
 function showMode(mode) {
   document.getElementById('tabComputer').classList.toggle('active', mode === 'computer');
   document.getElementById('tabPhone').classList.toggle('active', mode === 'phone');
+  const tb = document.getElementById('tabStash'); if (tb) tb.classList.toggle('active', mode === 'stash');
+  const sp = document.getElementById('stashPanel'); if (sp) sp.style.display = mode === 'stash' ? 'block' : 'none';
   document.getElementById('computerPanel').style.display = mode === 'computer' ? 'block' : 'none';
   document.getElementById('phonePanel').style.display = mode === 'phone' ? 'block' : 'none';
   if (mode !== 'phone') stopScanner();

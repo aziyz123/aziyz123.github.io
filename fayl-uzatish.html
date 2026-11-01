@@ -67,6 +67,9 @@
   .mode-tabs{ display:flex; gap:8px; margin-top:24px; }
   .mode-tab{ flex:1; padding:12px; text-align:center; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); font-family:'Archivo', sans-serif; font-weight:700; font-size:13px; color: rgba(243,239,228,0.6); cursor:pointer; }
   .mode-tab.active{ background: linear-gradient(135deg, rgba(201,164,92,0.25), rgba(169,129,63,0.15)); border-color: rgba(201,164,92,0.5); color: var(--gold-2); }
+  .stash-row{ display:flex; justify-content:space-between; align-items:center; gap:10px; padding:10px 0; border-top:1px dashed rgba(255,255,255,0.12); font-size:13px; }
+  .stash-name{ word-break:break-all; min-width:0; }
+  button.stash-btn{ flex:0 0 auto; width:auto; padding:8px 12px; margin-top:0; font-size:12px; }
 </style>
 </head>
 <body>
@@ -81,6 +84,7 @@
   <div class="mode-tabs">
     <div class="mode-tab active" id="tabComputer" onclick="showMode('computer')">💻 Kompyuter</div>
     <div class="mode-tab" id="tabPhone" onclick="showMode('phone')">📱 Telefon</div>
+    <div class="mode-tab" id="tabStash" onclick="showMode('stash')">🗂 24 soatlik xona</div>
   </div>
   <div id="computerPanel">
     <div class="card">
@@ -115,6 +119,29 @@
       <p class="hint" style="margin-top:0;">Xona kodini qo'lda kiriting:</p>
       <input type="text" id="manualCode" placeholder="Masalan: 4832" maxlength="6" style="width:100%; padding:14px; border-radius:10px; border:1px solid rgba(255,255,255,0.15); background:rgba(0,0,0,0.3); color:var(--paper); font-size:18px; letter-spacing:4px; text-align:center; font-family:'Archivo',sans-serif; margin-top:8px;">
       <button class="ghost" id="manualJoinBtn" style="margin-top:12px;">Xonaga kirish</button>
+    </div>
+  </div>
+  <div id="stashPanel" style="display:none;">
+    <div class="card">
+      <h2>1 · Oldindan yuklab qo'ying</h2>
+      <p class="hint" style="margin-top:0;">Slayd yoki faylni hozir yuklang. Fayl <b style="color:var(--gold-2)">24 soat</b> saqlanadi, keyin o'chib ketadi. Kompyuter yoki telefondan yuklash mumkin (har biri 25 MB gacha, xonada jami 50 MB).</p>
+      <input type="file" id="stashFileInput" multiple>
+      <div class="progress-bar-bg" id="stashUpBg"><div class="progress-bar-fill" id="stashUpFill"></div></div>
+      <div class="status-line" id="stashUpStatus"></div>
+      <div id="stashCodeBox" style="display:none;margin-top:16px;">
+        <div class="hint" style="margin:0;">Xona kodi — doskada shuni kiriting:</div>
+        <div class="room-code" id="stashCode" style="font-size:38px;letter-spacing:6px;"></div>
+        <div class="hint" id="stashExpiry"></div>
+        <button class="secondary" id="stashCopyBtn">Kodni nusxalash</button>
+        <div id="stashUpList" style="margin-top:12px;"></div>
+      </div>
+    </div>
+    <div class="card">
+      <h2>2 · Kod bilan olish (aqlli doskada)</h2>
+      <input type="text" id="stashCodeInput" inputmode="numeric" placeholder="6 xonali kod" maxlength="6" style="width:100%; padding:14px; border-radius:10px; border:1px solid rgba(255,255,255,0.15); background:rgba(0,0,0,0.3); color:var(--paper); font-size:20px; letter-spacing:5px; text-align:center; font-family:'Archivo',sans-serif;">
+      <button class="primary" id="stashOpenBtn" style="margin-top:12px;">Xonani ochish</button>
+      <div class="status-line" id="stashGetStatus"></div>
+      <div id="stashGetList" style="margin-top:12px;"></div>
     </div>
   </div>
   <div class="app-footer">
@@ -153,5 +180,6 @@
 <script src="fayl-core.js?v=1"></script>
 <script src="fayl-ui.js?v=1"></script>
 <script src="fayl-telegram.js?v=1"></script>
+<script src="fayl-stash.js?v=1"></script>
 </body>
 </html>
