@@ -1,10 +1,9 @@
 /*
  * Fayl Uzatish — "Oldindan saqlash": fayllarni xonaga oldindan yuklab qo'yish, 24 soatdan keyin o'chadi.
  * Ma'lumot Firebase Realtime Database'da:
- *   stash/<kod>/exp                  — tugash vaqti (ms)
- *   stash/<kod>/files/<fid>          — {name,size,type,total,at,complete}
- *   stash/<kod>/data/<fid>/cNNNNN    — base64 bo'laklar
- *   stashIndex/<kod>                 — tugash vaqti (tozalash uchun)
+ *   rooms/<kod>/stash/exp                  — tugash vaqti (ms)
+ *   rooms/<kod>/stash/files/<fid>          — {name,size,type,total,at,complete}
+ *   rooms/<kod>/stash/data/<fid>/cNNNNN    — base64 bo'laklar
  * Realtime Database o'zi o'chirmaydi, shuning uchun muddati o'tganlarini sahifa ochilganda
  * va kod kiritilganda tozalaymiz (sweep).
  */
@@ -36,17 +35,18 @@
   /* ---------- tozalash ---------- */
   function removeStash(code) {
     return Promise.all([
-      dbr().ref('stash/' + code).remove(),
-      dbr().ref('stashIndex/' + code).remove()
+      dbr().ref('rooms/' + code + '/stash').remove(),
+      Promise.resolve(forget(code))
     ]).catch(function () {});
   }
+  // Bu qurilmada yaratilgan xonalar ro'yxati (eskilarini o'zimiz tozalaymiz)
+  function mine() { try { return JSON.parse(localStorage.getItem('fayl_stash') || '{}'); } catch (e) { return {}; } }
+  function saveMine(o) { try { localStorage.setItem('fayl_stash', JSON.stringify(o)); } catch (e) {} }
+  function remember(code, exp) { var o = mine(); o[code] = exp; saveMine(o); }
+  function forget(code) { var o = mine(); delete o[code]; saveMine(o); }
   function sweep() {
-    try {
-      dbr().ref('stashIndex').orderByValue().endAt(Date.now()).limitToFirst(5).once('value').then(function (s) {
-        var v = s.val() || {};
-        Object.keys(v).forEach(function (code) { if (v[code] <= Date.now()) removeStash(code); });
-      }).catch(function () {});
-    } catch (e) {}
+    var o = mine();
+    Object.keys(o).forEach(function (code) { if (o[code] <= Date.now()) removeStash(code); });
   }
 
   /* ---------- yuklash ---------- */
@@ -56,7 +56,7 @@
     return (async function () {
       for (var i = 0; i < 8; i++) {
         var c = generateRoomCode();
-        var s = await dbr().ref('stash/' + c + '/exp').once('value');
+        var s = await dbr().ref('rooms/' + c + '/stash/exp').once('value');
         var e = s.val();
         if (!e) return c;
         if (e <= Date.now()) { await removeStash(c); return c; }
@@ -69,8 +69,8 @@
     if (curCode && curExp > Date.now()) return curCode;
     var code = await newCode();
     curExp = Date.now() + TTL;
-    await dbr().ref('stash/' + code + '/exp').set(curExp);
-    await dbr().ref('stashIndex/' + code).set(curExp);
+    await dbr().ref('rooms/' + code + '/stash/exp').set(curExp);
+    remember(code, curExp);
     curCode = code;
     $('stashCode').textContent = code;
     $('stashCodeBox').style.display = 'block';
@@ -87,13 +87,13 @@
   async function uploadOne(code, file, onProg) {
     if (!file.size) throw new Error('Fayl bo\'sh');
     if (file.size > MAX_FILE) throw new Error('Fayl katta (' + formatSize(file.size) + '). Eng ko\'pi ' + formatSize(MAX_FILE) + '.');
-    var cur = (await dbr().ref('stash/' + code + '/files').once('value')).val() || {};
+    var cur = (await dbr().ref('rooms/' + code + '/stash/files').once('value')).val() || {};
     var sum = 0; Object.keys(cur).forEach(function (k) { sum += (cur[k].size || 0); });
     if (sum + file.size > MAX_TOTAL) throw new Error('Xonada joy yetmaydi (jami ' + formatSize(MAX_TOTAL) + ').');
     var fid = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
     var total = Math.ceil(file.size / RAW);
-    var metaRef = dbr().ref('stash/' + code + '/files/' + fid);
-    var dataBase = 'stash/' + code + '/data/' + fid;
+    var metaRef = dbr().ref('rooms/' + code + '/stash/files/' + fid);
+    var dataBase = 'rooms/' + code + '/stash/data/' + fid;
     try {
       await metaRef.set({ name: file.name, size: file.size, type: file.type || '', total: total, at: Date.now(), complete: false });
       var next = 0, done = 0, written = 0, t0 = Date.now();
@@ -162,7 +162,7 @@
   var watched = {};
   function watchFiles(code, listEl, canDelete) {
     if (watched[listEl.id]) { try { watched[listEl.id].off(); } catch (e) {} }
-    var ref = dbr().ref('stash/' + code + '/files');
+    var ref = dbr().ref('rooms/' + code + '/stash/files');
     watched[listEl.id] = ref;
     ref.on('value', function (s) {
       var v = s.val() || {};
@@ -181,8 +181,8 @@
           var del = document.createElement('button');
           del.className = 'secondary stash-btn'; del.textContent = "O'chirish";
           del.onclick = function () {
-            dbr().ref('stash/' + code + '/files/' + fid).remove();
-            dbr().ref('stash/' + code + '/data/' + fid).remove();
+            dbr().ref('rooms/' + code + '/stash/files/' + fid).remove();
+            dbr().ref('rooms/' + code + '/stash/data/' + fid).remove();
           };
           row.appendChild(del);
         } else if (m.complete) {
@@ -201,7 +201,7 @@
     var key = code + '/' + fid;
     if (cache[key]) { present(cache[key]); return; }
     btn.disabled = true;
-    var ref = dbr().ref('stash/' + code + '/data/' + fid);
+    var ref = dbr().ref('rooms/' + code + '/stash/data/' + fid);
     var parts = new Array(m.total), got = 0, finished = false;
     var st = $('stashGetStatus');
     var timer = setTimeout(function () {
@@ -243,7 +243,7 @@
     if (!/^\d{6}$/.test(code)) { setStatus(st, "Kod 6 ta raqam bo'lishi kerak.", 'err'); return; }
     setStatus(st, 'Tekshirilmoqda...');
     try {
-      var exp = (await dbr().ref('stash/' + code + '/exp').once('value')).val();
+      var exp = (await dbr().ref('rooms/' + code + '/stash/exp').once('value')).val();
       if (!exp) { setStatus(st, '✗ Bunday xona topilmadi.', 'err'); $('stashGetList').innerHTML = ''; return; }
       if (exp <= Date.now()) {
         await removeStash(code);
