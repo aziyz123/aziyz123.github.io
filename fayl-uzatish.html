@@ -133,6 +133,7 @@
         <div class="room-code" id="stashCode" style="font-size:38px;letter-spacing:6px;"></div>
         <div class="hint" id="stashExpiry"></div>
         <button class="secondary" id="stashCopyBtn">Kodni nusxalash</button>
+        <button class="secondary" id="stashUpDelBtn" style="border-color:rgba(214,69,69,0.5);color:#ff9d9d;">🗑 Xonani butunlay o'chirish</button>
         <div id="stashUpList" style="margin-top:12px;"></div>
       </div>
     </div>
@@ -142,6 +143,10 @@
       <button class="primary" id="stashOpenBtn" style="margin-top:12px;">Xonani ochish</button>
       <div class="status-line" id="stashGetStatus"></div>
       <div id="stashGetList" style="margin-top:12px;"></div>
+      <div id="stashDelBox" style="display:none;margin-top:12px;">
+        <label style="display:flex;gap:8px;align-items:flex-start;font-size:13px;line-height:1.4;"><input type="checkbox" id="stashAutoDel" checked style="margin-top:3px;"> <span>Yuklab olgach, fayl bazadan o'chirilsin (joy bo'shaydi)</span></label>
+        <button class="secondary" id="stashGetDelBtn" style="border-color:rgba(214,69,69,0.5);color:#ff9d9d;">🗑 Ishlatib bo'ldim — xonani o'chirish</button>
+      </div>
     </div>
   </div>
   <div class="app-footer">
@@ -180,6 +185,6 @@
 <script src="fayl-core.js?v=1"></script>
 <script src="fayl-ui.js?v=1"></script>
 <script src="fayl-telegram.js?v=1"></script>
-<script src="fayl-stash.js?v=2"></script>
+<script src="fayl-stash.js?v=3"></script>
 </body>
 </html>

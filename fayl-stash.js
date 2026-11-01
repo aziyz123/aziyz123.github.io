@@ -50,7 +50,7 @@
   }
 
   /* ---------- yuklash ---------- */
-  var curCode = null, curExp = 0, busy = false;
+  var curCode = null, curExp = 0, busy = false, openedCode = null;
 
   function newCode() {
     return (async function () {
@@ -225,6 +225,7 @@
         setStatus(st, '✅ Tayyor: ' + m.name, 'ok');
         cache[key] = { name: m.name, type: mime, size: m.size, data: URL.createObjectURL(blob) };
         present(cache[key]);
+        if ($('stashAutoDel') && $('stashAutoDel').checked) deleteOneFile(code, fid);
       }
     });
     function present(f) {
@@ -234,6 +235,28 @@
       else if (cat === 'pptx') openPptxViewer(f);
       else downloadFile(f);
     }
+  }
+
+  /* ---------- o'chirish ---------- */
+  function deleteOneFile(code, fid) {
+    dbr().ref('rooms/' + code + '/stash/data/' + fid).remove().catch(function () {});
+    dbr().ref('rooms/' + code + '/stash/files/' + fid).remove().then(function () {
+      return dbr().ref('rooms/' + code + '/stash/files').once('value');
+    }).then(function (s) {
+      if (!s.val() || !Object.keys(s.val()).length) { removeStash(code); setStatus($('stashGetStatus'), "✅ Fayl olindi va bazadan o'chirildi. Xona bo'shadi, u ham o'chirildi.", 'ok'); }
+    }).catch(function () {});
+  }
+  async function deleteRoom(code, statusEl, listEl) {
+    if (!code) return;
+    if (!confirm('Xona ' + code + " va ichidagi hamma fayl o'chiriladi. Davom etasizmi?")) return;
+    try {
+      await dbr().ref('rooms/' + code + '/stash').remove();
+      forget(code);
+      if (watched[listEl.id]) { try { watched[listEl.id].off(); } catch (e) {} }
+      listEl.innerHTML = '';
+      setStatus(statusEl, "✅ Xona va fayllar bazadan o'chirildi.", 'ok');
+      return true;
+    } catch (e) { setStatus(statusEl, '✗ ' + errText(e), 'err'); }
   }
 
   /* ---------- kod bilan olish ---------- */
@@ -251,6 +274,8 @@
         $('stashGetList').innerHTML = ''; return;
       }
       setStatus(st, '✅ Xona topildi — ' + leftText(exp), 'ok');
+      openedCode = code;
+      $('stashDelBox').style.display = 'block';
       watchFiles(code, $('stashGetList'), false);
     } catch (e) { setStatus(st, '✗ ' + errText(e), 'err'); }
   }
@@ -264,6 +289,12 @@
       var t = $('stashCode').textContent;
       try { navigator.clipboard.writeText(t); $('stashCopyBtn').textContent = '✓ Nusxalandi'; } catch (e) {}
       setTimeout(function () { $('stashCopyBtn').textContent = 'Kodni nusxalash'; }, 1800);
+    });
+    $('stashUpDelBtn').addEventListener('click', async function () {
+      if (await deleteRoom(curCode, $('stashUpStatus'), $('stashUpList'))) { curCode = null; $('stashCodeBox').style.display = 'none'; $('stashUpBg').classList.remove('active'); }
+    });
+    $('stashGetDelBtn').addEventListener('click', async function () {
+      if (await deleteRoom(openedCode, $('stashGetStatus'), $('stashGetList'))) { openedCode = null; $('stashDelBox').style.display = 'none'; }
     });
     $('stashOpenBtn').addEventListener('click', function () { openByCode($('stashCodeInput').value); });
     $('stashCodeInput').addEventListener('keydown', function (e) { if (e.key === 'Enter') openByCode(e.target.value); });
