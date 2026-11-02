@@ -4,69 +4,1743 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Slayd Yaratuvchi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@400;600;700&family=Fraunces:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
 <style>
-html,body{margin:0;height:100%;background:#F3EFE4;font-family:system-ui,sans-serif}
-#msg{padding:48px 24px;text-align:center;color:#888}
-#msg a{color:#A9813F}
+  :root{
+    --ink:#20293A;
+    --paper:#F3EFE4;
+    --paper-2:#EAE3D2;
+    --gold:#A9813F;
+    --gold-2:#C9A45C;
+    --line: rgba(32,41,58,0.14);
+    --danger:#9C4A3C;
+    --ok:#4A6741;
+    --radius: 2px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family:'Inter', sans-serif;
+    min-height:100vh;
+  }
+  .wrap{
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+  }
+  header.top{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    border-bottom: 2px solid var(--ink);
+    padding-bottom: 18px;
+    margin-bottom: 36px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .brand{
+    font-family:'Zilla Slab', serif;
+    font-weight:700;
+    font-size: 28px;
+    letter-spacing: -0.01em;
+  }
+  .brand small{
+    display:block;
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 11px;
+    font-weight:400;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-top:4px;
+  }
+  .tag{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    color: rgba(32,41,58,0.55);
+    text-align:right;
+  }
+  .role-badge{
+    display:flex;
+    align-items:center;
+    gap: 10px;
+  }
+  .role-pill{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 5px 10px;
+    border: 1px solid var(--gold);
+    color: var(--gold);
+  }
+  .role-pill.admin{ background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  .logout-link{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: rgba(32,41,58,0.5);
+    cursor:pointer;
+    text-decoration: underline;
+  }
+
+  .card{
+    background: var(--paper-2);
+    border: 1px solid var(--line);
+    padding: 28px;
+    margin-bottom: 24px;
+    position:relative;
+  }
+  .card::before{
+    content:'';
+    position:absolute;
+    top:0; left:0;
+    width: 3px; height: 100%;
+    background: var(--gold);
+  }
+  .card.admin-card::before{ background: var(--ink); }
+  .card h2{
+    font-family:'Zilla Slab', serif;
+    font-size: 15px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin: 0 0 18px 0;
+    color: var(--ink);
+  }
+  label{
+    display:block;
+    font-size: 13px;
+    font-weight:600;
+    margin-bottom: 6px;
+    margin-top: 16px;
+  }
+  label:first-of-type{margin-top:0;}
+  textarea, input[type=text], input[type=number], input[type=password], input[type=file]{
+    width:100%;
+    font-family:'Inter', sans-serif;
+    font-size: 14px;
+    padding: 12px 14px;
+    border: 1px solid var(--line);
+    background: var(--paper);
+    color: var(--ink);
+    border-radius: var(--radius);
+    resize: vertical;
+  }
+  input[type=file]{ padding: 10px 14px; cursor:pointer; }
+  textarea:focus, input:focus{
+    outline: none;
+    border-color: var(--gold);
+  }
+  textarea{ min-height: 220px; line-height:1.5; }
+  .row{
+    display:flex;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  .row > div{ flex:1; min-width: 160px; }
+  .checkbox-row{
+    display:flex;
+    align-items:center;
+    gap: 10px;
+    margin-top: 18px;
+    padding: 12px 14px;
+    background: var(--paper);
+    border: 1px solid var(--line);
+  }
+  .checkbox-row input{ width:auto; }
+  .checkbox-row span{ font-size: 13px; }
+  .hint{
+    font-size: 11px;
+    color: rgba(32,41,58,0.5);
+    margin-top: 4px;
+    line-height:1.4;
+  }
+  .char-count{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    color: rgba(32,41,58,0.45);
+    text-align:right;
+    margin-top:4px;
+  }
+  .file-status{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 11px;
+    margin-top: 8px;
+  }
+  .file-status.ok{ color: var(--ok); }
+  .file-status.err{ color: var(--danger); }
+  .divider-or{
+    display:flex;
+    align-items:center;
+    gap: 12px;
+    margin: 20px 0 4px;
+    color: rgba(32,41,58,0.4);
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .divider-or::before, .divider-or::after{
+    content:'';
+    flex:1;
+    height: 1px;
+    background: var(--line);
+  }
+
+  button.primary{
+    width:100%;
+    margin-top: 24px;
+    padding: 16px;
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    font-family:'Zilla Slab', serif;
+    font-weight:700;
+    font-size: 15px;
+    letter-spacing: 0.02em;
+    cursor:pointer;
+    transition: background 0.15s ease;
+  }
+  button.primary:hover:not(:disabled){ background:#39465e; }
+  button.primary:disabled{ opacity:0.5; cursor:not-allowed; }
+
+  button.secondary{
+    padding: 12px 20px;
+    background: transparent;
+    color: var(--ink);
+    border: 1px solid var(--ink);
+    font-family:'Inter', sans-serif;
+    font-weight:600;
+    font-size: 13px;
+    cursor:pointer;
+  }
+  button.secondary:hover{ background: var(--ink); color: var(--paper); }
+
+  .progress-wrap{ display:none; margin-top:24px; }
+  .progress-wrap.active{ display:block; }
+  .progress-bar-bg{
+    height: 6px;
+    background: var(--paper);
+    border: 1px solid var(--line);
+  }
+  .progress-bar-fill{
+    height:100%;
+    width:0%;
+    background: linear-gradient(90deg, var(--gold), var(--gold-2));
+    transition: width 0.3s ease;
+  }
+  .progress-status{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 12px;
+    margin-top: 8px;
+    color: rgba(32,41,58,0.7);
+  }
+  .error-box{
+    display:none;
+    margin-top: 16px;
+    padding: 14px 16px;
+    background: rgba(156,74,60,0.1);
+    border: 1px solid var(--danger);
+    color: var(--danger);
+    font-size: 13px;
+  }
+  .error-box.active{ display:block; }
+  .success-box{
+    display:none;
+    margin-top: 16px;
+    padding: 14px 16px;
+    background: rgba(74,103,65,0.1);
+    border: 1px solid var(--ok);
+    color: var(--ok);
+    font-size: 13px;
+  }
+  .success-box.active{ display:block; }
+
+  .result-box{
+    display:none;
+    margin-top: 20px;
+    padding: 20px;
+    background: var(--ink);
+    color: var(--paper);
+  }
+  .result-box.active{ display:block; }
+  .result-box .rtitle{
+    font-family:'Fraunces', serif;
+    font-style:italic;
+    font-size: 18px;
+    margin-bottom: 4px;
+  }
+  .result-box .rmeta{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    color: var(--gold-2);
+    margin-bottom: 16px;
+  }
+  button.download{
+    padding: 12px 20px;
+    background: var(--gold);
+    color: var(--ink);
+    border:none;
+    font-weight:700;
+    font-size: 13px;
+    cursor:pointer;
+    font-family:'Inter',sans-serif;
+  }
+  button.download:hover{ background: var(--gold-2); }
+
+  .history{ margin-top: 40px; }
+  .history h2{
+    font-family:'Zilla Slab', serif;
+    font-size: 15px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 10px;
+  }
+  .hist-item{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding: 14px 0;
+    border-bottom: 1px dashed var(--line);
+    gap: 12px;
+  }
+  .hist-item .hi-left{ flex:1; min-width:0; }
+  .hist-item .hi-title{
+    font-weight:600;
+    font-size: 14px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .hist-item .hi-meta{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: rgba(32,41,58,0.5);
+    margin-top:2px;
+  }
+  .hist-item .hi-actions{
+    display:flex;
+    gap: 8px;
+    flex-shrink:0;
+  }
+  .hi-actions button{
+    border:none;
+    background: transparent;
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 11px;
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+    cursor:pointer;
+    padding: 6px 10px;
+    border: 1px solid var(--line);
+  }
+  .hi-actions button.dl{ border-color: var(--gold); color: var(--gold); }
+  .hi-actions button.dl:hover{ background: var(--gold); color: var(--paper); }
+  .hi-actions button.del{ color: var(--danger); border-color: var(--danger); }
+  .hi-actions button.del:hover{ background: var(--danger); color: var(--paper); }
+  .empty-hist{
+    font-size: 13px;
+    color: rgba(32,41,58,0.5);
+    padding: 20px 0;
+    font-style:italic;
+  }
+
+  .edit-slide-item{
+    background: var(--paper);
+    border: 1px solid var(--line);
+    padding: 16px;
+    margin-bottom: 14px;
+    position: relative;
+  }
+  .edit-slide-item .esi-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom: 10px;
+  }
+  .edit-slide-item .esi-num{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--gold);
+    font-weight:600;
+  }
+  .edit-slide-item .esi-remove{
+    border:none;
+    background: transparent;
+    color: var(--danger);
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 11px;
+    cursor:pointer;
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+    padding: 4px 8px;
+    border: 1px solid var(--danger);
+  }
+  .edit-slide-item .esi-remove:hover{ background: var(--danger); color: var(--paper); }
+  .edit-slide-item input[type=text]{
+    font-weight:600;
+    margin-bottom: 10px;
+  }
+  .edit-slide-item textarea{
+    min-height: 90px;
+    font-size: 13px;
+  }
+  .edit-slide-item.removed{ opacity:0.35; }
+  .esi-actions{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+  .esi-actions button{border:1px solid var(--line);background:var(--paper-2);color:var(--ink);font-family:'IBM Plex Mono',monospace;font-size:11px;cursor:pointer;padding:4px 8px}
+  .esi-actions button:hover{border-color:var(--gold);color:var(--gold)}
+  .esi-actions button.esi-remove{border-color:var(--danger);color:var(--danger)}
+  .esi-actions button.esi-remove:hover{background:var(--danger);color:var(--paper)}
+  #addSlideBtn{width:100%;margin:4px 0 14px;padding:12px;border:1px dashed var(--gold);background:transparent;color:var(--gold);font-family:'Zilla Slab',serif;font-weight:700;font-size:13px;cursor:pointer}
+  #addSlideBtn:hover{background:rgba(169,129,63,0.1)}
+
+
+  select{
+    width:100%;
+    font-family:'Inter', sans-serif;
+    font-size: 14px;
+    padding: 12px 14px;
+    border: 1px solid var(--line);
+    background: var(--paper);
+    color: var(--ink);
+  }
+
+  /* Gate screen */
+  #gateScreen{
+    min-height: 100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding: 24px;
+  }
+  .gate-box{
+    max-width: 380px;
+    width:100%;
+    background: var(--paper-2);
+    border: 1px solid var(--line);
+    padding: 40px 32px;
+    position:relative;
+  }
+  .gate-box::before{
+    content:'';
+    position:absolute;
+    top:0; left:0;
+    width:100%; height: 3px;
+    background: var(--gold);
+  }
+  .gate-brand{
+    font-family:'Zilla Slab', serif;
+    font-weight:700;
+    font-size: 24px;
+    text-align:center;
+    margin-bottom: 4px;
+  }
+  .gate-sub{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 11px;
+    text-transform:uppercase;
+    letter-spacing: 0.08em;
+    color: var(--gold);
+    text-align:center;
+    margin-bottom: 28px;
+  }
+  .gate-box label{ margin-top:0; }
+  .gate-box button{
+    width:100%;
+    margin-top: 18px;
+    padding: 14px;
+    background: var(--ink);
+    color: var(--paper);
+    border:none;
+    font-family:'Zilla Slab', serif;
+    font-weight:700;
+    font-size: 14px;
+    cursor:pointer;
+  }
+  .gate-box button:hover{ background:#39465e; }
+  .gate-error{
+    display:none;
+    margin-top: 14px;
+    font-size: 12px;
+    color: var(--danger);
+    text-align:center;
+  }
+  .gate-error.active{ display:block; }
+  .bg-box{border:1px solid var(--line);background:var(--paper-2);padding:14px;margin:0 0 16px}
+  .bg-box b{font-size:13px}
+  .bg-prev{position:relative;height:84px;max-width:300px;margin:8px 0;border:1px solid var(--line);background:#999 center/cover no-repeat;display:flex;align-items:center;justify-content:center;overflow:hidden}
+  .bg-prev i{position:absolute;inset:0;background:#000;opacity:0}
+  .bg-prev span{position:relative;font-weight:700;font-size:15px;color:#fff}
+  .bg-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:12px}
+  .bg-row input[type=range]{flex:1;min-width:140px}
+  .bg-link{border:none;background:transparent;color:var(--danger);font-size:11px;cursor:pointer;text-decoration:underline;padding:0}
+  .esi-bgwrap{margin-top:10px;font-size:12px}
+  .esi-bgwrap select{width:100%;padding:8px;font-size:12px;margin-top:4px}
 </style>
 </head>
 <body>
-<div id="msg">Yuklanmoqda...</div>
+
+<div id="gateScreen">
+  <div class="gate-box">
+    <div class="gate-brand">Slayd Yaratuvchi</div>
+    <div class="gate-sub">Kirish kodi talab qilinadi</div>
+    <label for="gateInput">Kirish kodi</label>
+    <input type="password" id="gateInput" placeholder="Kodni kiriting">
+    <button id="gateSubmit">Kirish</button>
+    <div class="gate-error" id="gateError"></div>
+  </div>
+</div>
+
+<div class="wrap" id="appContent" style="display:none;">
+
+  <header class="top">
+    <div class="brand">Slayd Yaratuvchi<small>Manba matnidan taqdimot</small></div>
+    <div class="role-badge">
+      <span class="role-pill" id="rolePill">Foydalanuvchi</span>
+      <span class="logout-link" id="logoutLink">Chiqish</span>
+    </div>
+  </header>
+
+  <div class="card">
+    <h2>1 &middot; Manba matni</h2>
+
+    <label for="sourceFile">Fayldan yuklash (PDF, DOCX yoki TXT)</label>
+    <input type="file" id="sourceFile" accept=".pdf,.docx,.txt">
+    <div class="file-status" id="fileStatus"></div>
+
+    <div class="divider-or">yoki qo'lda kiriting</div>
+
+    <label for="sourceText">Manba matni</label>
+    <textarea id="sourceText" placeholder="Manba matnini shu yerga joylashtiring yoki yuqoridan fayl yuklang..."></textarea>
+    <div class="char-count" id="charCount">0 belgi</div>
+
+    <div class="row">
+      <div>
+        <label for="presTitle">Taqdimot nomi</label>
+        <input type="text" id="presTitle" placeholder="Masalan: Imom Buxoriy hayoti va ijodi">
+      </div>
+      <div>
+        <label for="authorName">Tayyorlovchi</label>
+        <input type="text" id="authorName" placeholder="Ism familiyangiz">
+      </div>
+    </div>
+
+    <div class="row">
+      <div>
+        <label for="slideCount">Slaydlar soni</label>
+        <input type="number" id="slideCount" value="10" min="3" max="30">
+        <div class="checkbox-row" style="margin-top:10px;">
+          <input type="checkbox" id="autoSlideCount">
+          <span>Avtomatik aniqlansin (matn hajmiga qarab)</span>
+        </div>
+        <div class="hint">Qoida: 10 qatorlik chegara <b>faqat</b> "Avtomatik aniqlash" belgilanganda ishlaydi (shu holda slaydlar soni matn hajmidan kelib chiqib hisoblanadi). Sonni qo'lda kiritsangiz, matn so'ralgan songa qat'iy taqsimlanadi — 10 qator chegarasi qo'llanilmaydi.</div>
+      </div>
+      <div>
+        <label for="styleSelect">Dizayn uslubi</label>
+        <select id="styleSelect">
+          <option value="minimal">Minimalistik — sodda, toza chiziqlar</option>
+          <option value="rich">Chiroyli — boy dekorativ, rangli bloklar</option>
+        </select>
+      </div>
+    </div>
+
+    <label for="themeSelect">Dizayn yo'nalishi (rang palitrasi)</label>
+    <select id="themeSelect">
+      <option value="auto">Avtomatik aniqlash (matn asosida)</option>
+      <option value="tarix">Tarix / harbiy — jigarrang/lojuvard</option>
+      <option value="falsafa">Falsafa — intellektual, neytral</option>
+      <option value="din">Din / Islom mavzulari — nafis, oltin detalli</option>
+      <option value="umumiy">Umumiy — ko'k/moviy standart</option>
+      <option value="zamonaviy">Zamonaviy — qorong'u fon, oltin aksent</option>
+    </select>
+
+    <div class="checkbox-row">
+      <input type="checkbox" id="withGraphics" checked>
+      <span>Slaydlarga dizayn elementlari qo'shilsin (chiziqlar, aksent shakllar)</span>
+    </div>
+    <div class="hint">Eslatma: bu haqiqiy fotosuratlar emas — PowerPoint'ning o'zida chiziladigan, to'liq tahrirlanadigan geometrik dizayn elementlari.</div>
+
+    <div class="checkbox-row">
+      <input type="checkbox" id="withAgenda">
+      <span>"Reja" (mundarija) slaydi qo'shilsin — sarlavha slaydidan keyin</span>
+    </div>
+    <div class="hint">Barcha slaydlar sarlavhalarining ro'yxatini ko'rsatadigan alohida slayd qo'shiladi.</div>
+
+    <label for="sourcesText">Manbalar / foydalanilgan adabiyotlar (ixtiyoriy)</label>
+    <textarea id="sourcesText" placeholder="Masalan:&#10;1. Ismoilov A. Tarix asoslari. — Toshkent, 2020.&#10;2. https://example.uz/manba" style="min-height:90px;"></textarea>
+    <div class="hint">To'ldirilsa, taqdimot oxiriga avtomatik "Manbalar" nomli alohida slayd qo'shiladi.</div>
+
+    <button class="primary" id="generateBtn">Taqdimot yaratish</button>
+
+    <div class="progress-wrap" id="progressWrap">
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressFill"></div></div>
+      <div class="progress-status" id="progressStatus">Boshlanmoqda...</div>
+    </div>
+
+    <div class="error-box" id="errorBox"></div>
+
+    <div class="card" id="editPanel" style="display:none; margin-top:20px; padding:22px;">
+      <h2>Slaydlarni ko'rib chiqish va tahrirlash</h2>
+      <div class="hint" style="margin-bottom:16px;">Sarlavha va matnni o'zgartiring, rasm qo'shing, tartibini ↑↓ bilan o'zgartiring yoki yangi slayd qo'shing.</div>
+      <div class="bg-box" id="bgBox">
+        <b>🖼 Umumiy fon rasmi (ixtiyoriy)</b>
+        <div class="hint" style="margin:4px 0 8px;">Masalan: Registon rasmi. Hamma slaydga orqa fon bo'ladi. Matn yaqqol ko'rinishi uchun rasm qoraytiriladi. Alohida slaydga boshqa rasm yoki fonsiz holatni slayd ichidan tanlaysiz.</div>
+        <input type="file" id="bgFile" accept="image/*">
+        <div class="bg-prev" id="bgPrev" style="display:none;"><i></i><span>Namuna matn</span></div>
+        <div class="bg-row" id="bgCtl" style="display:none;">
+          <span>Qoraytirish:</span>
+          <input type="range" id="bgOverlay" min="0" max="90" value="55">
+          <b id="bgOverlayVal">55%</b>
+          <button type="button" class="bg-link" id="bgClear">Rasmni olib tashlash</button>
+        </div>
+        <div class="hint" style="margin:6px 0 0;">0% — qoraytirmasdan (rasm to'liq yorqin). Ko'proq — matn aniqroq o'qiladi. Matn rangi (oq yoki qora) rasmga qarab o'zi tanlanadi.</div>
+      </div>
+      <div id="editSlideList"></div>
+      <button type="button" id="addSlideBtn">+ Yangi slayd qo'shish</button>
+      <button class="primary" id="confirmBuildBtn" style="margin-top:8px;">PPTX faylini yaratish</button>
+    </div>
+
+    <div class="result-box" id="resultBox">
+      <div class="rtitle" id="resultTitle"></div>
+      <div class="rmeta" id="resultMeta"></div>
+      <button class="download" id="downloadBtn">.PPTX yuklab olish</button>
+    </div>
+  </div>
+
+  <div class="history">
+    <h2>Oldingi taqdimotlar</h2>
+    <div id="historyList"></div>
+  </div>
+
+  <div class="card admin-card" id="adminPanel" style="display:none; margin-top:40px;">
+    <h2>Admin &middot; Kirish kodlarini boshqarish</h2>
+    <div class="hint" style="margin-bottom:16px;">Bu yerda admin va oddiy foydalanuvchi uchun kirish kodlarini o'zgartirishingiz mumkin. O'zgartirilgach, eski kodlar ishlamay qoladi.</div>
+    <div class="row">
+      <div>
+        <label for="newAdminCode">Yangi admin kodi</label>
+        <input type="text" id="newAdminCode" placeholder="Yangi admin kodini kiriting">
+      </div>
+      <div>
+        <label for="newUserCode">Yangi foydalanuvchi kodi</label>
+        <input type="text" id="newUserCode" placeholder="Yangi foydalanuvchi kodini kiriting">
+      </div>
+    </div>
+    <button class="secondary" id="saveCodesBtn" style="margin-top:20px;">Kodlarni saqlash</button>
+    <div class="success-box" id="codesSuccessBox">Kodlar muvaffaqiyatli yangilandi.</div>
+    <div class="error-box" id="codesErrorBox"></div>
+  </div>
+
+</div>
+
 <script>
-(async function () {
-  var msg = document.getElementById('msg');
-  try {
-    var url = 'https://cdn.jsdelivr.net/gh/aziyz123/aziyz123.github.io@0395ca05c456f81b9e24c79793bb50b6f87121a3/slayd-yaratuvchi.html';
-    var html = await fetch(url + '?t=' + Date.now()).then(function (r) {
-      if (!r.ok) throw new Error('Yuklash: ' + r.status);
-      return r.text();
-    });
+// ---------- Universal storage (works in Claude.ai AND in a plain browser) ----------
+const HAS_CLOUD_STORAGE = (typeof window.storage !== 'undefined' && window.storage !== null);
+const LS_TAG_LOCAL = '__sy_local__:';
+const LS_TAG_SHARED = '__sy_shared__:';
 
-    html = html.replace(
-      '.edit-slide-item.removed{ opacity:0.35; }',
-      '.edit-slide-item.removed{ opacity:0.35; }\n' +
-      '  .esi-actions{display:flex;gap:6px;align-items:center;flex-wrap:wrap}\n' +
-      '  .esi-actions button{border:1px solid var(--line);background:var(--paper-2);color:var(--ink);' +
-      "font-family:'IBM Plex Mono',monospace;font-size:11px;cursor:pointer;padding:4px 8px}\n" +
-      '  .esi-actions button:hover{border-color:var(--gold);color:var(--gold)}\n' +
-      '  .esi-actions button.esi-remove{border-color:var(--danger);color:var(--danger)}\n' +
-      '  .esi-actions button.esi-remove:hover{background:var(--danger);color:var(--paper)}\n' +
-      '  #addSlideBtn{width:100%;margin:4px 0 14px;padding:12px;border:1px dashed var(--gold);' +
-      'background:transparent;color:var(--gold);' +
-      "font-family:'Zilla Slab',serif;font-weight:700;font-size:13px;cursor:pointer}\n" +
-      '  #addSlideBtn:hover{background:rgba(169,129,63,0.1)}'
-    );
-
-    html = html.replace(
-      '<option value="umumiy">Umumiy — ko\'k/moviy standart</option>\n    </select>',
-      '<option value="umumiy">Umumiy — ko\'k/moviy standart</option>\n' +
-      '      <option value="zamonaviy">Zamonaviy — qorong\'u fon, oltin aksent</option>\n    </select>'
-    );
-
-    html = html.replace(
-      "umumiy: {\n    label: 'Umumiy',\n    bg: 'F4F4F2', ink: '222222', accent: '3D5A80', accent2: '98C1D9',\n    headFont: 'Arial', bodyFont: 'Arial'\n  }\n};",
-      "umumiy: {\n    label: 'Umumiy',\n    bg: 'F4F4F2', ink: '222222', accent: '3D5A80', accent2: '98C1D9',\n    headFont: 'Arial', bodyFont: 'Arial'\n  },\n" +
-      "  zamonaviy: {\n    label: 'Zamonaviy',\n    bg: '12151C', ink: 'F3EFE4', accent: 'C9A45C', accent2: 'A9813F',\n    headFont: 'Arial', bodyFont: 'Arial'\n  }\n};"
-    );
-
-    html = html.replace(
-      '<div class="hint" style="margin-bottom:16px;">Har bir slayd sarlavhasi va matnini kerak bo\'lsa o\'zgartiring, keraksizini o\'chiring. Tayyor bo\'lgach, pastdagi tugmani bosing.</div>\n      <div id="editSlideList"></div>\n      <button class="primary" id="confirmBuildBtn" style="margin-top:8px;">PPTX faylini yaratish</button>',
-      '<div class="hint" style="margin-bottom:16px;">Sarlavha va matnni o\'zgartiring, rasm qo\'shing, tartibini ↑↓ bilan o\'zgartiring yoki yangi slayd qo\'shing.</div>\n      <div id="editSlideList"></div>\n      <button type="button" id="addSlideBtn">+ Yangi slayd qo\'shish</button>\n      <button class="primary" id="confirmBuildBtn" style="margin-top:8px;">PPTX faylini yaratish</button>'
-    );
-
-    var enhanceCode = "(function () {\n  function renumberEditSlides() {\n    var items = Array.from(document.querySelectorAll('#editSlideList .edit-slide-item'));\n    items.forEach(function (item, idx) {\n      item.dataset.index = idx;\n      var num = item.querySelector('.esi-num');\n      if (num) num.textContent = idx === 0 ? 'Sarlavha slaydi' : ('Slayd ' + (idx + 1));\n    });\n  }\n\n  function wireEditItem(item) {\n    if (item._wiredMove) return;\n    item._wiredMove = true;\n    var head = item.querySelector('.esi-head');\n    var removeBtn = item.querySelector('.esi-remove');\n    if (!head || !removeBtn || item.querySelector('.esi-up')) return;\n    var actions = document.createElement('div');\n    actions.className = 'esi-actions';\n    var up = document.createElement('button');\n    up.type = 'button';\n    up.className = 'esi-up';\n    up.textContent = '↑';\n    up.title = 'Yuqoriga';\n    var down = document.createElement('button');\n    down.type = 'button';\n    down.className = 'esi-down';\n    down.textContent = '↓';\n    down.title = 'Pastga';\n    up.onclick = function () {\n      var p = item.previousElementSibling;\n      if (p) {\n        item.parentNode.insertBefore(item, p);\n        renumberEditSlides();\n      }\n    };\n    down.onclick = function () {\n      var n = item.nextElementSibling;\n      if (n) {\n        item.parentNode.insertBefore(n, item);\n        renumberEditSlides();\n      }\n    };\n    removeBtn.parentNode.insertBefore(actions, removeBtn);\n    actions.appendChild(up);\n    actions.appendChild(down);\n    actions.appendChild(removeBtn);\n  }\n\n  function wireAddBtn() {\n    var btn = document.getElementById('addSlideBtn');\n    if (!btn || btn._wired) return;\n    btn._wired = true;\n    btn.onclick = function () {\n      var list = document.getElementById('editSlideList');\n      if (!list || typeof window.renderEditPanel !== 'function') return;\n      var cur = [];\n      Array.from(list.querySelectorAll('.edit-slide-item')).forEach(function (it) {\n        if (it.dataset.removed === '1') return;\n        cur.push({\n          title: (it.querySelector('.esi-title') || {}).value || '',\n          bullets: [(it.querySelector('.esi-body') || {}).value || ''],\n          image: it._imageData || null\n        });\n      });\n      cur.push({ title: '', bullets: [''] });\n      window.renderEditPanel(cur);\n      var last = list.querySelector('.edit-slide-item:last-child');\n      if (last) {\n        last.scrollIntoView({ behavior: 'smooth', block: 'nearest' });\n        var t = last.querySelector('.esi-title');\n        if (t) t.focus();\n      }\n    };\n  }\n\n  var _re = window.renderEditPanel;\n  if (typeof _re === 'function') {\n    window.renderEditPanel = function (slides) {\n      _re(slides);\n      Array.from(document.querySelectorAll('#editSlideList .edit-slide-item')).forEach(wireEditItem);\n      wireAddBtn();\n    };\n  }\n\n  var obs = new MutationObserver(function () {\n    wireAddBtn();\n    Array.from(document.querySelectorAll('#editSlideList .edit-slide-item')).forEach(wireEditItem);\n  });\n  obs.observe(document.documentElement, { childList: true, subtree: true });\n  wireAddBtn();\n})();\n";
-    var enhanceTag = '\n<script>\n' + enhanceCode + '\n</scr' + 'ipt>\n';
-    html = html.replace('</body>', enhanceTag + '</body>');
-
-    var blob = new Blob([html], { type: 'text/html;charset=utf-8' });
-    location.replace(URL.createObjectURL(blob));
-  } catch (e) {
-    msg.innerHTML =
-      'Xato: ' +
-      (e.message || e) +
-      '<br><br><a href="https://cdn.jsdelivr.net/gh/aziyz123/aziyz123.github.io@0395ca05c456f81b9e24c79793bb50b6f87121a3/slayd-yaratuvchi.html">Eski versiyani ochish</a>';
+async function storageGet(key, shared){
+  if(HAS_CLOUD_STORAGE){
+    try{ return await window.storage.get(key, shared); }catch(e){ return null; }
   }
+  try{
+    const raw = localStorage.getItem((shared ? LS_TAG_SHARED : LS_TAG_LOCAL) + key);
+    return raw !== null ? { key, value: raw, shared: !!shared } : null;
+  }catch(e){ return null; }
+}
+
+async function storageSet(key, value, shared){
+  if(HAS_CLOUD_STORAGE){
+    try{ return await window.storage.set(key, value, shared); }catch(e){ return null; }
+  }
+  try{
+    localStorage.setItem((shared ? LS_TAG_SHARED : LS_TAG_LOCAL) + key, value);
+    return { key, value, shared: !!shared };
+  }catch(e){ return null; }
+}
+
+async function storageDelete(key, shared){
+  if(HAS_CLOUD_STORAGE){
+    try{ return await window.storage.delete(key, shared); }catch(e){ return null; }
+  }
+  try{
+    localStorage.removeItem((shared ? LS_TAG_SHARED : LS_TAG_LOCAL) + key);
+    return { key, deleted: true, shared: !!shared };
+  }catch(e){ return null; }
+}
+
+async function storageList(prefix, shared){
+  if(HAS_CLOUD_STORAGE){
+    try{ return await window.storage.list(prefix, shared); }catch(e){ return { keys: [] }; }
+  }
+  try{
+    const tag = shared ? LS_TAG_SHARED : LS_TAG_LOCAL;
+    const fullPrefix = tag + (prefix || '');
+    const keys = [];
+    for(let i=0; i<localStorage.length; i++){
+      const k = localStorage.key(i);
+      if(k && k.indexOf(fullPrefix) === 0) keys.push(k.slice(tag.length));
+    }
+    return { keys, prefix, shared: !!shared };
+  }catch(e){ return { keys: [] }; }
+}
+
+// ---------- Access control ----------
+const DEFAULT_CODES = { admin: 'ADMIN-2026', user: 'TALABA-2026' };
+let currentRole = null;
+
+async function getCodes(){
+  const res = await storageGet('access:codes', true);
+  if(res && res.value){
+    try{ return JSON.parse(res.value); }catch(e){}
+  }
+  await storageSet('access:codes', JSON.stringify(DEFAULT_CODES), true);
+  return DEFAULT_CODES;
+}
+
+async function saveCodes(adminCode, userCode){
+  const codes = { admin: adminCode, user: userCode };
+  await storageSet('access:codes', JSON.stringify(codes), true);
+}
+
+function showGateError(msg){
+  const el = document.getElementById('gateError');
+  el.textContent = msg;
+  el.classList.add('active');
+}
+function hideGateError(){
+  document.getElementById('gateError').classList.remove('active');
+}
+
+async function attemptLogin(){
+  hideGateError();
+  const val = document.getElementById('gateInput').value.trim();
+  if(!val){ showGateError('Kodni kiriting.'); return; }
+  const codes = await getCodes();
+  if(val === codes.admin){
+    currentRole = 'admin';
+    unlockApp();
+  } else if(val === codes.user){
+    currentRole = 'user';
+    unlockApp();
+  } else {
+    showGateError('Kod noto\'g\'ri. Qaytadan urinib ko\'ring.');
+  }
+}
+
+function unlockApp(){
+  document.getElementById('gateScreen').style.display = 'none';
+  document.getElementById('appContent').style.display = 'block';
+  const pill = document.getElementById('rolePill');
+  if(currentRole === 'admin'){
+    pill.textContent = 'Admin';
+    pill.classList.add('admin');
+    document.getElementById('adminPanel').style.display = 'block';
+  } else {
+    pill.textContent = 'Foydalanuvchi';
+    pill.classList.remove('admin');
+    document.getElementById('adminPanel').style.display = 'none';
+  }
+  refreshHistory().catch(()=>{});
+}
+
+document.getElementById('gateSubmit').addEventListener('click', attemptLogin);
+document.getElementById('gateInput').addEventListener('keydown', (e) => {
+  if(e.key === 'Enter') attemptLogin();
+});
+document.getElementById('logoutLink').addEventListener('click', () => {
+  currentRole = null;
+  document.getElementById('gateInput').value = '';
+  document.getElementById('appContent').style.display = 'none';
+  document.getElementById('gateScreen').style.display = 'flex';
+});
+
+document.getElementById('saveCodesBtn').addEventListener('click', async () => {
+  const successBox = document.getElementById('codesSuccessBox');
+  const errBox = document.getElementById('codesErrorBox');
+  successBox.classList.remove('active');
+  errBox.classList.remove('active');
+  const newAdmin = document.getElementById('newAdminCode').value.trim();
+  const newUser = document.getElementById('newUserCode').value.trim();
+  if(!newAdmin || !newUser){
+    errBox.textContent = 'Ikkala maydonni ham to\'ldiring.';
+    errBox.classList.add('active');
+    return;
+  }
+  if(newAdmin === newUser){
+    errBox.textContent = 'Admin va foydalanuvchi kodlari bir xil bo\'lmasligi kerak.';
+    errBox.classList.add('active');
+    return;
+  }
+  try{
+    await saveCodes(newAdmin, newUser);
+    successBox.classList.add('active');
+    document.getElementById('newAdminCode').value = '';
+    document.getElementById('newUserCode').value = '';
+  }catch(e){
+    errBox.textContent = 'Saqlashda xatolik: ' + e.message;
+    errBox.classList.add('active');
+  }
+});
+
+// ---------- Theme definitions ----------
+const THEMES = {
+  tarix: {
+    label: 'Tarix',
+    bg: 'F5F1E8', ink: '1B2A41', accent: '8C6A3F', accent2: 'B08D57',
+    headFont: 'Zilla Slab', bodyFont: 'Georgia'
+  },
+  falsafa: {
+    label: 'Falsafa',
+    bg: 'F0EFEA', ink: '2B2B2B', accent: '4A5859', accent2: '7A8C8D',
+    headFont: 'Georgia', bodyFont: 'Georgia'
+  },
+  din: {
+    label: 'Din/Islom',
+    bg: 'FAF6EC', ink: '2B2418', accent: 'A9813F', accent2: '1B2A41',
+    headFont: 'Zilla Slab', bodyFont: 'Georgia'
+  },
+  umumiy: {
+    label: 'Umumiy',
+    bg: 'F4F4F2', ink: '222222', accent: '3D5A80', accent2: '98C1D9',
+    headFont: 'Arial', bodyFont: 'Arial'
+  },
+  zamonaviy: {
+    label: 'Zamonaviy',
+    bg: '12151C', ink: 'F3EFE4', accent: 'C9A45C', accent2: 'A9813F',
+    headFont: 'Arial', bodyFont: 'Arial'
+  }
+};
+
+function detectTheme(title, text){
+  const t = (title + ' ' + text.slice(0,2000)).toLowerCase();
+  const hist = ['tarix','harbiy','urush','jang','imperiya','sulola','xon','amir','qo\'shin','sarkarda','davlat','asr'];
+  const phil = ['falsafa','gnoseolog','dialektika','mantiq','ontolog','metafizik','fikr','ta\'limot'];
+  const din = ['islom','hadis','qur\'on','quron','payg\'ambar','imom','fiqh','sahoba','xalifa','masjid'];
+  let scores = {tarix:0, falsafa:0, din:0};
+  hist.forEach(w=>{ if(t.includes(w)) scores.tarix++; });
+  phil.forEach(w=>{ if(t.includes(w)) scores.falsafa++; });
+  din.forEach(w=>{ if(t.includes(w)) scores.din++; });
+  const best = Object.entries(scores).sort((a,b)=>b[1]-a[1])[0];
+  if(best[1] === 0) return 'umumiy';
+  return best[0];
+}
+
+// ---------- File extraction ----------
+if(window.pdfjsLib){
+  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+}
+
+async function extractTextFromFile(file){
+  const ext = file.name.split('.').pop().toLowerCase();
+  if(ext === 'pdf'){
+    const arrayBuffer = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    let text = '';
+    for(let i=1; i<=pdf.numPages; i++){
+      const page = await pdf.getPage(i);
+      const content = await page.getTextContent();
+      text += content.items.map(it => it.str).join(' ') + '\n\n';
+    }
+    return { text, meta: pdf.numPages + ' sahifa' };
+  } else if(ext === 'docx'){
+    const arrayBuffer = await file.arrayBuffer();
+    const result = await mammoth.extractRawText({ arrayBuffer });
+    return { text: result.value, meta: 'DOCX fayl' };
+  } else if(ext === 'txt'){
+    const text = await file.text();
+    return { text, meta: 'TXT fayl' };
+  } else {
+    throw new Error('Qo\'llab-quvvatlanmaydigan fayl turi: .' + ext + ' (faqat PDF, DOCX, TXT)');
+  }
+}
+
+document.getElementById('sourceFile').addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  const statusEl = document.getElementById('fileStatus');
+  if(!file) return;
+  statusEl.className = 'file-status';
+  statusEl.textContent = 'Fayl o\'qilmoqda...';
+  try{
+    const { text, meta } = await extractTextFromFile(file);
+    const cleaned = text.replace(/\s+\n/g, '\n').replace(/\n{3,}/g, '\n\n').trim();
+    if(cleaned.length < 20){
+      throw new Error('Fayldan matn topilmadi (skanerlangan rasm bo\'lishi mumkin).');
+    }
+    document.getElementById('sourceText').value = cleaned;
+    document.getElementById('charCount').textContent = cleaned.length + ' belgi';
+    updateAutoEstimate();
+    statusEl.className = 'file-status ok';
+    statusEl.textContent = '✓ ' + file.name + ' o\'qildi (' + meta + ', ' + cleaned.length + ' belgi)';
+  }catch(err){
+    statusEl.className = 'file-status err';
+    statusEl.textContent = '✗ ' + err.message;
+  }
+});
+
+// ---------- Offline slide generation (no API, no account, no limits) ----------
+function splitSentences(str){
+  const clean = str.replace(/\s+/g,' ').trim();
+  if(!clean) return [];
+  const parts = clean.match(/[^.!?…]+[.!?…]+|[^.!?…]+$/g);
+  return parts ? parts.map(s => s.trim()).filter(Boolean) : [clean];
+}
+
+function splitParagraphs(text){
+  let paras = text.split(/\n\s*\n+/).map(p => p.replace(/[ \t]+/g,' ').trim()).filter(p => p.length > 0);
+  if(paras.length <= 1){
+    paras = text.split(/\n+/).map(p => p.replace(/[ \t]+/g,' ').trim()).filter(p => p.length > 0);
+  }
+  return paras;
+}
+
+function shortTitleFromSentence(sentence, maxWords){
+  if(!sentence) return '';
+  const words = sentence.trim().split(/\s+/);
+  let t = words.slice(0, maxWords).join(' ');
+  if(words.length > maxWords) t += '…';
+  return t.replace(/[,;:]+$/,'');
+}
+
+// ---------- Geometry: how much text actually fits on one slide ----------
+// Content box used for bullets in buildPptx: width ~11.0in, height ~4.9in,
+// fontSize 17pt, lineSpacing 26pt, paraSpaceAfter 14pt (using the tighter
+// "minimal" numbers as the safe limit — the "rich" style has slightly more
+// room, so anything that fits here fits there too).
+const FIT_BOX_WIDTH_IN = 11.0;
+const FIT_BOX_HEIGHT_IN = 4.85;
+const FIT_FONT_PT = 17;
+const FIT_LINE_HEIGHT_PT = 26;
+const FIT_PARA_SPACE_PT = 14;
+// Average glyph width ~0.52em for mixed Latin/Cyrillic proportional text
+const FIT_CHARS_PER_LINE = Math.max(30, Math.floor((FIT_BOX_WIDTH_IN * 72) / (FIT_FONT_PT * 0.52)));
+const FIT_SPACING_LINES = FIT_PARA_SPACE_PT / FIT_LINE_HEIGHT_PT;
+// Hard rule: a slide's content may never exceed 10 lines of text.
+// (The geometric box calc gives ~12 lines of physical room, so 10 keeps a
+// clean safety margin below the true physical limit.)
+const MAX_LINES_PER_SLIDE = 10;
+const FIT_AVAILABLE_LINES = Math.min(
+  MAX_LINES_PER_SLIDE,
+  Math.max(3, Math.floor((FIT_BOX_HEIGHT_IN * 72) / FIT_LINE_HEIGHT_PT) - 1)
+);
+
+function linesForBullet(bullet){
+  return Math.max(1, Math.ceil(bullet.length / FIT_CHARS_PER_LINE));
+}
+
+function chunkTextByChars(text, maxChars){
+  const words = text.split(/\s+/).filter(Boolean);
+  const chunks = [];
+  let cur = '';
+  for(const w of words){
+    const candidate = cur ? (cur + ' ' + w) : w;
+    if(candidate.length > maxChars && cur){
+      chunks.push(cur);
+      cur = w;
+    } else {
+      cur = candidate;
+    }
+  }
+  if(cur) chunks.push(cur);
+  return chunks.length ? chunks : [text];
+}
+
+// Packs a flat list of sentences into groups, each never exceeding
+// `capacityLines` lines of content. This is the core packing engine —
+// both auto mode (capacity = FIT_AVAILABLE_LINES) and manual mode
+// (capacity computed to spread content across the requested slide count)
+// use this same, predictable math.
+function packWithCapacity(sentences, capacityLines){
+  const cap = Math.max(1, Math.min(FIT_AVAILABLE_LINES, capacityLines));
+  const groups = [];
+  let current = [];
+  let currentLines = 0;
+  const maxPieceChars = Math.max(20, FIT_CHARS_PER_LINE * Math.max(1, cap - 1));
+
+  for(const sentence of sentences){
+    let pieces = [sentence];
+    if(linesForBullet(sentence) + FIT_SPACING_LINES > cap){
+      pieces = chunkTextByChars(sentence, maxPieceChars);
+    }
+    for(const piece of pieces){
+      const pieceLines = linesForBullet(piece) + FIT_SPACING_LINES;
+      if(current.length > 0 && currentLines + pieceLines > cap){
+        groups.push(current);
+        current = [piece];
+        currentLines = pieceLines;
+      } else {
+        current.push(piece);
+        currentLines += pieceLines;
+      }
+    }
+  }
+  if(current.length) groups.push(current);
+  return groups.length ? groups : [sentences];
+}
+
+// Splits a bullet list into one or more groups, each guaranteed to fit
+// within one slide's content box (hard 10-line cap).
+function splitBulletsToFit(bullets){
+  return packWithCapacity(bullets, FIT_AVAILABLE_LINES);
+}
+
+// Distributes sentences to land as close as possible to `targetBuckets`
+// slides, while never exceeding the 10-line cap per slide. If the content
+// simply can't fit in that many slides without breaking the 10-line rule,
+// this naturally falls back to the true minimum needed (same number
+// autoSlideCount() would report) instead of runaway over-splitting.
+function distributeByLineBudget(sentences, targetBuckets){
+  const totalLines = sentences.reduce((sum, s) => sum + linesForBullet(s) + FIT_SPACING_LINES, 0);
+  let capacity = Math.min(FIT_AVAILABLE_LINES, Math.max(1, Math.ceil(totalLines / Math.max(1, targetBuckets))));
+  let groups = packWithCapacity(sentences, capacity);
+  // Greedy first-fit under-packs near the capacity boundary, which can
+  // produce noticeably more buckets than the target. Nudge capacity up
+  // (never past the hard 10-line cap) until we land at or under target.
+  while(groups.length > targetBuckets && capacity < FIT_AVAILABLE_LINES){
+    capacity++;
+    groups = packWithCapacity(sentences, capacity);
+  }
+  return groups;
+}
+
+// Expands any slide whose bullets don't geometrically fit into two or more
+// slides, so content is never cut off or overflowing at the bottom.
+function fitSlidesToBox(slideList){
+  const out = [];
+  slideList.forEach(sl => {
+    const groups = splitBulletsToFit(sl.bullets);
+    groups.forEach((g, gi) => {
+      out.push({ title: gi === 0 ? sl.title : sl.title + ' (davomi)', bullets: g });
+    });
+  });
+  return out;
+}
+
+function chunkArray(arr, k){
+  const n = arr.length;
+  if(k <= 0 || n === 0) return [arr];
+  const chunks = [];
+  const base = Math.floor(n / k), rem = n % k;
+  let idx = 0;
+  for(let i=0; i<k; i++){
+    const size = base + (i < rem ? 1 : 0);
+    if(size > 0) chunks.push(arr.slice(idx, idx + size));
+    idx += size;
+  }
+  return chunks.length ? chunks : [arr];
+}
+
+// Uses the SAME 10-line packing math as the real generator, so the number
+// shown to the user before generating always matches the real result.
+function autoSlideCount(sourceText){
+  const paragraphs = splitParagraphs(sourceText);
+  const allSentences = paragraphs.flatMap(p => splitSentences(p));
+  if(allSentences.length === 0) return 5;
+  const groups = splitBulletsToFit(allSentences);
+  return Math.max(3, groups.length + 2); // + title slide + conclusion slide
+}
+
+function generateSlidesOffline(sourceText, title, n, autoMode){
+  const paragraphs = splitParagraphs(sourceText);
+  const allSentences = paragraphs.flatMap(p => splitSentences(p));
+  if(allSentences.length === 0) throw new Error('Manba matnidan gaplarni ajratib bo\'lmadi. Matnni tekshirib qayta urinib ko\'ring.');
+
+  const titleSlide = {
+    title: title || shortTitleFromSentence(allSentences[0], 8),
+    bullets: [allSentences[0] || '']
+  };
+
+  const lastParaSentences = paragraphs.length ? splitSentences(paragraphs[paragraphs.length - 1]) : allSentences.slice(-4);
+  const concluBullets = (lastParaSentences.length ? lastParaSentences : allSentences.slice(-4)).slice(-4);
+  const conclusionSlide = {
+    title: 'Xulosa',
+    bullets: concluBullets.length ? concluBullets : ['Ushbu taqdimotda manba matnidagi asosiy jihatlar ko\'rib chiqildi.']
+  };
+
+  let contentSlides;
+
+  if(autoMode){
+    // Pure 10-line greedy packing — content slide count emerges naturally
+    // from the text itself, exactly matching autoSlideCount()'s estimate.
+    const groups = splitBulletsToFit(allSentences);
+    contentSlides = groups.map((g, i) => ({
+      title: shortTitleFromSentence(g[0], 6) || ('Qism ' + (i + 1)),
+      bullets: g
+    }));
+    return [titleSlide, ...contentSlides, ...fitSlidesToBox([conclusionSlide])];
+  }
+
+  // Manual mode: split all sentences into exactly `contentSlots` even groups
+  // by sentence count. The 10-line rule does NOT apply here at all — it is
+  // reserved exclusively for "Avtomatik" mode. Slides fill with whatever
+  // content the even split gives them, and the final count always equals
+  // the requested count (title + content + conclusion).
+  const contentSlots = Math.max(1, n - 2);
+  const buckets = chunkArray(allSentences, contentSlots).filter(b => b.length > 0);
+  contentSlides = buckets.map((bucket, i) => ({
+    title: shortTitleFromSentence(bucket[0], 6) || ('Qism ' + (i + 1)),
+    bullets: bucket
+  }));
+
+  if(n <= 2) return [titleSlide, conclusionSlide].slice(0, Math.max(n,2));
+  return [titleSlide, ...contentSlides, conclusionSlide];
+}
+
+// ---------- PPTX building ----------
+function bgIsLight(bg){
+  // qoraytirilgandan keyingi o'rtacha yorqinlik: past bo'lsa matn oq bo'ladi
+  const eff = (bg.lum == null ? 0.5 : bg.lum) * (1 - (bg.overlay || 0) / 100);
+  return eff < 0.5;
+}
+function buildPptx(themeKey, presTitle, author, slides, withGraphics, decorMode){
+  const th = THEMES[themeKey] || THEMES.umumiy;
+  const rich = decorMode === 'rich' && withGraphics;
+  const pptx = new PptxGenJS();
+  pptx.defineLayout({ name: 'WIDE', width: 13.33, height: 7.5 });
+  pptx.layout = 'WIDE';
+
+  // Places body text in a box; if `image` (data URL) is given, shrinks the
+  // text to make room and places the image beside it.
+  function placeTextWithImage(slide, text, box, textOpts, image){
+    let tx = box.x, ty = box.y, tw = box.w, th2 = box.h;
+    if(image){
+      const imgW = box.w * 0.4;
+      const gap = 0.35;
+      tw = box.w - imgW - gap;
+      try{
+        slide.addImage({ data: image, x: box.x + tw + gap, y: box.y, w: imgW, h: box.h, sizing: { type: 'contain', w: imgW, h: box.h } });
+      }catch(e){ console.warn('Rasm qo\'shishda xato:', e); tw = box.w; }
+    }
+    if(text){
+      slide.addText(text, Object.assign({ x: tx, y: ty, w: tw, h: th2 }, textOpts));
+    }
+  }
+
+  slides.forEach((sl, idx) => {
+    const slide = pptx.addSlide();
+    const bg = sl.bg && sl.bg.data ? sl.bg : null;
+    const hasBg = !!bg;
+    const T = hasBg ? (bgIsLight(bg) ? 'FFFFFF' : '111111') : null;
+    if(hasBg){
+      slide.background = { color: '000000' };
+      try{ slide.addImage({ data: bg.data, x:0, y:0, w:13.33, h:7.5 }); }catch(e){ console.warn('Fon rasmi xato:', e); }
+      if(bg.overlay > 0){
+        slide.addShape('rect', { x:0, y:0, w:13.33, h:7.5, fill:{ color:'000000', transparency: 100 - bg.overlay }, line:{ color:'000000', width:0, transparency:100 } });
+      }
+    }
+
+    if(idx === 0){
+      // ---- Title slide ----
+      if(rich){
+        if(!hasBg) slide.background = { color: th.ink };
+        slide.addShape('rect', { x:0, y:0, w:13.33, h:0.14, fill:{color:th.accent} });
+        slide.addShape('rect', { x:0, y:7.36, w:13.33, h:0.14, fill:{color:th.accent} });
+        slide.addShape('triangle', { x:10.3, y:-1.6, w:5, h:5, fill:{color:th.accent2, transparency:55}, line:{color:th.accent2,width:0}, rotate:200 });
+        slide.addShape('rect', { x:1.0, y:1.5, w:0.09, h:4.6, fill:{color:th.accent2} });
+        slide.addText(presTitle || sl.title, {
+          x:1.3, y:2.55, w:11.0, h:1.9,
+          fontFace: th.headFont, fontSize: 42, bold:true, color: hasBg ? T : th.bg, align:'left'
+        });
+        placeTextWithImage(slide, (sl.bullets && sl.bullets[0]) || '', { x:1.3, y:4.35, w:10.5, h:2.0 },
+          { fontFace: th.bodyFont, fontSize:16, color: hasBg ? T : th.accent2, italic:true, valign:'top' }, sl.image);
+        if(author){
+          slide.addText('Tayyorlovchi: ' + author, {
+            x:1.3, y:6.55, w:8, h:0.4,
+            fontFace:'IBM Plex Mono', fontSize:12, color: hasBg ? T : th.bg
+          });
+        }
+      } else {
+        if(!hasBg) slide.background = { color: th.bg };
+        if(withGraphics){
+          slide.addShape('rect', { x:0, y:0, w:0.18, h:7.5, fill:{color:th.accent} });
+        }
+        slide.addText(presTitle || sl.title, {
+          x:0.8, y:2.6, w:11.5, h:1.8,
+          fontFace: th.headFont, fontSize: 40, bold:true, color: hasBg ? T : th.ink, align:'left'
+        });
+        slide.addShape('rect', { x:0.85, y:4.15, w:2.2, h:0.05, fill:{color:th.accent} });
+        placeTextWithImage(slide, (sl.bullets && sl.bullets[0]) || '', { x:0.8, y:4.4, w:10.5, h:2.0 },
+          { fontFace: th.bodyFont, fontSize:16, color: hasBg ? T : th.accent, italic:true, valign:'top' }, sl.image);
+        if(author){
+          slide.addText('Tayyorlovchi: ' + author, {
+            x:0.8, y:6.6, w:8, h:0.4,
+            fontFace:'IBM Plex Mono', fontSize:11, color: hasBg ? T : th.accent
+          });
+        }
+      }
+    } else {
+      // ---- Content slide ----
+      if(rich){
+        if(!hasBg) slide.background = { color: th.bg };
+        slide.addShape('rect', { x:0, y:0, w:13.33, h:1.35, fill: hasBg ? { color:'000000', transparency:35 } : {color:th.ink} });
+        slide.addShape('rect', { x:0, y:1.35, w:13.33, h:0.08, fill:{color:th.accent} });
+        slide.addText(String(idx).padStart(2,'0'), {
+          x:0.65, y:0.35, w:1.3, h:0.6,
+          fontFace:'IBM Plex Mono', fontSize:14, color: hasBg ? 'FFFFFF' : th.accent2, bold:true
+        });
+        slide.addText(sl.title, {
+          x:1.85, y:0.28, w:10.7, h:0.95,
+          fontFace: th.headFont, fontSize:26, bold:true, color: hasBg ? 'FFFFFF' : th.bg
+        });
+        if(idx % 2 === 0){
+          slide.addShape('ellipse', { x:12.55, y:6.75, w:0.5, h:0.5, fill:{color:th.accent2}, line:{color:th.accent2,width:0} });
+        } else {
+          slide.addShape('rect', { x:12.65, y:6.85, w:0.5, h:0.12, fill:{color:th.accent} });
+        }
+        const paragraphText = (sl.bullets || []).join(' ');
+        placeTextWithImage(slide, paragraphText, { x:0.85, y:1.85, w:11.6, h:5.2 },
+          { fontFace: th.bodyFont, fontSize:17, color: hasBg ? T : th.ink, valign:'top', lineSpacing:27, align: sl.image ? 'left' : 'justify' }, sl.image);
+      } else {
+        if(!hasBg) slide.background = { color: th.bg };
+        if(withGraphics){
+          slide.addShape('rect', { x:0, y:0, w:0.18, h:7.5, fill:{color:th.accent} });
+          if(idx % 2 === 0){
+            slide.addShape('ellipse', { x:12.55, y:6.75, w:0.5, h:0.5, fill:{color:th.accent2}, line:{color:th.accent2,width:0} });
+          } else {
+            slide.addShape('rect', { x:12.7, y:0.5, w:0.35, h:0.08, fill:{color:th.accent} });
+          }
+        }
+        slide.addText(String(idx).padStart(2,'0'), {
+          x:0.8, y:0.45, w:1.5, h:0.6,
+          fontFace:'IBM Plex Mono', fontSize:14, color: hasBg ? T : th.accent, bold:true
+        });
+        slide.addText(sl.title, {
+          x:0.8, y:0.95, w:11.5, h:1.0,
+          fontFace: th.headFont, fontSize:28, bold:true, color: hasBg ? T : th.ink
+        });
+        slide.addShape('rect', { x:0.85, y:1.75, w:1.4, h:0.035, fill:{color:th.accent} });
+        const paragraphText = (sl.bullets || []).join(' ');
+        placeTextWithImage(slide, paragraphText, { x:0.85, y:2.15, w:11.0, h:4.9 },
+          { fontFace: th.bodyFont, fontSize:17, color: hasBg ? T : th.ink, valign:'top', lineSpacing:26, align: sl.image ? 'left' : 'justify' }, sl.image);
+      }
+    }
+
+    slide.addText(String(idx+1) + ' / ' + slides.length, {
+      x:12.3, y:7.1, w:0.9, h:0.3,
+      fontFace:'IBM Plex Mono', fontSize:9, color: hasBg ? T : (rich && idx===0 ? th.bg : th.accent), align:'right'
+    });
+  });
+
+  return pptx;
+}
+
+// ---------- Storage helpers (presentations are personal, per-role not separated) ----------
+async function savePresentation(record){
+  const key = 'pres:' + record.id;
+  await storageSet(key, JSON.stringify(record), false);
+}
+async function listPresentations(){
+  const res = await storageList('pres:', false);
+  if(!res || !res.keys) return [];
+  const items = [];
+  for(const k of res.keys){
+    try{
+      const r = await storageGet(k, false);
+      if(r && r.value) items.push(JSON.parse(r.value));
+    }catch(e){}
+  }
+  items.sort((a,b)=> b.id - a.id);
+  return items;
+}
+async function deletePresentation(id){
+  await storageDelete('pres:' + id, false);
+}
+
+// ---------- UI wiring ----------
+const sourceTextEl = document.getElementById('sourceText');
+const charCountEl = document.getElementById('charCount');
+const slideCountEl = document.getElementById('slideCount');
+const autoSlideCountEl = document.getElementById('autoSlideCount');
+
+function updateAutoEstimate(){
+  if(!autoSlideCountEl.checked) return;
+  const text = sourceTextEl.value.trim();
+  slideCountEl.value = text.length > 20 ? autoSlideCount(text) : 10;
+}
+
+sourceTextEl.addEventListener('input', () => {
+  charCountEl.textContent = sourceTextEl.value.length + ' belgi';
+  updateAutoEstimate();
+});
+
+autoSlideCountEl.addEventListener('change', () => {
+  slideCountEl.disabled = autoSlideCountEl.checked;
+  updateAutoEstimate();
+});
+
+const generateBtn = document.getElementById('generateBtn');
+const progressWrap = document.getElementById('progressWrap');
+const progressFill = document.getElementById('progressFill');
+const progressStatus = document.getElementById('progressStatus');
+const errorBox = document.getElementById('errorBox');
+const resultBox = document.getElementById('resultBox');
+const resultTitle = document.getElementById('resultTitle');
+const resultMeta = document.getElementById('resultMeta');
+const downloadBtn = document.getElementById('downloadBtn');
+
+let lastRecord = null;
+
+function setProgress(pct, statusText){
+  progressWrap.classList.add('active');
+  progressFill.style.width = pct + '%';
+  progressStatus.textContent = statusText;
+}
+function showError(msg){
+  errorBox.textContent = msg;
+  errorBox.classList.add('active');
+}
+function hideError(){ errorBox.classList.remove('active'); }
+
+// ---------- Two-phase flow: generate -> edit/preview -> build PPTX ----------
+let pendingMeta = null; // { themeKey, presTitle, author, withGraphics, decorMode, autoMode, n }
+const editPanel = document.getElementById('editPanel');
+const editSlideList = document.getElementById('editSlideList');
+const confirmBuildBtn = document.getElementById('confirmBuildBtn');
+
+function renderEditPanel(slides){
+  editSlideList.innerHTML = '';
+  slides.forEach((sl, idx) => {
+    const item = document.createElement('div');
+    item.className = 'edit-slide-item';
+    item.dataset.index = idx;
+    item._imageData = null;
+    const label = idx === 0 ? 'Sarlavha slaydi' : (idx === slides.length - 1 ? 'Xulosa slaydi' : ('Slayd ' + (idx + 1)));
+    item.innerHTML = `
+      <div class="esi-head">
+        <span class="esi-num">${label}</span>
+        <button type="button" class="esi-remove">O'chirish</button>
+      </div>
+      <input type="text" class="esi-title" value="${sl.title.replace(/"/g,'&quot;')}" placeholder="Sarlavha (bo'sh qoldirish mumkin)">
+      <textarea class="esi-body">${(sl.bullets || []).join(' ')}</textarea>
+      <label style="margin-top:10px; font-size:12px;">Shu slaydga rasm qo'shish (ixtiyoriy)</label>
+      <input type="file" class="esi-image-input" accept="image/*">
+      <div class="esi-image-preview" style="display:none; margin-top:8px;">
+        <img style="max-width:120px; max-height:80px; border:1px solid var(--line);">
+        <button type="button" class="esi-image-remove" style="margin-left:8px; border:none; background:transparent; color:var(--danger); font-size:11px; cursor:pointer; text-decoration:underline;">Rasmni olib tashlash</button>
+      </div>
+    `;
+    item.querySelector('.esi-remove').addEventListener('click', () => {
+      item.classList.toggle('removed');
+      item.dataset.removed = item.classList.contains('removed') ? '1' : '';
+    });
+    const imgInput = item.querySelector('.esi-image-input');
+    const imgPreview = item.querySelector('.esi-image-preview');
+    const imgTag = imgPreview.querySelector('img');
+    imgInput.addEventListener('change', () => {
+      const file = imgInput.files[0];
+      if(!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        item._imageData = reader.result;
+        imgTag.src = reader.result;
+        imgPreview.style.display = 'flex';
+        imgPreview.style.alignItems = 'center';
+      };
+      reader.readAsDataURL(file);
+    });
+    item.querySelector('.esi-image-remove').addEventListener('click', () => {
+      item._imageData = null;
+      imgInput.value = '';
+      imgPreview.style.display = 'none';
+    });
+    editSlideList.appendChild(item);
+  });
+}
+
+function readEditedSlides(){
+  const items = Array.from(editSlideList.querySelectorAll('.edit-slide-item'));
+  return items
+    .filter(item => item.dataset.removed !== '1')
+    .map(item => {
+      const slide = {
+        title: item.querySelector('.esi-title').value.trim(),
+        bullets: [item.querySelector('.esi-body').value.trim()]
+      };
+      if(item._imageData) slide.image = item._imageData;
+      const bgr = window.resolveSlideBg ? window.resolveSlideBg(item) : null;
+      if(bgr) slide.bg = bgr;
+      return slide;
+    })
+    .filter(sl => sl.bullets[0].length > 0 || sl.image);
+}
+
+
+generateBtn.addEventListener('click', async () => {
+  hideError();
+  resultBox.classList.remove('active');
+  editPanel.style.display = 'none';
+  const sourceText = sourceTextEl.value.trim();
+  const presTitle = document.getElementById('presTitle').value.trim();
+  const author = document.getElementById('authorName').value.trim();
+  const autoMode = autoSlideCountEl.checked;
+  const n = autoMode
+    ? Math.max(3, autoSlideCount(sourceText))
+    : Math.max(3, Math.min(30, parseInt(document.getElementById('slideCount').value) || 10));
+  const withGraphics = document.getElementById('withGraphics').checked;
+  const decorMode = document.getElementById('styleSelect').value;
+  let themeChoice = document.getElementById('themeSelect').value;
+
+  if(sourceText.length < 50){
+    showError('Iltimos, kamida bir necha jumladan iborat manba matnini kiriting yoki fayl yuklang.');
+    return;
+  }
+  if(typeof PptxGenJS === 'undefined'){
+    showError('PowerPoint kutubxonasi yuklanmadi. Internet aloqasini tekshiring va sahifani qayta yuklang (F5).');
+    return;
+  }
+
+  generateBtn.disabled = true;
+  progressWrap.classList.add('active');
+  progressFill.style.width = '0%';
+
+  try{
+    const themeKey = themeChoice === 'auto' ? detectTheme(presTitle, sourceText) : themeChoice;
+
+    setProgress(30, 'Matn paragraf va gaplarga ajratilmoqda...');
+    await new Promise(r => setTimeout(r, 150));
+
+    setProgress(70, 'Slaydlarga taqsimlanmoqda...');
+    let slides = generateSlidesOffline(sourceText, presTitle, n, autoMode);
+    if(!slides.length) throw new Error('Slaydlar yaratib bo\'lmadi, matningizni tekshiring.');
+
+    if(document.getElementById('withAgenda').checked && slides.length > 2){
+      const middleTitles = slides.slice(1, -1).map(s => s.title).filter(Boolean);
+      if(middleTitles.length > 0){
+        const agendaText = middleTitles.map((t, i) => (i + 1) + '. ' + t).join('\n');
+        const agendaSlide = { title: 'Reja', bullets: [agendaText] };
+        slides = [slides[0], agendaSlide, ...slides.slice(1)];
+      }
+    }
+    await new Promise(r => setTimeout(r, 150));
+
+    setProgress(100, 'Tayyor — ko\'rib chiqing!');
+
+    pendingMeta = { themeKey, presTitle, author, withGraphics, decorMode, autoMode, n };
+    renderEditPanel(slides);
+    editPanel.style.display = 'block';
+    editPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }catch(err){
+    console.error(err);
+    showError('Xatolik yuz berdi: ' + err.message);
+  }finally{
+    generateBtn.disabled = false;
+    progressWrap.classList.remove('active');
+  }
+});
+
+confirmBuildBtn.addEventListener('click', async () => {
+  hideError();
+  if(!pendingMeta){ showError('Avval "Taqdimot yaratish" tugmasini bosing.'); return; }
+  const { themeKey, presTitle, author, withGraphics, decorMode, autoMode, n } = pendingMeta;
+
+  let slides = readEditedSlides();
+  const sourcesText = document.getElementById('sourcesText').value.trim();
+  if(sourcesText){
+    slides = [...slides, { title: 'Manbalar', bullets: [sourcesText], bg: window.globalBgResolved ? window.globalBgResolved() : null }];
+  }
+  if(slides.length === 0){
+    showError('Kamida bitta slayd qolishi kerak.');
+    return;
+  }
+
+  confirmBuildBtn.disabled = true;
+  try{
+    const pptx = buildPptx(themeKey, presTitle || slides[0].title, author, slides, withGraphics, decorMode);
+
+    const record = {
+      id: Date.now(),
+      title: presTitle || slides[0].title,
+      author: author,
+      theme: themeKey,
+      decorMode: decorMode,
+      withGraphics: withGraphics,
+      slides: slides,
+      createdAt: new Date().toISOString()
+    };
+    try{ await savePresentation(record); }catch(e){ console.warn('Tarixga saqlashda xato (e\'tiborsiz qoldiriladi):', e); }
+    lastRecord = { record, pptx };
+
+    resultTitle.textContent = record.title;
+    let metaText = slides.length + ' ta slayd  ·  ' + (THEMES[themeKey] ? THEMES[themeKey].label : themeKey) + ' uslub' + (author ? '  ·  ' + author : '') + '  ·  ' + new Date(record.createdAt).toLocaleString('uz-UZ');
+    if(!autoMode && slides.length !== n){
+      metaText += '  ·  (tahrirlashda o\'zgartirilgan)';
+    }
+    resultMeta.textContent = metaText;
+    resultBox.classList.add('active');
+    resultBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+    await refreshHistory();
+  }catch(err){
+    console.error(err);
+    showError('Xatolik yuz berdi: ' + err.message);
+  }finally{
+    confirmBuildBtn.disabled = false;
+  }
+});
+
+downloadBtn.addEventListener('click', () => {
+  if(!lastRecord) return;
+  const fname = (lastRecord.record.title || 'taqdimot').replace(/[^a-zA-Z0-9 \-_]/g,'').slice(0,60) || 'taqdimot';
+  lastRecord.pptx.writeFile({ fileName: fname + '.pptx' });
+});
+
+async function refreshHistory(){
+  const listEl = document.getElementById('historyList');
+  const items = await listPresentations();
+  if(items.length === 0){
+    listEl.innerHTML = '<div class="empty-hist">Hozircha taqdimotlar yo\'q. Birinchisini yarating!</div>';
+    return;
+  }
+  listEl.innerHTML = '';
+  items.forEach(rec => {
+    const div = document.createElement('div');
+    div.className = 'hist-item';
+    div.innerHTML = `
+      <div class="hi-left">
+        <div class="hi-title">${escapeHtml(rec.title)}</div>
+        <div class="hi-meta">${rec.slides.length} slayd · ${THEMES[rec.theme] ? THEMES[rec.theme].label : rec.theme}${rec.author ? ' · ' + escapeHtml(rec.author) : ''} · ${new Date(rec.createdAt).toLocaleDateString('uz-UZ')}</div>
+      </div>
+      <div class="hi-actions">
+        <button class="dl">Yuklab olish</button>
+        <button class="del">O'chirish</button>
+      </div>
+    `;
+    div.querySelector('.dl').addEventListener('click', () => {
+      const pptx = buildPptx(THEMES[rec.theme] ? rec.theme : 'umumiy', rec.title, rec.author || '', rec.slides, rec.withGraphics, rec.decorMode || 'minimal');
+      const fname = rec.title.replace(/[^a-zA-Z0-9 \-_]/g,'').slice(0,60) || 'taqdimot';
+      pptx.writeFile({ fileName: fname + '.pptx' });
+    });
+    div.querySelector('.del').addEventListener('click', async () => {
+      await deletePresentation(rec.id);
+      await refreshHistory();
+    });
+    listEl.appendChild(div);
+  });
+}
+
+function escapeHtml(str){
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+</script>
+
+<script>
+// ---------- Fon rasmi (umumiy va har slayd uchun) ----------
+(function () {
+  var G = { data: null, lum: 0.5, overlay: 55 };
+  function $(i) { return document.getElementById(i); }
+
+  function processImage(file) {
+    return new Promise(function (res, rej) {
+      var url = URL.createObjectURL(file), img = new Image();
+      img.onload = function () {
+        try {
+          var W = 1600, H = 900, c = document.createElement('canvas'); c.width = W; c.height = H;
+          var x = c.getContext('2d');
+          var sc = Math.max(W / img.width, H / img.height), w = img.width * sc, h = img.height * sc;
+          x.drawImage(img, (W - w) / 2, (H - h) / 2, w, h);   // 16:9 ga "cover" qilib kesish
+          var s = document.createElement('canvas'); s.width = 32; s.height = 18;
+          var sx = s.getContext('2d'); sx.drawImage(c, 0, 0, 32, 18);
+          var d = sx.getImageData(0, 0, 32, 18).data, sum = 0;
+          for (var i = 0; i < d.length; i += 4) sum += (0.2126 * d[i] + 0.7152 * d[i + 1] + 0.0722 * d[i + 2]) / 255;
+          URL.revokeObjectURL(url);
+          res({ data: c.toDataURL('image/jpeg', 0.84), lum: sum / (d.length / 4) });
+        } catch (e) { rej(e); }
+      };
+      img.onerror = function () { URL.revokeObjectURL(url); rej(new Error('Rasm ochilmadi')); };
+      img.src = url;
+    });
+  }
+
+  function paintPrev(el, bg) {
+    if (!el) return;
+    if (!bg || !bg.data) { el.style.display = 'none'; return; }
+    el.style.display = 'flex';
+    el.style.backgroundImage = 'url(' + bg.data + ')';
+    el.querySelector('i').style.opacity = (bg.overlay / 100).toFixed(2);
+    var eff = bg.lum * (1 - bg.overlay / 100);
+    el.querySelector('span').style.color = eff < 0.5 ? '#fff' : '#111';
+  }
+
+  function paintGlobal() {
+    paintPrev($('bgPrev'), G);
+    $('bgCtl').style.display = G.data ? 'flex' : 'none';
+    $('bgOverlayVal').textContent = G.overlay + '%';
+    refreshAllPrev();
+  }
+
+  window.globalBgResolved = function () {
+    return G.data ? { data: G.data, lum: G.lum, overlay: G.overlay } : null;
+  };
+
+  function itemState(item) {
+    var m = item.querySelector('.esi-bgmode');
+    return { mode: m ? m.value : 'global', bg: item._bg || null, ov: item.querySelector('.esi-bgov') ? +item.querySelector('.esi-bgov').value : 55 };
+  }
+  window.getBgState = itemState;
+  window.resolveSlideBg = function (item) {
+    var st = itemState(item);
+    if (st.mode === 'none') return null;
+    if (st.mode === 'custom') return st.bg ? { data: st.bg.data, lum: st.bg.lum, overlay: st.ov } : null;
+    return window.globalBgResolved();
+  };
+
+  function refreshItemPrev(item) {
+    var st = itemState(item), box = item.querySelector('.esi-bgcustom');
+    if (!box) return;
+    box.style.display = st.mode === 'custom' ? 'block' : 'none';
+    item.querySelector('.esi-bgovv').textContent = st.ov + '%';
+    paintPrev(item.querySelector('.esi-bgprev'), st.bg ? { data: st.bg.data, lum: st.bg.lum, overlay: st.ov } : null);
+    var note = item.querySelector('.esi-bgnote');
+    note.textContent = st.mode === 'global' ? (G.data ? "Bu slayd umumiy fon rasmini ishlatadi." : "Umumiy fon rasmi tanlanmagan — oddiy shablon fon bo'ladi.") : (st.mode === 'none' ? "Bu slayd rasmsiz, oddiy shablon fon bilan chiqadi." : (st.bg ? '' : 'Rasm tanlang.'));
+  }
+  function refreshAllPrev() {
+    Array.prototype.forEach.call(document.querySelectorAll('#editSlideList .edit-slide-item'), refreshItemPrev);
+  }
+
+  window.addBgControls = function (item, state) {
+    if (item.querySelector('.esi-bgwrap')) return;
+    var w = document.createElement('div'); w.className = 'esi-bgwrap';
+    w.innerHTML = '<label>Slayd foni</label>' +
+      '<select class="esi-bgmode"><option value="global">Umumiy fon (tanlangan bo\'lsa)</option><option value="none">Bu slaydda fon rasmisiz</option><option value="custom">Bu slayd uchun boshqa rasm</option></select>' +
+      '<div class="hint esi-bgnote" style="margin:4px 0;"></div>' +
+      '<div class="esi-bgcustom" style="display:none">' +
+      '<input type="file" class="esi-bgfile" accept="image/*">' +
+      '<div class="bg-prev esi-bgprev" style="display:none;"><i></i><span>Namuna matn</span></div>' +
+      '<div class="bg-row"><span>Qoraytirish:</span><input type="range" class="esi-bgov" min="0" max="90" value="55"><b class="esi-bgovv">55%</b></div></div>';
+    item.appendChild(w);
+    var sel = w.querySelector('.esi-bgmode'), ov = w.querySelector('.esi-bgov'), fi = w.querySelector('.esi-bgfile');
+    if (state) { sel.value = state.mode || 'global'; item._bg = state.bg || null; ov.value = state.ov != null ? state.ov : 55; }
+    sel.onchange = function () { refreshItemPrev(item); };
+    ov.oninput = function () { refreshItemPrev(item); };
+    fi.onchange = function () {
+      var f = fi.files[0]; if (!f) return;
+      processImage(f).then(function (r) { item._bg = r; refreshItemPrev(item); }).catch(function (e) { alert('Rasm yuklanmadi: ' + (e.message || e)); });
+    };
+    refreshItemPrev(item);
+  };
+
+  document.addEventListener('DOMContentLoaded', function () {
+    $('bgFile').addEventListener('change', function (e) {
+      var f = e.target.files[0]; if (!f) return;
+      processImage(f).then(function (r) { G.data = r.data; G.lum = r.lum; paintGlobal(); })
+        .catch(function (err) { alert('Rasm yuklanmadi: ' + (err.message || err)); });
+    });
+    $('bgOverlay').addEventListener('input', function (e) { G.overlay = +e.target.value; paintGlobal(); });
+    $('bgClear').addEventListener('click', function () { G.data = null; $('bgFile').value = ''; paintGlobal(); });
+  });
 })();
+</script>
+<script>
+(function () {
+  function renumberEditSlides() {
+    var items = Array.from(document.querySelectorAll('#editSlideList .edit-slide-item'));
+    items.forEach(function (item, idx) {
+      item.dataset.index = idx;
+      var num = item.querySelector('.esi-num');
+      if (num) num.textContent = idx === 0 ? 'Sarlavha slaydi' : ('Slayd ' + (idx + 1));
+    });
+  }
+
+  function wireEditItem(item) {
+    if (item._wiredMove) return;
+    item._wiredMove = true;
+    var head = item.querySelector('.esi-head');
+    var removeBtn = item.querySelector('.esi-remove');
+    if (!head || !removeBtn || item.querySelector('.esi-up')) return;
+    var actions = document.createElement('div');
+    actions.className = 'esi-actions';
+    var up = document.createElement('button');
+    up.type = 'button';
+    up.className = 'esi-up';
+    up.textContent = '↑';
+    up.title = 'Yuqoriga';
+    var down = document.createElement('button');
+    down.type = 'button';
+    down.className = 'esi-down';
+    down.textContent = '↓';
+    down.title = 'Pastga';
+    up.onclick = function () {
+      var p = item.previousElementSibling;
+      if (p) {
+        item.parentNode.insertBefore(item, p);
+        renumberEditSlides();
+      }
+    };
+    down.onclick = function () {
+      var n = item.nextElementSibling;
+      if (n) {
+        item.parentNode.insertBefore(n, item);
+        renumberEditSlides();
+      }
+    };
+    removeBtn.parentNode.insertBefore(actions, removeBtn);
+    actions.appendChild(up);
+    actions.appendChild(down);
+    actions.appendChild(removeBtn);
+  }
+
+  function wireAddBtn() {
+    var btn = document.getElementById('addSlideBtn');
+    if (!btn || btn._wired) return;
+    btn._wired = true;
+    btn.onclick = function () {
+      var list = document.getElementById('editSlideList');
+      if (!list || typeof window.renderEditPanel !== 'function') return;
+      var cur = [];
+      Array.from(list.querySelectorAll('.edit-slide-item')).forEach(function (it) {
+        if (it.dataset.removed === '1') return;
+        cur.push({
+          title: (it.querySelector('.esi-title') || {}).value || '',
+          bullets: [(it.querySelector('.esi-body') || {}).value || ''],
+          image: it._imageData || null,
+          bgState: window.getBgState ? window.getBgState(it) : null
+        });
+      });
+      cur.push({ title: '', bullets: [''] });
+      window.renderEditPanel(cur);
+      var last = list.querySelector('.edit-slide-item:last-child');
+      if (last) {
+        last.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        var t = last.querySelector('.esi-title');
+        if (t) t.focus();
+      }
+    };
+  }
+
+  var _re = window.renderEditPanel;
+  if (typeof _re === 'function') {
+    window.renderEditPanel = function (slides) {
+      _re(slides);
+      var its = Array.from(document.querySelectorAll('#editSlideList .edit-slide-item'));
+      its.forEach(function (it, i) {
+        var sl = slides[i] || {};
+        if (sl.image) {
+          it._imageData = sl.image;
+          var pv = it.querySelector('.esi-image-preview'), im = pv && pv.querySelector('img');
+          if (im) { im.src = sl.image; pv.style.display = 'flex'; pv.style.alignItems = 'center'; }
+        }
+        if (window.addBgControls) window.addBgControls(it, sl.bgState);
+      });
+      its.forEach(wireEditItem);
+      wireAddBtn();
+    };
+  }
+
+  var obs = new MutationObserver(function () {
+    wireAddBtn();
+    Array.from(document.querySelectorAll('#editSlideList .edit-slide-item')).forEach(wireEditItem);
+  });
+  obs.observe(document.documentElement, { childList: true, subtree: true });
+  wireAddBtn();
+})();
+
 </script>
 </body>
 </html>
