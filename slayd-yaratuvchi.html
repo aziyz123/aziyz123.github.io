@@ -519,6 +519,22 @@
     <label for="sourceText">Manba matni</label>
     <textarea id="sourceText" placeholder="Manba matnini shu yerga joylashtiring yoki yuqoridan fayl yuklang..."></textarea>
     <div class="char-count" id="charCount">0 belgi</div>
+    <div class="bg-box" id="tagHelp" style="margin-top:10px;">
+      <b>🏷 Teg bilan aniq bo'lish (ixtiyoriy)</b>
+      <div class="hint" style="margin:4px 0 6px;">Slayd sarlavhasini o'zingiz belgilang: qator boshiga <b># </b> qo'ying. Shu qatordan keyingi matn o'sha slaydga tushadi, avtomatik bo'lish o'chadi. Word (.docx) faylda «Sarlavha 1/2» uslubi bo'lsa, u o'zi teg bo'ladi.</div>
+      <pre style="margin:0 0 8px;font-size:12px;white-space:pre-wrap;color:var(--ink);">Kirish matni (sarlavha slaydida chiqadi)
+
+# Registon maydoni
+Registon uchta madrasadan iborat...
+
+# Amir Temur davri
+Shahar poytaxt bo'lgan...
+
+# Xulosa
+Samarqand — jahon madaniyati markazi.</pre>
+      <button type="button" id="tagSample" class="bg-link" style="color:var(--gold);">Namunani matn maydoniga qo'yish</button>
+      <div class="hint" id="tagStatus" style="margin:6px 0 0;"></div>
+    </div>
 
     <div class="row">
       <div>
@@ -850,6 +866,16 @@ async function extractTextFromFile(file){
     return { text, meta: pdf.numPages + ' sahifa' };
   } else if(ext === 'docx'){
     const arrayBuffer = await file.arrayBuffer();
+    try{
+      const html = (await mammoth.convertToHtml({ arrayBuffer })).value;
+      const doc = new DOMParser().parseFromString(html, 'text/html');
+      const lines = []; let heads = 0;
+      doc.body.childNodes.forEach(nd => {
+        const t = (nd.textContent || '').trim(); if(!t) return;
+        if(/^H[1-6]$/.test(nd.nodeName)){ lines.push('# ' + t); heads++; } else lines.push(t);
+      });
+      if(heads) return { text: lines.join('\n\n'), meta: 'DOCX fayl, ' + heads + ' ta sarlavha slaydga aylantirildi' };
+    }catch(e){ console.warn('DOCX sarlavhalari:', e); }
     const result = await mammoth.extractRawText({ arrayBuffer });
     return { text: result.value, meta: 'DOCX fayl' };
   } else if(ext === 'txt'){
@@ -1045,7 +1071,37 @@ function autoSlideCount(sourceText){
   return Math.max(3, groups.length + 2); // + title slide + conclusion slide
 }
 
+// ---------- Teg rejimi: "# Sarlavha" qatori yangi slayd boshlaydi ----------
+function parseTagged(text){
+  const lines = String(text || '').replace(/\r/g,'').split('\n');
+  const sections = []; let intro = [], cur = null;
+  lines.forEach(line => {
+    const m = line.match(/^\s*#{1,6}[ \t]*(\S.*)$/);
+    if(m){ cur = { title: m[1].trim().replace(/\s*#+\s*$/,''), body: [] }; sections.push(cur); }
+    else if(cur){ cur.body.push(line); }
+    else { intro.push(line); }
+  });
+  if(!sections.length) return null;
+  return { intro: intro.join('\n').trim(), sections: sections.map(x => ({ title: x.title, body: x.body.join('\n').trim() })) };
+}
+function generateTaggedSlides(tg, title){
+  const out = [];
+  const introSent = splitSentences(tg.intro.replace(/\n+/g,' '));
+  const first = tg.sections[0];
+  out.push({ title: title || (introSent[0] ? shortTitleFromSentence(introSent[0], 8) : 'Taqdimot'), bullets: [introSent[0] ? tg.intro.replace(/\n+/g,' ') : ''] });
+  tg.sections.forEach(sec => {
+    const paras = splitParagraphs(sec.body);
+    const sents = paras.flatMap(p => splitSentences(p));
+    if(!sents.length){ out.push({ title: sec.title, bullets: [''] }); return; }
+    fitSlidesToBox([{ title: sec.title, bullets: sents }]).forEach(x => out.push(x));
+  });
+  out.__tag = true;
+  return out;
+}
+
 function generateSlidesOffline(sourceText, title, n, autoMode){
+  const tg = parseTagged(sourceText);
+  if(tg) return generateTaggedSlides(tg, title);
   const paragraphs = splitParagraphs(sourceText);
   const allSentences = paragraphs.flatMap(p => splitSentences(p));
   if(allSentences.length === 0) throw new Error('Manba matnidan gaplarni ajratib bo\'lmadi. Matnni tekshirib qayta urinib ko\'ring.');
@@ -1366,7 +1422,7 @@ function readEditedSlides(){
       if(bgr) slide.bg = bgr;
       return slide;
     })
-    .filter(sl => sl.bullets[0].length > 0 || sl.image);
+    .filter(sl => sl.bullets[0].length > 0 || sl.image || sl.title);
 }
 
 
@@ -1385,7 +1441,7 @@ generateBtn.addEventListener('click', async () => {
   const decorMode = document.getElementById('styleSelect').value;
   let themeChoice = document.getElementById('themeSelect').value;
 
-  if(sourceText.length < 50){
+  if(sourceText.length < 50 && !parseTagged(sourceText)){
     showError('Iltimos, kamida bir necha jumladan iborat manba matnini kiriting yoki fayl yuklang.');
     return;
   }
@@ -1408,8 +1464,9 @@ generateBtn.addEventListener('click', async () => {
     let slides = generateSlidesOffline(sourceText, presTitle, n, autoMode);
     if(!slides.length) throw new Error('Slaydlar yaratib bo\'lmadi, matningizni tekshiring.');
 
+    const wasTag = !!slides.__tag;
     if(document.getElementById('withAgenda').checked && slides.length > 2){
-      const middleTitles = slides.slice(1, -1).map(s => s.title).filter(Boolean);
+      const middleTitles = (slides.__tag ? slides.slice(1) : slides.slice(1, -1)).map(s => s.title).filter(t => t && !/ \(davomi\)$/.test(t));
       if(middleTitles.length > 0){
         const agendaText = middleTitles.map((t, i) => (i + 1) + '. ' + t).join('\n');
         const agendaSlide = { title: 'Reja', bullets: [agendaText] };
@@ -1741,6 +1798,20 @@ function escapeHtml(str){
   wireAddBtn();
 })();
 
+</script>
+<script>
+(function(){
+  var ta=document.getElementById('sourceText'), st=document.getElementById('tagStatus');
+  function upd(){
+    var tg = window.parseTagged ? parseTagged(ta.value) : null;
+    st.textContent = tg ? ('✓ Teg rejimi: ' + tg.sections.length + ' ta slayd belgilandi (' + tg.sections.map(function(x){return x.title;}).slice(0,6).join(' · ') + (tg.sections.length>6?' …':'') + '). Slayd soni va avtomatik bo\'lish ishlamaydi.') : '';
+  }
+  ta.addEventListener('input', upd); upd();
+  document.getElementById('tagSample').addEventListener('click', function(){
+    ta.value = "Samarqand — Markaziy Osiyoning eng qadimiy shaharlaridan biri.\n\n# Registon maydoni\nRegiston uchta madrasadan iborat: Ulug'bek, Sherdor va Tillakori. Ular XV–XVII asrlarda qurilgan.\n\n# Amir Temur davri\nAmir Temur davrida Samarqand saltanat poytaxtiga aylandi. Shahar ko'plab me'moriy obidalar bilan bezatildi.\n\n# Xulosa\nSamarqand jahon madaniyati va ilm-fan markazi hisoblanadi.";
+    ta.dispatchEvent(new Event('input')); upd();
+  });
+})();
 </script>
 </body>
 </html>
