@@ -767,6 +767,10 @@ function unlockApp(){
   refreshHistory().catch(()=>{});
 }
 
+// Kirish kodi o'chirilgan: sahifa darrov ochiladi
+currentRole = 'user';
+unlockApp();
+['logoutLink','rolePill'].forEach(id => { const el = document.getElementById(id); if(el) el.style.display = 'none'; });
 document.getElementById('gateSubmit').addEventListener('click', attemptLogin);
 document.getElementById('gateInput').addEventListener('keydown', (e) => {
   if(e.key === 'Enter') attemptLogin();
