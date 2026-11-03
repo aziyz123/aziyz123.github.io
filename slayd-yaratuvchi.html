@@ -9,6 +9,9 @@
 <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
+<script src="fayl-stash-api.js?v=1"></script>
 <style>
   :root{
     --ink:#20293A;
@@ -638,6 +641,17 @@ Samarqand — jahon madaniyati markazi.</pre>
       <div class="rtitle" id="resultTitle"></div>
       <div class="rmeta" id="resultMeta"></div>
       <button class="download" id="downloadBtn">.PPTX yuklab olish</button>
+      <button class="download" id="sendBoardBtn" style="margin-top:10px;background:transparent;color:var(--gold);border:1px solid var(--gold);">📤 Doskaga yuborish (kod bilan)</button>
+      <div id="sendBoardBox" style="display:none;margin-top:14px;padding:14px;border:1px dashed var(--gold);">
+        <div class="hint" id="sendBoardStatus" style="margin:0 0 6px;"></div>
+        <div id="sendBoardCodeWrap" style="display:none;">
+          <div class="hint" style="margin:0;">Xona kodi:</div>
+          <div id="sendBoardCode" style="font-family:'Archivo Black','Inter',sans-serif;font-size:40px;letter-spacing:6px;color:var(--gold);"></div>
+          <div class="hint" style="margin:6px 0;">Aqlli doskada <b>aziyz123.github.io/fayl-uzatish.html</b> ni oching → «🗂 24 soatlik xona» → shu kodni kiriting → faylni yuklab oling. Fayl 24 soatdan keyin o'chadi.</div>
+          <button type="button" class="bg-link" id="sendBoardCopy" style="color:var(--gold);font-size:13px;">Kodni nusxalash</button>
+          &nbsp;·&nbsp;<a id="sendBoardLink" href="#" target="_blank" rel="noopener" style="color:var(--gold);font-size:13px;">Xonani ochish</a>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -1573,6 +1587,31 @@ confirmBuildBtn.addEventListener('click', async () => {
   }finally{
     confirmBuildBtn.disabled = false;
   }
+});
+
+document.getElementById('sendBoardBtn').addEventListener('click', async () => {
+  if(!lastRecord) return;
+  const btn = document.getElementById('sendBoardBtn'), box = document.getElementById('sendBoardBox');
+  const st = document.getElementById('sendBoardStatus');
+  if(!window.FaylStashAPI || typeof firebase === 'undefined'){ box.style.display = 'block'; st.textContent = '✗ Internet aloqasi yo\'q yoki Firebase yuklanmadi. Sahifani yangilang.'; return; }
+  btn.disabled = true; box.style.display = 'block'; document.getElementById('sendBoardCodeWrap').style.display = 'none';
+  st.textContent = 'Fayl tayyorlanmoqda...';
+  try{
+    const blob = await lastRecord.pptx.write({ outputType: 'blob' });
+    const fname = (lastRecord.record.title || 'taqdimot').replace(/[^a-zA-Z0-9 \-_]/g,'').trim().slice(0,60) || 'taqdimot';
+    const file = new File([blob], fname + '.pptx', { type: 'application/vnd.openxmlformats-officedocument.presentationml.presentation' });
+    const res = await FaylStashAPI.upload(file, file.name, (d, t) => { st.textContent = 'Yuborilmoqda... ' + Math.round(d / t * 100) + '% (' + (d/1048576).toFixed(1) + ' / ' + (t/1048576).toFixed(1) + ' MB)'; });
+    st.textContent = '✅ Yuborildi! Faylni doskada shu kod bilan oling (24 soat ichida).';
+    document.getElementById('sendBoardCode').textContent = res.code;
+    document.getElementById('sendBoardLink').href = 'fayl-uzatish.html?stash=' + res.code;
+    document.getElementById('sendBoardCodeWrap').style.display = 'block';
+  }catch(err){
+    st.textContent = '✗ ' + (err && err.message || err) + ' (Fayl katta bo\'lsa, rasmlar sonini kamaytiring yoki .PPTX ni yuklab oling.)';
+  }finally{ btn.disabled = false; }
+});
+document.getElementById('sendBoardCopy').addEventListener('click', () => {
+  const t = document.getElementById('sendBoardCode').textContent;
+  try{ navigator.clipboard.writeText(t); document.getElementById('sendBoardCopy').textContent = '✓ Nusxalandi'; }catch(e){}
 });
 
 downloadBtn.addEventListener('click', () => {
