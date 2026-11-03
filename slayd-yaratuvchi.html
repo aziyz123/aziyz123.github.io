@@ -1111,6 +1111,17 @@ function cleanMd(t){
     .replace(/\bTL;?DR\b[ \t]*:?/gi,'')
     .replace(/[ \t]+\n/g,'\n').replace(/\n{3,}/g,'\n\n').trim();
 }
+// Sarlavha va matn bir qatorga yopishib qolgan bo'lsa, ajratib olamiz
+function splitHead(h){
+  h = cleanMd(h).replace(/\s*#+\s*$/,'').trim();
+  if(h.length <= 70) return { title: h.replace(/[:.]$/,'').trim(), rest: '' };
+  let m = h.match(/^(.{4,70}?)\s*(?::|–|—|\s-)\s+(\S.*)$/);
+  if(m) return { title: m[1].trim(), rest: m[2] };
+  m = h.match(/^(.{4,70}?[.!?])\s+(\S.*)$/);
+  if(m) return { title: m[1].replace(/[.!?]$/,'').trim(), rest: m[2] };
+  const t = shortTitleFromSentence(h, 6) || h.split(/\s+/).slice(0,6).join(' ');
+  return { title: t, rest: h };
+}
 const TAG_RE = /^\s*(?:#{1,6}[ \t]*|SLAYD[ \t]*[:\-–—][ \t]*|@@[ \t]*)(\S.*)$/i;
 function parseTagged(text){
   let raw = String(text || '').replace(/\r/g,'');
@@ -1123,7 +1134,7 @@ function parseTagged(text){
   const sections = []; let intro = [], cur = null;
   lines.forEach(line => {
     const m = line.match(TAG_RE);
-    if(m){ cur = { title: cleanMd(m[1]).replace(/\s*#+\s*$/,'').replace(/[:.]$/,'').trim(), body: [] }; if(cur.title) sections.push(cur); else cur = null; }
+    if(m){ const h = splitHead(m[1]); cur = { title: h.title, body: h.rest ? [h.rest] : [] }; if(cur.title) sections.push(cur); else cur = null; }
     else if(cur){ cur.body.push(line); }
     else { intro.push(line); }
   });
@@ -1924,7 +1935,7 @@ function escapeHtml(str){
 "1) Eng boshida 1-2 jumlalik qisqa kirish yoz. Kirishdan oldin hech narsa yozma (\"TL;DR\", \"Albatta\", salomlashish va hokazo bo'lmasin).\n"+
 "2) Keyin "+n+" ta bo'lim yoz. Har bo'lim ALOHIDA QATORDA \"SLAYD: \" so'zi va qisqa sarlavha bilan boshlansin. Misol: SLAYD: Registon maydoni\n"+
 "3) Sarlavha 2-6 so'zdan iborat bo'lsin, raqamsiz (1., 2. yozma), oxirida nuqta yoki ikki nuqta bo'lmasin.\n"+
-"4) Sarlavhadan keyingi qatordan shu bo'limning oddiy matni kelsin: 4-7 ta to'liq jumla, har jumla 25 so'zdan oshmasin, bitta abzatsda.\n"+
+"4) Sarlavhadan keyin ENTER bosib, matnni YANGI QATORDAN boshla (sarlavha va matn bir qatorda bo'lmasin). Matn: 4-7 ta to'liq jumla, har jumla 25 so'zdan oshmasin, bitta abzatsda.\n"+
 "5) Oxirgi bo'lim doim \"SLAYD: Xulosa\" bo'lsin (2-3 jumla).\n"+
 "6) \"SLAYD:\" so'zini faqat bo'lim sarlavhasi uchun ishlat, boshqa joyda ishlatma.\n"+
 "7) Hech qanday bezak qo'shma: # belgisi, qalin yoki qiyshiq yozuv (** va *), nuqtali ro'yxat, jadval, emoji, havola, qavs ichidagi izoh bo'lmasin.\n"+
