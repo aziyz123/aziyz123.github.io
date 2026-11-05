@@ -247,6 +247,7 @@
     <p>Slayd, musobaqa, imtihon, fayl almashish va dars rejasi — barchasi bepul, internet orqali, hech qanday o'rnatishsiz. Proyektorda oching, QR ko'rsating, boshlang.</p>
     <div class="hero-cta">
       <a class="btn" href="#tools">Vositalarni ko'rish</a>
+      <a class="btn" href="#" id="openInstall" style="background:transparent;color:var(--gold-2);border:1px solid var(--gold-2);">📲 Ilova / yorliq o'rnatish</a>
     </div>
   </div>
   <div class="scroll-cue"><span class="line"></span> Pastga tushing</div>
@@ -356,6 +357,26 @@
   </div>
 </section>
 
+<div id="installModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.72);align-items:center;justify-content:center;padding:16px;">
+  <div style="background:#1B2029;color:#F3EFE4;max-width:560px;width:100%;max-height:90vh;overflow:auto;border:1px solid rgba(201,164,92,.4);border-radius:14px;padding:24px;font-family:'Inter',sans-serif;">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
+      <b style="font-size:18px;">📲 Ilova / yorliq o'rnatish</b>
+      <button id="closeInstall" style="background:none;border:none;color:#F3EFE4;font-size:26px;cursor:pointer;line-height:1;">×</button>
+    </div>
+    <p style="font-size:13px;opacity:.7;margin:8px 0 16px;">Qurilmangizga qarab birini tanlang.</p>
+    <button id="doInstall" style="display:none;width:100%;padding:14px;margin-bottom:10px;border:none;border-radius:10px;background:#C9A45C;color:#12151C;font-weight:800;font-size:15px;cursor:pointer;">⚡ Brauzer orqali ilova qilib o'rnatish</button>
+    <button id="dlShortcut" style="width:100%;padding:14px;margin-bottom:10px;border:1px solid rgba(201,164,92,.5);border-radius:10px;background:transparent;color:#C9A45C;font-weight:700;font-size:14px;cursor:pointer;">🖥 Kompyuter / doska uchun yorliq (.url) yuklab olish</button>
+    <a href="https://github.com/aziyz123/aziyz123.github.io/releases/download/apk-latest/Oquv-Vositalari.apk" style="display:block;text-align:center;padding:14px;margin-bottom:16px;border:1px solid rgba(201,164,92,.5);border-radius:10px;color:#C9A45C;font-weight:700;font-size:14px;text-decoration:none;">🤖 Android uchun APK yuklab olish</a>
+    <div style="font-size:13px;line-height:1.6;opacity:.9;">
+      <b>Yorliq (.url) qanday ishlatiladi:</b> yuklangan faylni <b>Ish stoli</b>ga ko'chiring. Ustiga ikki marta bossangiz, sayt brauzerda ochiladi.<br><br>
+      <b>Chrome (Windows doskasi):</b> o'ng yuqoridagi <b>⋮</b> → «Quyish, saqlash va ulashish» → <b>«Sahifani ilova sifatida o'rnatish»</b> yoki «Yorliq yaratish» («Ochilsin: alohida oynada» belgilang).<br>
+      <b>Microsoft Edge:</b> <b>⋯</b> → «Ilovalar» → <b>«Ushbu saytni ilova sifatida o'rnatish»</b>.<br>
+      <b>Android doska:</b> Chrome <b>⋮</b> → «Bosh ekranga qo'shish», yoki yuqoridagi APK.<br><br>
+      <span style="opacity:.7;">Menyuda bunday band yo'q bo'lsa, brauzer eski bo'lishi mumkin. Chrome yoki Edge'ni yangilang. O'rnatilmasa ham, yorliq (.url) har doim ishlaydi.</span>
+    </div>
+  </div>
+</div>
+
 <footer class="site-footer">
   <div class="brand2">O'quv Vositalari</div>
   <div class="meta">Yaratdi: <a href="https://t.me/byaziyz" target="_blank" rel="noopener">@byaziyz</a>　　2026</div>
@@ -405,6 +426,20 @@
 </script>
 
 <script>
+  (function(){
+    var modal=document.getElementById('installModal'), dp=null;
+    window.addEventListener('beforeinstallprompt', function(e){ e.preventDefault(); dp=e; document.getElementById('doInstall').style.display='block'; });
+    window.addEventListener('appinstalled', function(){ dp=null; document.getElementById('doInstall').style.display='none'; });
+    document.getElementById('openInstall').addEventListener('click', function(e){ e.preventDefault(); modal.style.display='flex'; });
+    document.getElementById('closeInstall').addEventListener('click', function(){ modal.style.display='none'; });
+    modal.addEventListener('click', function(e){ if(e.target===modal) modal.style.display='none'; });
+    document.getElementById('doInstall').addEventListener('click', function(){ if(dp){ dp.prompt(); dp.userChoice.finally(function(){ dp=null; document.getElementById('doInstall').style.display='none'; }); } });
+    document.getElementById('dlShortcut').addEventListener('click', function(){
+      var txt='[InternetShortcut]\r\nURL=https://aziyz123.github.io/\r\nIconIndex=0\r\n';
+      var a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([txt],{type:'application/octet-stream'}));
+      a.download="O'quv Vositalari.url"; document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    });
+  })();
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('/sw.js')
