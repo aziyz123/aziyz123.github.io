@@ -76,6 +76,7 @@
     $('stashCodeBox').style.display = 'block';
     renderExpiry();
     watchFiles(code, $('stashUpList'), true);
+    watchQuizzes(code, $('stashUpQuizList'), true);
     return code;
   }
 
@@ -196,6 +197,36 @@
     });
   }
 
+  function watchQuizzes(code, listEl, canDelete) {
+    var key = listEl.id + '_q';
+    if (watched[key]) { try { watched[key].off(); } catch (e) {} }
+    var ref = dbr().ref('rooms/' + code + '/stash/quizzes');
+    watched[key] = ref;
+    ref.on('value', function (s) {
+      var v = s.val() || {};
+      listEl.innerHTML = '';
+      Object.keys(v).sort(function (a, b) { return (v[a].at || 0) - (v[b].at || 0); }).forEach(function (qid) {
+        var m = v[qid];
+        var row = document.createElement('div'); row.className = 'stash-row';
+        var label = document.createElement('span'); label.className = 'stash-name';
+        label.textContent = '🎮 ' + (m.name || 'Savollar') + ' (' + (m.count || '?') + ' ta savol)';
+        row.appendChild(label);
+        if (canDelete) {
+          var del = document.createElement('button'); del.className = 'secondary stash-btn'; del.textContent = "O'chirish";
+          del.onclick = function () { dbr().ref('rooms/' + code + '/stash/quizzes/' + qid).remove(); };
+          row.appendChild(del);
+        } else {
+          var go = document.createElement('a'); go.className = 'primary stash-btn';
+          go.style.cssText = 'text-decoration:none;display:inline-block;text-align:center;border-radius:10px;background:linear-gradient(135deg,var(--gold-2),var(--gold));color:var(--stage);font-weight:800;';
+          go.textContent = "O'yinni boshlash";
+          go.href = 'sinf-musobaqasi.html?stash=' + code + '&quiz=' + qid;
+          row.appendChild(go);
+        }
+        listEl.appendChild(row);
+      });
+    });
+  }
+
   var cache = {};
   function fetchFile(code, fid, m, row, btn) {
     var key = code + '/' + fid;
@@ -241,9 +272,10 @@
   function deleteOneFile(code, fid) {
     dbr().ref('rooms/' + code + '/stash/data/' + fid).remove().catch(function () {});
     dbr().ref('rooms/' + code + '/stash/files/' + fid).remove().then(function () {
-      return dbr().ref('rooms/' + code + '/stash/files').once('value');
-    }).then(function (s) {
-      if (!s.val() || !Object.keys(s.val()).length) { removeStash(code); setStatus($('stashGetStatus'), "✅ Fayl olindi va bazadan o'chirildi. Xona bo'shadi, u ham o'chirildi.", 'ok'); }
+      return Promise.all([dbr().ref('rooms/' + code + '/stash/files').once('value'), dbr().ref('rooms/' + code + '/stash/quizzes').once('value')]);
+    }).then(function (r) {
+      var f = r[0].val(), q = r[1].val();
+      if ((!f || !Object.keys(f).length) && (!q || !Object.keys(q).length)) { removeStash(code); setStatus($('stashGetStatus'), "✅ Fayl olindi va bazadan o'chirildi. Xona bo'shadi, u ham o'chirildi.", 'ok'); }
     }).catch(function () {});
   }
   async function deleteRoom(code, statusEl, listEl) {
@@ -254,6 +286,7 @@
       forget(code);
       if (watched[listEl.id]) { try { watched[listEl.id].off(); } catch (e) {} }
       listEl.innerHTML = '';
+      var ql = $(listEl.id === 'stashUpList' ? 'stashUpQuizList' : 'stashGetQuizList'); if (ql) ql.innerHTML = '';
       setStatus(statusEl, "✅ Xona va fayllar bazadan o'chirildi.", 'ok');
       return true;
     } catch (e) { setStatus(statusEl, '✗ ' + errText(e), 'err'); }
@@ -277,6 +310,7 @@
       openedCode = code;
       $('stashDelBox').style.display = 'block';
       watchFiles(code, $('stashGetList'), false);
+      watchQuizzes(code, $('stashGetQuizList'), false);
     } catch (e) { setStatus(st, '✗ ' + errText(e), 'err'); }
   }
 
@@ -289,6 +323,20 @@
       var t = $('stashCode').textContent;
       try { navigator.clipboard.writeText(t); $('stashCopyBtn').textContent = '✓ Nusxalandi'; } catch (e) {}
       setTimeout(function () { $('stashCopyBtn').textContent = 'Kodni nusxalash'; }, 1800);
+    });
+    $('stashQuizSave').addEventListener('click', async function () {
+      var st = $('stashQuizStatus'), text = ($('stashQuizText').value || '').trim();
+      if (!text) { setStatus(st, "Savollar matnini yozing.", 'err'); return; }
+      this.disabled = true;
+      try {
+        var code = await ensureRoom();
+        var qid = 'q' + Date.now().toString(36) + Math.random().toString(36).slice(2, 4);
+        var count = text.split(/\n\s*\n+/).filter(function (b) { return b.trim(); }).length;
+        await dbr().ref('rooms/' + code + '/stash/quizzes/' + qid).set({ name: ($('stashQuizName').value || '').trim() || 'Bilim Kechasi savollari', text: text, count: count, at: Date.now() });
+        setStatus(st, '✅ ' + count + ' ta savol saqlandi. Xona kodi: ' + code, 'ok');
+        $('stashQuizText').value = ''; $('stashQuizName').value = '';
+      } catch (e) { setStatus(st, '✗ ' + errText(e), 'err'); }
+      this.disabled = false;
     });
     $('stashUpDelBtn').addEventListener('click', async function () {
       if (await deleteRoom(curCode, $('stashUpStatus'), $('stashUpList'))) { curCode = null; $('stashCodeBox').style.display = 'none'; $('stashUpBg').classList.remove('active'); }

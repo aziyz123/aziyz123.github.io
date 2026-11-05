@@ -41,14 +41,51 @@
     var m = (e && (e.code || e.message)) || String(e);
     return /permission/i.test(m) ? "Ma'lumotlar bazasi yozishga ruxsat bermadi (qoidalar)." : m;
   }
+  /** Mavjud xonani tekshiradi (code berilsa) yoki yangi xona ochadi. */
+  async function openRoom(existing) {
+    if (existing) {
+      if (!/^\d{6}$/.test(existing)) throw new Error("Xona kodi 6 ta raqam bo'lishi kerak.");
+      var e = (await db().ref('rooms/' + existing + '/stash/exp').once('value')).val();
+      if (!e || e <= Date.now()) throw new Error('Bunday xona topilmadi yoki muddati tugagan.');
+      return { code: existing, exp: e };
+    }
+    var code = await newCode(), exp = Date.now() + TTL;
+    await db().ref('rooms/' + code + '/stash/exp').set(exp);
+    remember(code, exp);
+    return { code: code, exp: exp };
+  }
+  function countQuestions(text) {
+    return String(text || '').split(/\n\s*\n+/).filter(function (b) { return b.trim(); }).length;
+  }
+  /** Bilim Kechasi savollarini (matn) xonaga saqlaydi. existing — mavjud xona kodi (ixtiyoriy). */
+  async function saveQuiz(text, name, existing) {
+    try {
+      text = String(text || '').trim();
+      if (!text) throw new Error("Savollar matni bo'sh.");
+      if (text.length > 200000) throw new Error('Savollar matni juda uzun.');
+      var room = await openRoom(existing);
+      var qid = 'q' + Date.now().toString(36) + Math.random().toString(36).slice(2, 4);
+      await db().ref('rooms/' + room.code + '/stash/quizzes/' + qid).set({ name: name || 'Bilim Kechasi savollari', text: text, count: countQuestions(text), at: Date.now() });
+      return { code: room.code, exp: room.exp, qid: qid };
+    } catch (e) { throw new Error(friendly(e)); }
+  }
+  /** Xonadagi savollar to'plamlarini o'qiydi. only — bitta qid (ixtiyoriy). */
+  async function getQuizzes(code, only) {
+    try {
+      var room = await openRoom(code);
+      var v = (await db().ref('rooms/' + code + '/stash/quizzes').once('value')).val() || {};
+      var list = Object.keys(v).filter(function (k) { return !only || k === only; })
+        .sort(function (a, b) { return (v[a].at || 0) - (v[b].at || 0); })
+        .map(function (k) { return { id: k, name: v[k].name, text: v[k].text, count: v[k].count }; });
+      return { exp: room.exp, quizzes: list };
+    } catch (e) { throw new Error(friendly(e)); }
+  }
   /** file: File|Blob (name berilsa File). Qaytaradi {code, exp}. */
-  async function upload(file, name, onProg) {
+  async function upload(file, name, onProg, existing) {
     try {
       if (!file || !file.size) throw new Error("Fayl bo'sh");
       if (file.size > MAX_FILE) throw new Error('Fayl katta (' + (file.size / 1048576).toFixed(1) + " MB). Eng ko'pi 25 MB.");
-      var code = await newCode(), exp = Date.now() + TTL, base = 'rooms/' + code + '/stash';
-      await db().ref(base + '/exp').set(exp);
-      remember(code, exp);
+      var room = await openRoom(existing), code = room.code, exp = room.exp, base = 'rooms/' + code + '/stash';
       var fid = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
       var total = Math.ceil(file.size / RAW);
       var meta = db().ref(base + '/files/' + fid);
@@ -72,5 +109,5 @@
       return { code: code, exp: exp };
     } catch (e) { var err = new Error(friendly(e)); throw err; }
   }
-  window.FaylStashAPI = { upload: upload };
+  window.FaylStashAPI = { upload: upload, saveQuiz: saveQuiz, getQuizzes: getQuizzes, openRoom: openRoom };
 })();

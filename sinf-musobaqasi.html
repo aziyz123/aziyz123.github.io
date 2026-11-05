@@ -10,6 +10,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="fayl-stash-api.js?v=2"></script>
 <style>
   :root{
     --stage:#0A0D13; --stage-2:#121722; --stage-3:#1C2331;
@@ -300,6 +301,20 @@ Javob: C
 2. Amir Temur qachon tug'ilgan?
 Javob: 1336-yilda</div>
       <div class="parsed-preview" id="parsedPreview"></div>
+      <div class="example-box" style="margin-top:14px;font-family:inherit;white-space:normal;">
+        <b>☁️ 24 soatlik xona</b>
+        <div class="hint" style="margin:4px 0 10px;">Savollarni oldindan xonaga saqlab qo'ying, doskada kod bilan oling. Fayl uzatish bilan bir xil xona (slayd ham shu yerda turadi).</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+          <input type="text" id="stashSaveCode" inputmode="numeric" maxlength="6" placeholder="Mavjud xona kodi (bo'sh = yangi)" style="flex:1;min-width:200px;padding:10px;">
+          <button type="button" class="secondary-btn" id="stashSaveBtn">Savollarni xonaga saqlash</button>
+        </div>
+        <div id="stashSaveOut" class="hint" style="margin-top:8px;"></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:12px;">
+          <input type="text" id="stashLoadCode" inputmode="numeric" maxlength="6" placeholder="Xona kodi" style="flex:1;min-width:140px;padding:10px;">
+          <button type="button" class="secondary-btn" id="stashLoadBtn">Xonadan savollarni olish</button>
+        </div>
+        <div id="stashLoadOut" class="hint" style="margin-top:8px;"></div>
+      </div>
       <div class="error-box" id="setupError"></div>
     </div>
 
@@ -478,7 +493,7 @@ const firebaseConfig = {
 let fbApp = null, fbDb = null;
 function getDb(){
   if(!fbDb){
-    fbApp = firebase.initializeApp(firebaseConfig);
+    fbApp = firebase.apps.length ? firebase.app() : firebase.initializeApp(firebaseConfig);
     fbDb = firebase.database();
   }
   return fbDb;
@@ -703,6 +718,43 @@ function updatePreview(){
   parsedPreview.textContent = msg;
 }
 qaTextEl.addEventListener('input', updatePreview);
+
+// ----- 24 soatlik xona: saqlash / olish -----
+(function(){
+  const $s = id => document.getElementById(id);
+  $s('stashSaveBtn').addEventListener('click', async () => {
+    const out = $s('stashSaveOut'); const text = qaTextEl.value.trim();
+    if(!text){ out.textContent = 'Avval savollarni yuqoridagi maydonga yozing.'; return; }
+    if(!window.FaylStashAPI){ out.textContent = 'Internet aloqasi yo\'q (Firebase yuklanmadi).'; return; }
+    $s('stashSaveBtn').disabled = true; out.textContent = 'Saqlanmoqda...';
+    try{
+      const r = await FaylStashAPI.saveQuiz(text, (document.title || 'Bilim Kechasi') + ' savollari', $s('stashSaveCode').value.trim());
+      out.innerHTML = '✅ Saqlandi. Xona kodi: <b style="font-size:22px;letter-spacing:3px;">' + r.code + '</b> — doskada <b>Fayl Uzatish → 24 soatlik xona</b> ga kodni kiriting yoki shu sahifada «Xonadan savollarni olish» ni bosing. 24 soatdan keyin o\'chadi.';
+    }catch(e){ out.textContent = '✗ ' + e.message; }
+    $s('stashSaveBtn').disabled = false;
+  });
+  async function loadFromRoom(code, qid){
+    const out = $s('stashLoadOut');
+    out.textContent = 'Xonadan olinmoqda...';
+    try{
+      const r = await FaylStashAPI.getQuizzes(code, qid);
+      if(!r.quizzes.length){ out.textContent = 'Bu xonada savollar yo\'q.'; return false; }
+      qaTextEl.value = r.quizzes.map(q => q.text).join('\n\n');
+      updatePreview();
+      out.textContent = '✅ ' + r.quizzes.reduce((n,q)=>n+(q.count||0),0) + ' ta savol xonadan yuklandi. Quyida sozlamalarni tekshirib, «O\'yinni boshlash» ni bosing.';
+      return true;
+    }catch(e){ out.textContent = '✗ ' + e.message; return false; }
+  }
+  $s('stashLoadBtn').addEventListener('click', () => {
+    if(!window.FaylStashAPI){ $s('stashLoadOut').textContent = 'Internet aloqasi yo\'q (Firebase yuklanmadi).'; return; }
+    loadFromRoom($s('stashLoadCode').value.trim());
+  });
+  const sp = new URLSearchParams(location.search), sc = sp.get('stash');
+  if(sc && /^\d{6}$/.test(sc)){
+    $s('stashLoadCode').value = sc;
+    window.addEventListener('load', () => { if(window.FaylStashAPI) loadFromRoom(sc, sp.get('quiz') || undefined); });
+  }
+})();
 numGamesEl.addEventListener('input', updatePreview);
 
 function renderTeamNameInputs(){

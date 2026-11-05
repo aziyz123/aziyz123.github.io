@@ -641,7 +641,8 @@ Samarqand — jahon madaniyati markazi.</pre>
       <div class="rtitle" id="resultTitle"></div>
       <div class="rmeta" id="resultMeta"></div>
       <button class="download" id="downloadBtn">.PPTX yuklab olish</button>
-      <button class="download" id="sendBoardBtn" style="margin-top:10px;background:transparent;color:var(--gold);border:1px solid var(--gold);">📤 Doskaga yuborish (kod bilan)</button>
+      <input type="text" id="sendBoardCodeIn" inputmode="numeric" maxlength="6" placeholder="Mavjud xona kodi (bo'sh = yangi xona)" style="width:100%;margin-top:10px;padding:10px;font-size:13px;">
+      <button class="download" id="sendBoardBtn" style="margin-top:8px;background:transparent;color:var(--gold);border:1px solid var(--gold);">📤 Doskaga yuborish (kod bilan)</button>
       <div id="sendBoardBox" style="display:none;margin-top:14px;padding:14px;border:1px dashed var(--gold);">
         <div class="hint" id="sendBoardStatus" style="margin:0 0 6px;"></div>
         <div id="sendBoardCodeWrap" style="display:none;">
@@ -1611,7 +1612,7 @@ document.getElementById('sendBoardBtn').addEventListener('click', async () => {
     const blob = await lastRecord.pptx.write({ outputType: 'blob' });
     const fname = (lastRecord.record.title || 'taqdimot').replace(/[^a-zA-Z0-9 \-_]/g,'').trim().slice(0,60) || 'taqdimot';
     const file = new File([blob], fname + '.pptx', { type: 'application/vnd.openxmlformats-officedocument.presentationml.presentation' });
-    const res = await FaylStashAPI.upload(file, file.name, (d, t) => { st.textContent = 'Yuborilmoqda... ' + Math.round(d / t * 100) + '% (' + (d/1048576).toFixed(1) + ' / ' + (t/1048576).toFixed(1) + ' MB)'; });
+    const res = await FaylStashAPI.upload(file, file.name, (d, t) => { st.textContent = 'Yuborilmoqda... ' + Math.round(d / t * 100) + '% (' + (d/1048576).toFixed(1) + ' / ' + (t/1048576).toFixed(1) + ' MB)'; }, document.getElementById('sendBoardCodeIn').value.trim());
     st.textContent = '✅ Yuborildi! Faylni doskada shu kod bilan oling (24 soat ichida).';
     document.getElementById('sendBoardCode').textContent = res.code;
     document.getElementById('sendBoardLink').href = 'fayl-uzatish.html?stash=' + res.code;

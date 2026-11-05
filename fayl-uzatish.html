@@ -126,6 +126,13 @@
       <h2>1 · Oldindan yuklab qo'ying</h2>
       <p class="hint" style="margin-top:0;">Slayd yoki faylni hozir yuklang. Fayl <b style="color:var(--gold-2)">24 soat</b> saqlanadi, keyin o'chib ketadi. Kompyuter yoki telefondan yuklash mumkin (har biri 25 MB gacha, xonada jami 50 MB).</p>
       <input type="file" id="stashFileInput" multiple>
+      <details style="margin-top:14px;">
+        <summary style="cursor:pointer;color:var(--gold-2);font-weight:700;font-size:14px;">🎮 Bilim Kechasi savollarini ham qo'shish</summary>
+        <input type="text" id="stashQuizName" placeholder="Nomi (masalan: Temur yurishlari)" style="width:100%;margin-top:10px;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.15);background:rgba(0,0,0,0.3);color:var(--paper);font-size:14px;">
+        <textarea id="stashQuizText" placeholder="Savollarni Bilim Kechasidagi formatda yozing:&#10;&#10;1. O'zbekiston poytaxti qaysi shahar?&#10;A) Samarqand&#10;B) Buxoro&#10;C) Toshkent&#10;D) Andijon&#10;Javob: C&#10;&#10;2. Amir Temur qachon tug'ilgan?&#10;Javob: 1336-yilda" style="width:100%;height:170px;margin-top:8px;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.15);background:rgba(0,0,0,0.3);color:var(--paper);font-size:13px;font-family:'IBM Plex Mono',monospace;"></textarea>
+        <button class="secondary" id="stashQuizSave">Savollarni xonaga saqlash</button>
+        <div class="status-line" id="stashQuizStatus"></div>
+      </details>
       <div class="progress-bar-bg" id="stashUpBg"><div class="progress-bar-fill" id="stashUpFill"></div></div>
       <div class="status-line" id="stashUpStatus"></div>
       <div id="stashCodeBox" style="display:none;margin-top:16px;">
@@ -135,6 +142,7 @@
         <button class="secondary" id="stashCopyBtn">Kodni nusxalash</button>
         <button class="secondary" id="stashUpDelBtn" style="border-color:rgba(214,69,69,0.5);color:#ff9d9d;">🗑 Xonani butunlay o'chirish</button>
         <div id="stashUpList" style="margin-top:12px;"></div>
+        <div id="stashUpQuizList"></div>
       </div>
     </div>
     <div class="card">
@@ -143,6 +151,7 @@
       <button class="primary" id="stashOpenBtn" style="margin-top:12px;">Xonani ochish</button>
       <div class="status-line" id="stashGetStatus"></div>
       <div id="stashGetList" style="margin-top:12px;"></div>
+      <div id="stashGetQuizList"></div>
       <div id="stashDelBox" style="display:none;margin-top:12px;">
         <label style="display:flex;gap:8px;align-items:flex-start;font-size:13px;line-height:1.4;"><input type="checkbox" id="stashAutoDel" checked style="margin-top:3px;"> <span>Yuklab olgach, fayl bazadan o'chirilsin (joy bo'shaydi)</span></label>
         <button class="secondary" id="stashGetDelBtn" style="border-color:rgba(214,69,69,0.5);color:#ff9d9d;">🗑 Ishlatib bo'ldim — xonani o'chirish</button>
@@ -185,6 +194,6 @@
 <script src="fayl-core.js?v=1"></script>
 <script src="fayl-ui.js?v=1"></script>
 <script src="fayl-telegram.js?v=1"></script>
-<script src="fayl-stash.js?v=3"></script>
+<script src="fayl-stash.js?v=4"></script>
 </body>
 </html>
