@@ -22,7 +22,7 @@
   function dbr() { return initFb().db; }
   function errText(e) {
     var m = (e && (e.code || e.message)) || String(e);
-    if (/permission/i.test(m)) return "Ma'lumotlar bazasi yozishga ruxsat bermadi (qoidalar).";
+    if (/permission/i.test(m)) return "Ma'lumotlar bazasi ruxsat bermadi (qoidalar). Pastdagi «🔧 Xonani tekshirish» tugmasini bosing. [" + m + "]";
     return m;
   }
   function leftText(exp) {
@@ -314,10 +314,41 @@
     } catch (e) { setStatus(st, '✗ ' + errText(e), 'err'); }
   }
 
+  /* ---------- tekshiruv ---------- */
+  async function diagnose() {
+    var out = $('stashDiagOut'), lines = [];
+    function show() { out.textContent = lines.join('\n'); }
+    var code = generateRoomCode(), base = 'rooms/' + code + '/stash';
+    lines.push('Internet: ' + (navigator.onLine ? 'bor' : "YO'Q")); show();
+    async function step(name, fn) {
+      try { var r = await fn(); lines.push('✓ ' + name + (r !== undefined ? ' → ' + r : '')); }
+      catch (e) { lines.push('✗ ' + name + ' → ' + ((e && (e.code || e.message)) || e)); }
+      show();
+    }
+    var t0 = Date.now();
+    await step("Yozish: xona muddati", function () { return dbr().ref(base + '/exp').set(Date.now() + TTL); });
+    await step("Yozish: fayl ma'lumoti", function () { return dbr().ref(base + '/files/t1').set({ name: 'test.txt', size: 4, type: 'text/plain', total: 1, at: Date.now(), complete: false }); });
+    await step("Yozish: fayl bo'lagi", function () { return dbr().ref(base + '/data/t1/c00000').set('dGVzdA=='); });
+    await step("Yozish: savol", function () { return dbr().ref(base + '/quizzes/q1').set({ name: 't', text: '1. a\nJavob: b', count: 1, at: Date.now() }); });
+    await step("O'qish: bo'lak", async function () { var s = await dbr().ref(base + '/data/t1/c00000').once('value'); return s.val() === 'dGVzdA==' ? 'to\'g\'ri' : 'NOTO\'G\'RI: ' + s.val(); });
+    await step("O'qish: child_added", function () {
+      return new Promise(function (res, rej) {
+        var r = dbr().ref(base + '/data/t1'), to = setTimeout(function () { r.off(); rej(new Error('javob kelmadi (5s)')); }, 5000);
+        r.on('child_added', function () { clearTimeout(to); r.off(); res('keldi'); }, function (e) { clearTimeout(to); rej(e); });
+      });
+    });
+    await step("O'chirish", function () { return dbr().ref(base).remove(); });
+    lines.push('Vaqt: ' + (Date.now() - t0) + ' ms');
+    var bad = lines.filter(function (l) { return l.charAt(0) === '✗'; }).length;
+    lines.push(bad ? '\n❌ ' + bad + ' ta xato. Shu matnni nusxalab yuboring.' : '\n✅ Hammasi ishlayapti. Muammo boshqa joyda: fayl hajmi yoki internet bo\'lishi mumkin.');
+    show();
+  }
+
   /* ---------- ulash ---------- */
   function init() {
     if (!$('stashPanel')) return;
     if (window.QuizPrompt) QuizPrompt.mount($('qpHost'));
+    $('stashDiagBtn').addEventListener('click', diagnose);
     sweep();
     $('stashFileInput').addEventListener('change', function (e) { uploadFiles(Array.prototype.slice.call(e.target.files)); });
     $('stashCopyBtn').addEventListener('click', function () {
