@@ -317,6 +317,7 @@
   /* ---------- ulash ---------- */
   function init() {
     if (!$('stashPanel')) return;
+    if (window.QuizPrompt) QuizPrompt.mount($('qpHost'));
     sweep();
     $('stashFileInput').addEventListener('change', function (e) { uploadFiles(Array.prototype.slice.call(e.target.files)); });
     $('stashCopyBtn').addEventListener('click', function () {

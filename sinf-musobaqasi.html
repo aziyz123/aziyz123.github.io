@@ -11,6 +11,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="fayl-stash-api.js?v=2"></script>
+<script src="quiz-prompt.js?v=1"></script>
 <style>
   :root{
     --stage:#0A0D13; --stage-2:#121722; --stage-3:#1C2331;
@@ -301,6 +302,7 @@ Javob: C
 2. Amir Temur qachon tug'ilgan?
 Javob: 1336-yilda</div>
       <div class="parsed-preview" id="parsedPreview"></div>
+      <div class="example-box" id="qpHost" style="margin-top:14px;font-family:inherit;white-space:normal;"></div>
       <div class="example-box" style="margin-top:14px;font-family:inherit;white-space:normal;">
         <b>☁️ 24 soatlik xona</b>
         <div class="hint" style="margin:4px 0 10px;">Savollarni oldindan xonaga saqlab qo'ying, doskada kod bilan oling. Fayl uzatish bilan bir xil xona (slayd ham shu yerda turadi).</div>
@@ -613,7 +615,23 @@ if(addRoomCode){
 }
 
 
+function normalizeQA(raw){
+  // AI javobini tozalash: markdown belgilari, "SAVOL:" tegi, qator uzilishlari
+  const lines = String(raw || '').replace(/\r/g,'').replace(/```/g,'').replace(/\*\*|__/g,'').split('\n');
+  const out = []; let seenAnswer = false;
+  lines.forEach(l0 => {
+    let l = l0.replace(/^[ \t]*[*•–-][ \t]+/, '').replace(/^[ \t]*#{1,6}[ \t]*/, '');
+    const isQ = /^\s*(SAVOL\s*\d*\s*[:.)\-–—]|\d+[.)]\s)/i.test(l);
+    if(isQ && seenAnswer && out.length && out[out.length-1].trim() !== ''){ out.push(''); }
+    if(isQ){ seenAnswer = false; l = l.replace(/^\s*SAVOL\s*\d*\s*[:.)\-–—]\s*/i, ''); }
+    if(/^\s*(javob|to'g'ri javob|togri javob|answer|javobi)\s*[:\-–]/i.test(l)) seenAnswer = true;
+    out.push(l);
+  });
+  return out.join('\n');
+}
+
 function parseQA(rawText){
+  rawText = normalizeQA(rawText);
   const blocks = rawText.split(/\n\s*\n+/).map(b => b.trim()).filter(Boolean);
   const questions = [];
   const warnings = [];
@@ -718,6 +736,8 @@ function updatePreview(){
   parsedPreview.textContent = msg;
 }
 qaTextEl.addEventListener('input', updatePreview);
+
+if(window.QuizPrompt) QuizPrompt.mount(document.getElementById('qpHost'));
 
 // ----- 24 soatlik xona: saqlash / olish -----
 (function(){
