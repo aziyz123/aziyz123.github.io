@@ -616,18 +616,33 @@ if(addRoomCode){
 
 
 function normalizeQA(raw){
-  // AI javobini tozalash: markdown belgilari, "SAVOL:" tegi, qator uzilishlari
-  const lines = String(raw || '').replace(/\r/g,'').replace(/```/g,'').replace(/\*\*|__/g,'').split('\n');
+  // AI javobini tozalash: apostroflar, markdown, belgilar, "SAVOL:" tegi, qator uzilishlari
+  const lines = String(raw || '').replace(/\r/g,'')
+    .replace(/[​-‍﻿]/g,'').replace(/[   ]/g,' ')
+    .replace(/```/g,'').replace(/\*\*|__/g,'')
+    .replace(/[ʻʼ’‘`´ʹ′]/g,"'").split('\n');
+  const Q_RE = /^(?:(?:savol|savoli|question|q)\s*\d*\s*[:.)\-–—]\s*|\d+\s*[.)\-–—]\s*(?:savol\s*[:.]?\s*)?)/i;
+  const A_RE = /^(?:to'g'ri\s+javob|togri\s+javob|tog'ri\s+javob|javobi|javob|correct\s+answer|answer)\s*[:\-–—=]?\s*(\S.*)$/i;
   const out = []; let seenAnswer = false;
   lines.forEach(l0 => {
-    let l = l0.replace(/^[ \t]*[*•–-][ \t]+/, '').replace(/^[ \t]*#{1,6}[ \t]*/, '');
-    const isQ = /^\s*(SAVOL\s*\d*\s*[:.)\-–—]|\d+[.)]\s)/i.test(l);
-    if(isQ && seenAnswer && out.length && out[out.length-1].trim() !== ''){ out.push(''); }
-    if(isQ){ seenAnswer = false; l = l.replace(/^\s*SAVOL\s*\d*\s*[:.)\-–—]\s*/i, ''); }
-    if(/^\s*(javob|to'g'ri javob|togri javob|answer|javobi)\s*[:\-–]/i.test(l)) seenAnswer = true;
+    // boshidagi emoji, ro'yxat belgilari va boshqa ortiqcha belgilarni olib tashlaymiz
+    let l = l0.replace(/^[^\p{L}\p{N}(\[]+/u, '').replace(/^\[|\]$/g,'').trim();
+    if(!l){ out.push(''); return; }
+    const isQ = Q_RE.test(l);
+    if(isQ && seenAnswer && out.length && out[out.length-1].trim() !== '') out.push('');
+    if(isQ){ seenAnswer = false; l = l.replace(Q_RE, '').trim(); }
+    else {
+      const am = l.match(A_RE);
+      if(am){ l = 'Javob: ' + am[1].trim().replace(/^[(\[]\s*/,''); seenAnswer = true; }
+      else {
+        // variantlar: (A) matn / A. matn / A) matn / A: matn  ->  A) matn
+        const om = l.match(/^\(?([A-Da-d])(?:\)|\.|:)\s*(\S.*)$/);
+        if(om) l = om[1].toUpperCase() + ') ' + om[2].trim();
+      }
+    }
     out.push(l);
   });
-  return out.join('\n');
+  return out.join('\n').replace(/\n{3,}/g,'\n\n');
 }
 
 function parseQA(rawText){
@@ -730,6 +745,13 @@ function updatePreview(){
   if(!text){ parsedPreview.textContent = ''; return; }
   const { questions, warnings } = parseQA(text);
   const numGames = Math.max(1, parseInt(numGamesEl.value) || 1);
+  if(!questions.length){
+    const first = normalizeQA(text).split('\n').filter(Boolean).slice(0,4).join(' ⏎ ').slice(0,260);
+    parsedPreview.innerHTML = '⚠️ 0 ta savol aniqlandi. Har savol shunday bo\'lishi kerak: <b>savol qatori</b>, so\'ng <b>A) B) C) D)</b> variantlar va <b>Javob: C</b> qatori (savollar orasida bo\'sh qator). Ochiq savolda variantlar bo\'lmaydi, faqat <b>Javob: ...</b>.'
+      + (warnings.length ? '<br><span style="opacity:.8">' + warnings.slice(0,2).join(' ') + '</span>' : '')
+      + '<br><span style="opacity:.7">Dastur ko\'rgan boshlanish: ' + first.replace(/</g,'&lt;') + '</span>';
+    return;
+  }
   let msg = questions.length + ' ta savol aniqlandi.';
   if(numGames > 1) msg += ' (' + numGames + ' o\'yinga bo\'linsa, har birida ~' + Math.floor(questions.length/numGames) + ' tadan)';
   if(warnings.length) msg += ' — ' + warnings.length + ' ta blokda muammo bor';
