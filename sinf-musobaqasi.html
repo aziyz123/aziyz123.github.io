@@ -623,6 +623,13 @@ function normalizeQA(raw){
     .replace(/[ʻʼ’‘`´ʹ′]/g,"'").split('\n');
   const Q_RE = /^(?:(?:savol|savoli|question|q)\s*\d*\s*[:.)\-–—]\s*|\d+\s*[.)\-–—]\s*(?:savol\s*[:.]?\s*)?)/i;
   const A_RE = /^(?:to'g'ri\s+javob|togri\s+javob|tog'ri\s+javob|javobi|javob|correct\s+answer|answer)\s*[:\-–—=]?\s*(\S.*)$/i;
+  // variantlar bir qatorga yozilgan bo'lsa ("A) x B) y C) z D) w"), ajratamiz
+  const spread = [];
+  lines.forEach(l => {
+    if(/^[^\p{L}\p{N}(]*\(?[Aa][).:]\s.+\s\(?[Bb][).:]\s/u.test(l)) l.split(/\s+(?=\(?[B-Db-d][).:]\s)/).forEach(x => spread.push(x));
+    else spread.push(l);
+  });
+  lines.length = 0; spread.forEach(x => lines.push(x));
   const out = []; let seenAnswer = false;
   lines.forEach(l0 => {
     // boshidagi emoji, ro'yxat belgilari va boshqa ortiqcha belgilarni olib tashlaymiz
