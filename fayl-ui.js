@@ -87,6 +87,7 @@ async function openPptxViewer(file) {
   const canvas = document.getElementById('pptxCanvas');
   const loading = document.getElementById('pptxLoading');
   const counter = document.getElementById('pptxSlideCounter');
+  const zoomLabel = document.getElementById('pptxZoomLabel');
 
   document.getElementById('pptxViewerTitle').textContent = file.name;
   overlay.classList.add('active');
@@ -94,12 +95,31 @@ async function openPptxViewer(file) {
   loading.style.display = 'block';
   loading.textContent = 'Slaydlar yuklanmoqda...';
   counter.textContent = '';
+  if (zoomLabel) zoomLabel.textContent = '100%';
   pptxCurrentIndex = 0;
   pptxTotalSlides = 0;
+  window._pptxZoom = 1;
 
   if (pptxKeyHandler) {
     document.removeEventListener('keydown', pptxKeyHandler);
     pptxKeyHandler = null;
+  }
+
+  function applyZoom() {
+    const z = window._pptxZoom || 1;
+    const maxW = window.innerWidth - 32;
+    const maxH = window.innerHeight - 80;
+    let baseW = Math.min(maxW, 1280);
+    let baseH = baseW * 9 / 16;
+    if (baseH > maxH) {
+      baseH = maxH;
+      baseW = baseH * 16 / 9;
+    }
+    const w = Math.round(baseW * z);
+    const h = Math.round(baseH * z);
+    canvas.style.width = w + 'px';
+    canvas.style.height = h + 'px';
+    if (zoomLabel) zoomLabel.textContent = Math.round(z * 100) + '%';
   }
 
   try {
@@ -119,16 +139,10 @@ async function openPptxViewer(file) {
       type: 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
     });
 
-    // Ekranga sig'adigan o'lcham (toolbar ~56px)
-    const maxW = Math.min(window.innerWidth - 24, 1600);
-    const maxH = Math.min(window.innerHeight - 70, 900);
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    canvas.width = Math.floor(maxW * dpr);
-    canvas.height = Math.floor(maxH * dpr);
-    canvas.style.width = maxW + 'px';
-    canvas.style.height = maxH + 'px';
-    canvas.style.maxWidth = '100%';
-    canvas.style.maxHeight = 'calc(100vh - 70px)';
+    canvas.width = 1280;
+    canvas.height = 720;
+    window._pptxZoom = 1;
+    applyZoom();
 
     const ViewerClass = PptxViewJS.PPTXViewer || PptxViewJS.default || PptxViewJS;
     pptxViewerInstance = new ViewerClass({
@@ -138,53 +152,69 @@ async function openPptxViewer(file) {
     });
 
     await pptxViewerInstance.loadFile(pptxFile);
-    await pptxViewerInstance.render(canvas, { quality: 'high' });
+    await pptxViewerInstance.render(canvas, { slideIndex: 0, quality: 'high' });
 
-    pptxTotalSlides = (typeof pptxViewerInstance.getSlideCount === 'function'
-      ? pptxViewerInstance.getSlideCount()
-      : (pptxViewerInstance.slideCount || 1)) || 1;
-    pptxCurrentIndex = (typeof pptxViewerInstance.getCurrentSlideIndex === 'function'
-      ? pptxViewerInstance.getCurrentSlideIndex()
-      : 0) || 0;
+    pptxTotalSlides = pptxViewerInstance.getSlideCount ? pptxViewerInstance.getSlideCount() : (pptxViewerInstance.slideCount || 1);
+    pptxCurrentIndex = pptxViewerInstance.getCurrentSlideIndex ? pptxViewerInstance.getCurrentSlideIndex() : 0;
+    if (pptxCurrentIndex == null || isNaN(pptxCurrentIndex)) pptxCurrentIndex = 0;
 
     counter.textContent = (pptxCurrentIndex + 1) + ' / ' + pptxTotalSlides;
     loading.style.display = 'none';
     canvas.style.display = 'block';
 
-    async function goTo(idx) {
+    async function showSlide(idx) {
       if (idx < 0 || idx >= pptxTotalSlides) return;
       try {
         if (typeof pptxViewerInstance.goToSlide === 'function') {
-          await pptxViewerInstance.goToSlide(idx);
-        } else if (idx > pptxCurrentIndex && typeof pptxViewerInstance.nextSlide === 'function') {
-          await pptxViewerInstance.nextSlide();
-        } else if (idx < pptxCurrentIndex && typeof pptxViewerInstance.previousSlide === 'function') {
-          await pptxViewerInstance.previousSlide();
+          await pptxViewerInstance.goToSlide(idx, canvas);
+        } else if (typeof pptxViewerInstance.render === 'function') {
+          await pptxViewerInstance.render(canvas, { slideIndex: idx, quality: 'high' });
         } else if (typeof pptxViewerInstance.renderSlide === 'function') {
           await pptxViewerInstance.renderSlide(idx, canvas, { quality: 'high' });
         }
-        if (typeof pptxViewerInstance.render === 'function' && typeof pptxViewerInstance.goToSlide !== 'function') {
-          await pptxViewerInstance.render(canvas, { quality: 'high' });
-        }
-        pptxCurrentIndex = (typeof pptxViewerInstance.getCurrentSlideIndex === 'function')
+        pptxCurrentIndex = pptxViewerInstance.getCurrentSlideIndex
           ? pptxViewerInstance.getCurrentSlideIndex()
           : idx;
+        if (pptxCurrentIndex == null || isNaN(pptxCurrentIndex)) pptxCurrentIndex = idx;
         counter.textContent = (pptxCurrentIndex + 1) + ' / ' + pptxTotalSlides;
       } catch (e) {
-        console.warn('Slide navigation error', e);
+        console.warn('Slide nav error', e);
+        try {
+          await pptxViewerInstance.render(canvas, { slideIndex: idx, quality: 'high' });
+          pptxCurrentIndex = idx;
+          counter.textContent = (pptxCurrentIndex + 1) + ' / ' + pptxTotalSlides;
+        } catch (e2) {
+          console.error(e2);
+        }
       }
     }
 
-    document.getElementById('pptxPrevBtn').onclick = () => goTo(pptxCurrentIndex - 1);
-    document.getElementById('pptxNextBtn').onclick = () => goTo(pptxCurrentIndex + 1);
+    document.getElementById('pptxPrevBtn').onclick = () => showSlide(pptxCurrentIndex - 1);
+    document.getElementById('pptxNextBtn').onclick = () => showSlide(pptxCurrentIndex + 1);
     document.getElementById('pptxDownloadBtn').onclick = () => downloadFile(file);
+
+    const zoomOutBtn = document.getElementById('pptxZoomOut');
+    const zoomInBtn = document.getElementById('pptxZoomIn');
+    if (zoomOutBtn) {
+      zoomOutBtn.onclick = () => {
+        window._pptxZoom = Math.max(0.4, (window._pptxZoom || 1) - 0.15);
+        applyZoom();
+      };
+    }
+    if (zoomInBtn) {
+      zoomInBtn.onclick = () => {
+        window._pptxZoom = Math.min(2.5, (window._pptxZoom || 1) + 0.15);
+        applyZoom();
+      };
+    }
+
     document.getElementById('pptxCloseBtn').onclick = () => {
       overlay.classList.remove('active');
       if (pptxKeyHandler) {
         document.removeEventListener('keydown', pptxKeyHandler);
         pptxKeyHandler = null;
       }
-      try { if (pptxViewerInstance && pptxViewerInstance.destroy) pptxViewerInstance.destroy(); } catch(e) {}
+      try { if (pptxViewerInstance && pptxViewerInstance.destroy) pptxViewerInstance.destroy(); } catch (e) {}
       pptxViewerInstance = null;
     };
 
@@ -192,12 +222,18 @@ async function openPptxViewer(file) {
       if (!overlay.classList.contains('active')) return;
       if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
         e.preventDefault();
-        goTo(pptxCurrentIndex + 1);
+        showSlide(pptxCurrentIndex + 1);
       } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
         e.preventDefault();
-        goTo(pptxCurrentIndex - 1);
+        showSlide(pptxCurrentIndex - 1);
       } else if (e.key === 'Escape') {
         document.getElementById('pptxCloseBtn').click();
+      } else if (e.key === '+' || e.key === '=') {
+        e.preventDefault();
+        if (zoomInBtn) zoomInBtn.click();
+      } else if (e.key === '-') {
+        e.preventDefault();
+        if (zoomOutBtn) zoomOutBtn.click();
       }
     };
     document.addEventListener('keydown', pptxKeyHandler);
