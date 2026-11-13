@@ -11,6 +11,9 @@
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/pptxviewjs/dist/PptxViewJS.min.js"></script>
 <style>
   :root{ --stage:#12151C; --stage-2:#1B2029; --paper:#F3EFE4; --gold:#A9813F; --gold-2:#C9A45C; --danger:#D64545; --ok:#4A9A6A; --t1:#E8A33D; --t2:#2E8B8B; --t3:#B23A6B; --t4:#6B8F5C; }
   *{box-sizing:border-box;}
@@ -57,13 +60,15 @@
   .divider::before, .divider::after{ content:''; flex:1; height:1px; background: rgba(255,255,255,0.08); }
   #scannerBox{ display:none; margin-top:16px; border-radius:12px; overflow:hidden; background:#000; } #scannerBox.active{ display:block; } #qr-reader{ width:100%; }
   .viewer-overlay{ display:none; position:fixed; inset:0; z-index:1000; background:#0a0a0c; flex-direction:column; } .viewer-overlay.active{ display:flex; }
-  .viewer-toolbar{ display:flex; justify-content:space-between; align-items:center; padding:12px 16px; background:rgba(0,0,0,0.7); color:#fff; }
-  .viewer-toolbar .title{ font-size:13px; font-weight:600; max-width:60%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .viewer-toolbar{ display:flex; justify-content:space-between; align-items:center; padding:12px 16px; background:rgba(0,0,0,0.7); color:#fff; gap:10px; flex-wrap:wrap; }
+  .viewer-toolbar .title{ font-size:13px; font-weight:600; max-width:40%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .viewer-toolbar button{ background:rgba(255,255,255,0.12); border:none; color:#fff; padding:8px 14px; border-radius:8px; font-size:13px; cursor:pointer; }
-  .viewer-body{ flex:1; display:flex; align-items:center; justify-content:center; overflow:auto; padding:12px; }
+  .viewer-toolbar .nav-btns{ display:flex; gap:8px; align-items:center; }
+  .viewer-body{ flex:1; display:flex; align-items:center; justify-content:center; overflow:auto; padding:12px; background:#0d0f14; }
   .viewer-body img{ max-width:100%; max-height:100%; object-fit:contain; border-radius:4px; }
   .viewer-body iframe{ width:100%; height:100%; border:none; background:#fff; }
   .viewer-hint{ text-align:center; color:rgba(255,255,255,0.5); font-size:13px; padding:20px; }
+  #pptxCanvas{ max-width:100%; max-height:calc(100vh - 70px); display:none; }
   .mode-tabs{ display:flex; gap:8px; margin-top:24px; }
   .mode-tab{ flex:1; padding:12px; text-align:center; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); font-family:'Archivo', sans-serif; font-weight:700; font-size:13px; color: rgba(243,239,228,0.6); cursor:pointer; }
   .mode-tab.active{ background: linear-gradient(135deg, rgba(201,164,92,0.25), rgba(169,129,63,0.15)); border-color: rgba(201,164,92,0.5); color: var(--gold-2); }
@@ -193,11 +198,23 @@
   <div class="viewer-body" style="padding:0;"><iframe id="pdfViewerFrame" src=""></iframe></div>
 </div>
 <div class="viewer-overlay" id="pptxViewer">
-  <div class="viewer-toolbar"><span class="title" id="pptxViewerTitle">PowerPoint</span><div><button id="pptxCloseBtn">Yopish</button></div></div>
-  <div class="viewer-body"><div class="viewer-hint"><p style="font-size:18px; margin-bottom:12px;">📄 PowerPoint fayli</p><p>Yuklab olib, PowerPoint yoki Google Slides da oching.</p><button class="primary" id="pptxDownloadBtn" style="max-width:280px; margin:24px auto 0; display:block;">Yuklab olish</button></div></div>
+  <div class="viewer-toolbar">
+    <span class="title" id="pptxViewerTitle">PowerPoint</span>
+    <div class="nav-btns">
+      <span id="pptxSlideCounter" style="font-size:13px; opacity:0.85; min-width:60px; text-align:center;"></span>
+      <button id="pptxPrevBtn">←</button>
+      <button id="pptxNextBtn">→</button>
+      <button id="pptxDownloadBtn">Yuklab olish</button>
+      <button id="pptxCloseBtn">Yopish</button>
+    </div>
+  </div>
+  <div class="viewer-body">
+    <div id="pptxLoading" style="color:#aaa; font-size:16px; display:none;">Slaydlar yuklanmoqda...</div>
+    <canvas id="pptxCanvas"></canvas>
+  </div>
 </div>
 <script src="fayl-core.js?v=1"></script>
-<script src="fayl-ui.js?v=1"></script>
+<script src="fayl-ui.js?v=2"></script>
 <script src="fayl-telegram.js?v=1"></script>
 <script src="quiz-prompt.js?v=1"></script>
 <script src="fayl-stash.js?v=6"></script>
