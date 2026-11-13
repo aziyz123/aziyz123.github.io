@@ -441,7 +441,7 @@ async function startScanner() {
 }
 async function stopScanner() {
   if (html5QrCode) {
-    try { await html5Qrcode.stop(); } catch(e) {}
+    try { await html5QrCode.stop(); } catch(e) {}
     try { html5QrCode.clear(); } catch(e) {}
     html5QrCode = null;
   }
