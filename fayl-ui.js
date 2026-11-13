@@ -25,6 +25,10 @@ function generateRoomCode(){
 let html5QrCode = null;
 let currentFile = null;
 let receiver = null, sender = null, wakeLock = null;
+let pptxViewerInstance = null;
+let pptxCurrentIndex = 0;
+let pptxTotalSlides = 0;
+let pptxKeyHandler = null;
 
 function guessMime(name, mime) {
   if (mime && mime !== 'application/octet-stream') return mime;
@@ -77,12 +81,135 @@ function openPdfViewer(file) {
     document.getElementById('pdfViewerFrame').src = '';
   };
 }
-function openPptxViewer(file) {
+
+async function openPptxViewer(file) {
+  const overlay = document.getElementById('pptxViewer');
+  const canvas = document.getElementById('pptxCanvas');
+  const loading = document.getElementById('pptxLoading');
+  const counter = document.getElementById('pptxSlideCounter');
+
   document.getElementById('pptxViewerTitle').textContent = file.name;
-  document.getElementById('pptxViewer').classList.add('active');
-  document.getElementById('pptxDownloadBtn').onclick = () => downloadFile(file);
-  document.getElementById('pptxCloseBtn').onclick = () => document.getElementById('pptxViewer').classList.remove('active');
+  overlay.classList.add('active');
+  canvas.style.display = 'none';
+  loading.style.display = 'block';
+  loading.textContent = 'Slaydlar yuklanmoqda...';
+  counter.textContent = '';
+  pptxCurrentIndex = 0;
+  pptxTotalSlides = 0;
+
+  if (pptxKeyHandler) {
+    document.removeEventListener('keydown', pptxKeyHandler);
+    pptxKeyHandler = null;
+  }
+
+  try {
+    if (!window.PptxViewJS) {
+      throw new Error('PptxViewJS yuklanmadi. Internetni tekshiring.');
+    }
+
+    let blob;
+    if (typeof file.data === 'string' && file.data.startsWith('blob:')) {
+      const res = await fetch(file.data);
+      blob = await res.blob();
+    } else if (typeof file.data === 'string' && file.data.startsWith('data:')) {
+      const res = await fetch(file.data);
+      blob = await res.blob();
+    } else {
+      blob = file.data;
+    }
+
+    const pptxFile = new File([blob], file.name || 'presentation.pptx', {
+      type: 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
+    });
+
+    const maxW = Math.min(window.innerWidth - 24, 1280);
+    const maxH = Math.min(window.innerHeight - 80, 720);
+    canvas.width = maxW;
+    canvas.height = maxH;
+
+    const ViewerClass = PptxViewJS.PPTXViewer || PptxViewJS.default || PptxViewJS;
+    pptxViewerInstance = new ViewerClass({ canvas: canvas });
+
+    if (typeof pptxViewerInstance.loadFile === 'function') {
+      await pptxViewerInstance.loadFile(pptxFile);
+    } else if (typeof pptxViewerInstance.load === 'function') {
+      await pptxViewerInstance.load(pptxFile);
+    } else {
+      throw new Error('loadFile metod topilmadi');
+    }
+
+    if (typeof pptxViewerInstance.render === 'function') {
+      await pptxViewerInstance.render(canvas);
+    }
+
+    pptxTotalSlides = pptxViewerInstance.slideCount
+      || (typeof pptxViewerInstance.getSlideCount === 'function' ? pptxViewerInstance.getSlideCount() : 0)
+      || (pptxViewerInstance.slides ? pptxViewerInstance.slides.length : 0)
+      || 1;
+
+    pptxCurrentIndex = 0;
+    counter.textContent = (pptxCurrentIndex + 1) + ' / ' + pptxTotalSlides;
+    loading.style.display = 'none';
+    canvas.style.display = 'block';
+
+    async function goTo(idx) {
+      if (idx < 0 || idx >= pptxTotalSlides) return;
+      pptxCurrentIndex = idx;
+      try {
+        if (typeof pptxViewerInstance.goToSlide === 'function') {
+          await pptxViewerInstance.goToSlide(idx);
+        } else if (typeof pptxViewerInstance.renderSlide === 'function') {
+          await pptxViewerInstance.renderSlide(idx);
+        } else if (idx > pptxCurrentIndex && typeof pptxViewerInstance.nextSlide === 'function') {
+          await pptxViewerInstance.nextSlide();
+        } else if (idx < pptxCurrentIndex && typeof pptxViewerInstance.prevSlide === 'function') {
+          await pptxViewerInstance.prevSlide();
+        }
+        if (typeof pptxViewerInstance.render === 'function') {
+          await pptxViewerInstance.render(canvas);
+        }
+      } catch (e) {
+        console.warn('Slide navigation error', e);
+      }
+      counter.textContent = (pptxCurrentIndex + 1) + ' / ' + pptxTotalSlides;
+    }
+
+    document.getElementById('pptxPrevBtn').onclick = () => goTo(pptxCurrentIndex - 1);
+    document.getElementById('pptxNextBtn').onclick = () => goTo(pptxCurrentIndex + 1);
+    document.getElementById('pptxDownloadBtn').onclick = () => downloadFile(file);
+    document.getElementById('pptxCloseBtn').onclick = () => {
+      overlay.classList.remove('active');
+      if (pptxKeyHandler) {
+        document.removeEventListener('keydown', pptxKeyHandler);
+        pptxKeyHandler = null;
+      }
+      pptxViewerInstance = null;
+    };
+
+    pptxKeyHandler = (e) => {
+      if (!overlay.classList.contains('active')) return;
+      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+        e.preventDefault();
+        goTo(pptxCurrentIndex + 1);
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        e.preventDefault();
+        goTo(pptxCurrentIndex - 1);
+      } else if (e.key === 'Escape') {
+        document.getElementById('pptxCloseBtn').click();
+      }
+    };
+    document.addEventListener('keydown', pptxKeyHandler);
+
+  } catch (err) {
+    console.error('PPTX viewer error:', err);
+    loading.style.display = 'block';
+    loading.innerHTML = 'Slaydlarni ochib bo\'lmadi.<br><small style="opacity:0.7">' + (err.message || err) + '</small><br><br>Yuklab olib PowerPoint da oching.';
+    canvas.style.display = 'none';
+    document.getElementById('pptxDownloadBtn').onclick = () => downloadFile(file);
+    document.getElementById('pptxCloseBtn').onclick = () => overlay.classList.remove('active');
+  }
 }
+
 function addToHistory(f) {
   let box = document.getElementById('receivedHistory');
   if (!box) {
@@ -128,7 +255,7 @@ function showReceivedFile(val) {
     btn.textContent = 'PDF ni ochish'; btn.onclick = () => openPdfViewer(val); actions.appendChild(btn);
   } else if (cat === 'pptx') {
     const btn = document.createElement('button'); btn.className = 'primary';
-    btn.textContent = 'PowerPoint haqida'; btn.onclick = () => openPptxViewer(val); actions.appendChild(btn);
+    btn.textContent = 'Slaydlarni ochish'; btn.onclick = () => openPptxViewer(val); actions.appendChild(btn);
   }
   const dl = document.createElement('button'); dl.className = 'secondary';
   dl.textContent = 'Yuklab olish'; dl.onclick = () => downloadFile(val); actions.appendChild(dl);
@@ -314,7 +441,7 @@ async function startScanner() {
 }
 async function stopScanner() {
   if (html5QrCode) {
-    try { await html5QrCode.stop(); } catch(e) {}
+    try { await html5Qrcode.stop(); } catch(e) {}
     try { html5QrCode.clear(); } catch(e) {}
     html5QrCode = null;
   }
