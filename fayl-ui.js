@@ -111,8 +111,8 @@ async function openPptxViewer(file) {
 
   function applyZoom() {
     const z = window._pptxZoom || 1;
-    const maxW = window.innerWidth - 32;
-    const maxH = window.innerHeight - 80;
+    const maxW = window.innerWidth - 16;
+    const maxH = window.innerHeight - 16;
     let baseW = Math.min(maxW, 1280);
     let baseH = baseW * 9 / 16;
     if (baseH > maxH) { baseH = maxH; baseW = baseH * 16 / 9; }
