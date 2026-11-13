@@ -108,10 +108,7 @@ async function openPptxViewer(file) {
     }
 
     let blob;
-    if (typeof file.data === 'string' && file.data.startsWith('blob:')) {
-      const res = await fetch(file.data);
-      blob = await res.blob();
-    } else if (typeof file.data === 'string' && file.data.startsWith('data:')) {
+    if (typeof file.data === 'string' && (file.data.startsWith('blob:') || file.data.startsWith('data:'))) {
       const res = await fetch(file.data);
       blob = await res.blob();
     } else {
@@ -122,15 +119,16 @@ async function openPptxViewer(file) {
       type: 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
     });
 
-    // Canvas ni viewportga moslab katta qilish
-    const body = canvas.parentElement;
-    const availW = Math.max(body.clientWidth - 16, window.innerWidth - 32);
-    const availH = Math.max(body.clientHeight - 16, window.innerHeight - 90);
+    // Ekranga sig'adigan o'lcham (toolbar ~56px)
+    const maxW = Math.min(window.innerWidth - 24, 1600);
+    const maxH = Math.min(window.innerHeight - 70, 900);
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    canvas.width = Math.floor(availW * dpr);
-    canvas.height = Math.floor(availH * dpr);
-    canvas.style.width = availW + 'px';
-    canvas.style.height = availH + 'px';
+    canvas.width = Math.floor(maxW * dpr);
+    canvas.height = Math.floor(maxH * dpr);
+    canvas.style.width = maxW + 'px';
+    canvas.style.height = maxH + 'px';
+    canvas.style.maxWidth = '100%';
+    canvas.style.maxHeight = 'calc(100vh - 70px)';
 
     const ViewerClass = PptxViewJS.PPTXViewer || PptxViewJS.default || PptxViewJS;
     pptxViewerInstance = new ViewerClass({
@@ -139,49 +137,42 @@ async function openPptxViewer(file) {
       backgroundColor: '#111111'
     });
 
-    if (typeof pptxViewerInstance.loadFile === 'function') {
-      await pptxViewerInstance.loadFile(pptxFile);
-    } else if (typeof pptxViewerInstance.load === 'function') {
-      await pptxViewerInstance.load(pptxFile);
-    } else {
-      throw new Error('loadFile metod topilmadi');
-    }
+    await pptxViewerInstance.loadFile(pptxFile);
+    await pptxViewerInstance.render(canvas, { quality: 'high' });
 
-    if (typeof pptxViewerInstance.render === 'function') {
-      await pptxViewerInstance.render(canvas, { quality: 'high', scale: 1 });
-    }
+    pptxTotalSlides = (typeof pptxViewerInstance.getSlideCount === 'function'
+      ? pptxViewerInstance.getSlideCount()
+      : (pptxViewerInstance.slideCount || 1)) || 1;
+    pptxCurrentIndex = (typeof pptxViewerInstance.getCurrentSlideIndex === 'function'
+      ? pptxViewerInstance.getCurrentSlideIndex()
+      : 0) || 0;
 
-    pptxTotalSlides = pptxViewerInstance.slideCount
-      || (typeof pptxViewerInstance.getSlideCount === 'function' ? pptxViewerInstance.getSlideCount() : 0)
-      || (pptxViewerInstance.slides ? pptxViewerInstance.slides.length : 0)
-      || 1;
-
-    pptxCurrentIndex = 0;
     counter.textContent = (pptxCurrentIndex + 1) + ' / ' + pptxTotalSlides;
     loading.style.display = 'none';
     canvas.style.display = 'block';
 
     async function goTo(idx) {
       if (idx < 0 || idx >= pptxTotalSlides) return;
-      pptxCurrentIndex = idx;
       try {
         if (typeof pptxViewerInstance.goToSlide === 'function') {
-          await pptxViewerInstance.goToSlide(idx, canvas);
+          await pptxViewerInstance.goToSlide(idx);
+        } else if (idx > pptxCurrentIndex && typeof pptxViewerInstance.nextSlide === 'function') {
+          await pptxViewerInstance.nextSlide();
+        } else if (idx < pptxCurrentIndex && typeof pptxViewerInstance.previousSlide === 'function') {
+          await pptxViewerInstance.previousSlide();
         } else if (typeof pptxViewerInstance.renderSlide === 'function') {
           await pptxViewerInstance.renderSlide(idx, canvas, { quality: 'high' });
-        } else if (idx > pptxCurrentIndex && typeof pptxViewerInstance.nextSlide === 'function') {
-          await pptxViewerInstance.nextSlide(canvas);
-        } else if (idx < pptxCurrentIndex && (typeof pptxViewerInstance.previousSlide === 'function' || typeof pptxViewerInstance.prevSlide === 'function')) {
-          const prev = pptxViewerInstance.previousSlide || pptxViewerInstance.prevSlide;
-          await prev.call(pptxViewerInstance, canvas);
         }
-        if (typeof pptxViewerInstance.render === 'function') {
+        if (typeof pptxViewerInstance.render === 'function' && typeof pptxViewerInstance.goToSlide !== 'function') {
           await pptxViewerInstance.render(canvas, { quality: 'high' });
         }
+        pptxCurrentIndex = (typeof pptxViewerInstance.getCurrentSlideIndex === 'function')
+          ? pptxViewerInstance.getCurrentSlideIndex()
+          : idx;
+        counter.textContent = (pptxCurrentIndex + 1) + ' / ' + pptxTotalSlides;
       } catch (e) {
         console.warn('Slide navigation error', e);
       }
-      counter.textContent = (pptxCurrentIndex + 1) + ' / ' + pptxTotalSlides;
     }
 
     document.getElementById('pptxPrevBtn').onclick = () => goTo(pptxCurrentIndex - 1);
@@ -193,6 +184,7 @@ async function openPptxViewer(file) {
         document.removeEventListener('keydown', pptxKeyHandler);
         pptxKeyHandler = null;
       }
+      try { if (pptxViewerInstance && pptxViewerInstance.destroy) pptxViewerInstance.destroy(); } catch(e) {}
       pptxViewerInstance = null;
     };
 
