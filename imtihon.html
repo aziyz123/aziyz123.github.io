@@ -148,6 +148,16 @@
   .tbar i.low{ background:#E5534B; }
   #warnBar{ display:none; background:#B23A3A; color:#fff; padding:10px 12px; border-radius:8px; margin-top:12px; font-size:13px; font-weight:600; line-height:1.4; }
   #playScreen{ user-select:none; -webkit-user-select:none; }
+  #qOverlay{ display:none; position:fixed; inset:0; z-index:60; background:var(--stage,#12151C); overflow:auto; padding:24px 20px 40px; }
+  #qOverlay .qo-in{ max-width:900px; margin:0 auto; }
+  .qo-q{ font-family:'Archivo',sans-serif; font-weight:800; font-size:clamp(24px,4vw,40px); line-height:1.35; margin:14px 0 24px; }
+  .qo-opt{ display:flex; gap:12px; align-items:center; padding:16px 18px; margin-bottom:12px; border-radius:12px; border:2px solid rgba(255,255,255,0.12); background:var(--stage-2); font-size:clamp(18px,2.6vw,28px); font-weight:600; }
+  .qo-opt.ok{ border-color:#3BB273; background:rgba(59,178,115,.18); }
+  .qo-opt b{ font-family:'IBM Plex Mono',monospace; color:var(--gold); }
+  .qo-opt .cnt{ margin-left:auto; font-family:'IBM Plex Mono',monospace; font-size:.7em; color:rgba(243,239,228,.65); white-space:nowrap; }
+  .qo-nav{ display:flex; gap:10px; margin-top:20px; flex-wrap:wrap; }
+  .qo-nav button{ flex:1; min-width:110px; }
+  .qrow{ cursor:pointer; }
 </style>
 </head>
 <body>
@@ -221,6 +231,7 @@ Javob: C</div>
   </div>
 
   <div id="leaveToasts"></div>
+  <div id="qOverlay"><div class="qo-in" id="qoBody"></div></div>
   <div id="hostMonitor" style="display:none;">
     <div class="card">
       <h2>Jarayon (<span id="pCount2">0</span> ishtirokchi)</h2>
@@ -238,6 +249,10 @@ Javob: C</div>
         <button class="primary" id="exportPdfBtn" style="margin-top:0;">🖨 PDF</button>
         <button class="primary" id="exportWordBtn" style="margin-top:0; background:linear-gradient(135deg, var(--t2), var(--t4)); color:#fff;">📄 Word (.docx)</button>
       </div>
+    </div>
+    <div class="card">
+      <h2>🔎 Savollar tahlili — bosib, hammaga tushuntiring</h2>
+      <div id="qAnalysisList"></div>
     </div>
     <button class="primary" id="newExamBtn">Yangi test yaratish</button>
   </div>
@@ -648,6 +663,7 @@ function runHostView(){
     document.getElementById('hostLeaderboard').style.display = 'block';
     R = buildReport(participants);
     const medals = ['🥇','🥈','🥉'];
+    renderQAnalysis();
     document.getElementById('leaderboardList').innerHTML = R.res.length ? R.res.map((r, i) => {
       const flag = r.leaves ? '<span class="lb-flag">⚠️×' + r.leaves + '</span>' : '';
       return '<div class="leaderboard-row' + (i===0?' top1':'') + '" style="flex-wrap:wrap;">' +
@@ -659,6 +675,58 @@ function runHostView(){
         '</div>';
     }).join('') : '<div class="empty-note">Hech kim testni ishlamadi.</div>';
   }
+
+
+  // ---------- Savolni katta ochib tushuntirish ----------
+  function optStats(qi){
+    const q = examQuestions[qi], cnt = q.options ? q.options.map(() => 0) : [], wrongNames = [];
+    let none = 0;
+    R.res.forEach(r => {
+      const a = r.ans[qi];
+      if(!a){ none++; wrongNames.push(r.p.name); return; }
+      if(!a.ok) wrongNames.push(r.p.name);
+      if(q.type === 'mc' && a.txt && a.ord){
+        const sh = LETTERS.indexOf(a.txt[0]); const orig = sh >= 0 ? LETTERS.indexOf(a.ord[sh]) : -1;
+        if(orig >= 0 && cnt[orig] != null) cnt[orig]++;
+      } else if(!a.txt) none++;
+    });
+    return { cnt, wrongNames, none };
+  }
+  function renderQAnalysis(){
+    const rows = examQuestions.map((q, qi) => {
+      const st = optStats(qi), total = R.res.length || 1, bad = st.wrongNames.length;
+      return { qi, bad, pct: Math.round((total - bad) / total * 100) };
+    });
+    rows.sort((a, b) => b.bad - a.bad || a.qi - b.qi);
+    document.getElementById('qAnalysisList').innerHTML = rows.map(r =>
+      '<div class="participant-row qrow" data-qi="' + r.qi + '"><span>' + (r.qi + 1) + '. ' + escapeHtml(examQuestions[r.qi].question.slice(0, 60)) + (examQuestions[r.qi].question.length > 60 ? '…' : '') +
+      '</span><span class="p-status ' + (r.bad ? 'violated' : 'finished') + '">' + r.bad + ' xato · ' + r.pct + '%</span></div>').join('');
+    document.querySelectorAll('#qAnalysisList .qrow').forEach(el => el.addEventListener('click', () => openQ(+el.dataset.qi)));
+  }
+  function openQ(qi){
+    const q = examQuestions[qi], st = optStats(qi), total = R.res.length;
+    let h = '<div class="qtag">Savol ' + (qi + 1) + ' / ' + examQuestions.length + ' · to\'g\'ri topganlar: ' + (total - st.wrongNames.length) + ' / ' + total + '</div>' +
+      '<div class="qo-q">' + escapeHtml(q.question) + '</div>';
+    if(q.type === 'mc'){
+      h += q.options.map((o, i) => '<div class="qo-opt' + (i === q.correctIndex ? ' ok' : '') + '"><b>' + LETTERS[i] + ')</b> ' + escapeHtml(o) +
+        (i === q.correctIndex ? ' ✓' : '') + '<span class="cnt">' + st.cnt[i] + ' kishi tanladi</span></div>').join('');
+    } else {
+      h += '<div class="qo-opt ok">✓ ' + escapeHtml(q.answer) + '</div>';
+    }
+    if(st.wrongNames.length) h += '<div class="hint" style="font-size:15px;margin-top:14px;">Topa olmaganlar: ' + st.wrongNames.map(escapeHtml).join(', ') + '</div>';
+    h += '<div class="qo-nav"><button class="primary" id="qoPrev" style="margin-top:0">← Oldingi</button><button class="primary" id="qoClose" style="margin-top:0;background:#555;color:#fff">✕ Yopish</button><button class="primary" id="qoNext" style="margin-top:0">Keyingi →</button></div>';
+    document.getElementById('qoBody').innerHTML = h;
+    const ov = document.getElementById('qOverlay'); ov.style.display = 'block'; ov.scrollTop = 0;
+    document.getElementById('qoClose').onclick = () => { ov.style.display = 'none'; };
+    document.getElementById('qoPrev').onclick = () => openQ((qi - 1 + examQuestions.length) % examQuestions.length);
+    document.getElementById('qoNext').onclick = () => openQ((qi + 1) % examQuestions.length);
+  }
+  document.addEventListener('keydown', (e) => {
+    const ov = document.getElementById('qOverlay'); if(ov.style.display !== 'block') return;
+    if(e.key === 'Escape') ov.style.display = 'none';
+    if(e.key === 'ArrowRight') document.getElementById('qoNext').click();
+    if(e.key === 'ArrowLeft') document.getElementById('qoPrev').click();
+  });
 
   // ---------- Eksport ----------
   const fileBase = () => (document.getElementById('testNameInput').value.trim() || 'test-natijalari').replace(/[\\/:*?"<>|]+/g, '_');
