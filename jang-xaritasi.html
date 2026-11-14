@@ -63,6 +63,7 @@
         <label for="scn">Yangi jang: AI javobini shu yerga joylang (o'zi yuklanadi)</label>
         <textarea id="scn" spellcheck="false" placeholder="AI bergan javobni shu yerga qo'ying — kod yozishingiz shart emas"></textarea>
         <div class="row"><button id="loadBtn" class="alt">Yuklash</button></div>
+        <div class="msg err" id="scnErr" style="display:none;white-space:pre-wrap;font-size:12px;"></div>
       </div>
 
       <div class="card">
@@ -193,14 +194,66 @@ DEMO.note = "Manbalarda qo'shin soni farq qiladi; raqamlar taxminiy, fillar soni
 const LIB = { anqara: DEMO, ehromlar: PYR };
 
 function cleanJson(raw){
-  let x = String(raw || '').replace(/[“”„]/g, '"').replace(/ /g, ' ');
-  x = x.replace(/```(?:json)?/gi, '');
+  let x = String(raw || '').replace(/[“”„‟]/g, '"').replace(/[‘’‚‛]/g, "'").replace(/ /g, ' ').replace(/[​-‍﻿]/g, '');
+  x = x.replace(/```(?:json|javascript|js)?/gi, '');
   const i = x.indexOf('{'), j = x.lastIndexOf('}');
-  if(i < 0) throw new Error('JSON topilmadi — "{" belgisi yo\'q.');
-  if(j < i) throw new Error('Javob to\'liq emas (oxiri kesilgan). AI javobini oxirigacha nusxalang yoki "davom et" deb so\'rang.');
+  if(i < 0) throw new Error('JSON topilmadi: matnda "{" belgisi yo\'q. AI javobi o\'rniga uning savoli yoki xatosini joylab yubormadingizmi?');
+  if(j < i) throw new Error('Javob to\'liq emas (oxiri kesilgan). AI javobini oxirigacha nusxalang yoki AI\'ga "davom et" deb yozing.');
   x = x.slice(i, j + 1);
-  x = x.replace(/^\s*\/\/.*$/gm, '').replace(/\/\*[\s\S]*?\*\//g, '').replace(/,\s*([}\]])/g, '$1');
+  x = x.replace(/^\s*\/\/.*$/gm, '').replace(/\/\*[\s\S]*?\*\//g, '');
+  x = x.replace(/\[(\d+)\]/g, '');                         // [1] kabi havola raqamlarini olib tashlash
+  x = x.replace(/\bTrue\b/g, 'true').replace(/\bFalse\b/g, 'false').replace(/\bNone\b|\bundefined\b|\bNaN\b/g, 'null');
+  x = x.replace(/:\s*(\d{1,3}(?:[,  ]\d{3})+)(\s*[,}\]])/g, (m, n, e) => ': ' + n.replace(/\D/g, '') + e);   // 30,000 -> 30000
+  x = x.replace(/([{,]\s*)([A-Za-z_][A-Za-z0-9_]*)\s*:/g, '$1"$2":');   // qo'shtirnoqsiz kalitlar
+  x = x.replace(/,(\s*[}\]])/g, '$1');                      // oxirgi vergul
   return x;
+}
+function parseLoose(raw){
+  const x = cleanJson(raw);
+  try{ return JSON.parse(x); }
+  catch(e1){
+    let msgTxt = e1.message, m = /position (\d+)/.exec(e1.message);
+    if(m){ const p = +m[1]; const lines = x.slice(0, p).split('\n'); msgTxt = (lines.length) + '-qator: ..."' + x.slice(Math.max(0, p - 40), p).replace(/\n/g, ' ') + ' ⟵ SHU YERDA XATO ⟶ ' + x.slice(p, p + 25).replace(/\n/g, ' ') + '"'; }
+    throw new Error('JSON tuzilishi buzuq. ' + msgTxt + '\nBu AI xatosi: unga "JSON\'ni to\'g\'rilab, faqat JSON qilib qayta yoz" deb yozing.');
+  }
+}
+const KIND_ALIAS = { infantry: 'piyoda', foot: 'piyoda', cavalry: 'otliq', horse: 'otliq', horsemen: 'otliq', archers: 'kamonchi', archer: 'kamonchi', musketeers: 'miltiqchi', musketeer: 'miltiqchi', riflemen: 'miltiqchi', artillery: 'top', cannon: 'top', cannons: 'top', guns: 'top', elephants: 'fil', elephant: 'fil', "to'p": 'top', "to'plar": 'top', fillar: 'fil', otliqlar: 'otliq', piyodalar: 'piyoda', kamonchilar: 'kamonchi', miltiqchilar: 'miltiqchi' };
+const ALIASES = { sides: ['sides', 'armies', 'forces', 'tomonlar', 'qoshinlar', "qo'shinlar"], stages: ['stages', 'phases', 'steps', 'bosqichlar', 'bosqich'], groups: ['groups', 'units', 'guruhlar', 'armies'] };
+function pick(o, names){ for(const n of names) if(o && o[n] != null) return o[n]; return undefined; }
+function normalizeScenario(sc, warns){
+  if(!sc || typeof sc !== 'object') throw new Error('Ssenariy obyekt emas.');
+  const keys = Object.keys(sc).join(', ');
+  const sides = pick(sc, ALIASES.sides), stages = pick(sc, ALIASES.stages);
+  if(!Array.isArray(sides)) throw new Error('"sides" (tomonlar) ro\'yxati topilmadi. Topilgan kalitlar: ' + keys);
+  if(!Array.isArray(stages) || !stages.length) throw new Error('"stages" (bosqichlar) ro\'yxati topilmadi yoki bo\'sh. Topilgan kalitlar: ' + keys);
+  if(sides.length < 2) throw new Error('Kamida 2 ta tomon kerak, topilgani: ' + sides.length);
+  if(sides.length > 2) warns.push('2 tomondan ortiq berilgan — faqat birinchi ikkitasi olindi.');
+  const out = { title: String(sc.title || 'JANG'), year: sc.year || '', topic: sc.topic || '', terrain: sc.terrain || '', features: Array.isArray(sc.features) ? sc.features : [], result: sc.result || '', note: sc.note || '', sources: Array.isArray(sc.sources) ? sc.sources : [] };
+  const ids = {}; const colors = ['#C62828', '#2E9E4F'];
+  out.sides = sides.slice(0, 2).map((sd, si) => {
+    const gr = pick(sd, ALIASES.groups);
+    if(!Array.isArray(gr) || !gr.length){ warns.push((si + 1) + '-tomonda guruhlar yo\'q — bitta umumiy guruh qo\'shildi.'); }
+    const groups = (Array.isArray(gr) && gr.length ? gr : [{ name: sd.name || 'Qo\'shin', count: sd.count || sd.troops || 10000, kind: 'piyoda', commander: true }]).map((g, gi) => {
+      let kind = String(g.kind || g.type || 'piyoda').toLowerCase().trim(); kind = KIND_ALIAS[kind] || kind;
+      if(!['piyoda', 'otliq', 'kamonchi', 'miltiqchi', 'top', 'fil'].includes(kind)){ warns.push('"' + (g.name || g.id) + '": noma\'lum tur "' + kind + '" — piyoda deb olindi.'); kind = 'piyoda'; }
+      const num = v => { const n = parseFloat(String(v).replace(/[^\d.]/g, '')); return isFinite(n) ? n : NaN; };
+      let id = String(g.id || (si ? 'b' : 'a') + (gi + 1)); if(ids[id]) id += '_' + gi; ids[id] = 1;
+      let x = num(g.x), y = num(g.y);
+      if(isNaN(x) || isNaN(y)){ x = 12 + (gi % 4) * 25; y = si ? 22 + Math.floor(gi / 4) * 10 : 78 - Math.floor(gi / 4) * 10; warns.push('"' + (g.name || id) + '": joyi (x,y) berilmagan — avtomatik qo\'yildi.'); }
+      return Object.assign({}, g, { id, kind, count: num(g.count) || (kind === 'top' || kind === 'fil' ? 6 : 1000), x: Math.max(0, Math.min(100, x)), y: Math.max(0, Math.min(100, y)) });
+    });
+    if(!groups.some(g => g.commander) && groups.length) groups[0].commander = true;
+    return { name: sd.name || ('Tomon ' + (si + 1)), color: /^#[0-9a-f]{3,8}$/i.test(sd.color || '') ? sd.color : colors[si], commander: sd.commander || sd.leader || sd.general || '', groups };
+  });
+  out.stages = stages.map((st, i) => {
+    const o = { text: st.text || st.title || st.description || ('Bosqich ' + (i + 1)), dur: +st.dur || +st.duration || 5, arrows: st.arrows };
+    const cam = Array.isArray(st.cam) ? st.cam.map(Number) : null; o.cam = cam && cam.length >= 2 && cam.every(isFinite) ? [cam[0], cam[1], cam[2] || 1] : [50, 50, 1];
+    o.moves = (Array.isArray(st.moves) ? st.moves : []).map(m => { const to = Array.isArray(m.to) ? m.to : (m.x != null ? [m.x, m.y] : null); return { g: m.g || m.group || m.id, to: to && to.map(Number) }; }).filter(m => { const ok = ids[m.g] && m.to && m.to.length >= 2 && m.to.every(isFinite); if(!ok) warns.push((i + 1) + '-bosqich: harakat o\'tkazib yuborildi (guruh "' + m.g + '" topilmadi yoki joyi noto\'g\'ri).'); return ok; });
+    if(st.losses && typeof st.losses === 'object'){ o.losses = {}; Object.keys(st.losses).forEach(k => { let v = parseFloat(st.losses[k]); if(!ids[k] || !isFinite(v)){ warns.push((i + 1) + '-bosqich: yo\'qotish "' + k + '" o\'tkazib yuborildi.'); return; } if(v > 1) v = v / 100; o.losses[k] = Math.max(0, Math.min(1, v)); }); }
+    if(Array.isArray(st.defect)) o.defect = st.defect.filter(d => ids[d.g] && (d.to === 0 || d.to === 1));
+    return o;
+  });
+  return out;
 }
 
 const $ = id => document.getElementById(id);
@@ -574,11 +627,14 @@ function drawOverlay(tm, k, gn, v){
 // ---------- Boshqaruv ----------
 function loadScenario(text){
   try{
-    const sc = JSON.parse(cleanJson(text));
+    const warns = [];
+    const sc = normalizeScenario(parseLoose(text), warns);
     model = buildModel(sc); S = sc; t = 0; playing = false; $('playBtn').textContent = '▶ Boshlash';
     if(sc.topic && !topicOverride) $('topic').placeholder = sc.topic;
-    showSrc(sc); render(0); msg('Yuklandi: ' + sc.title + ' · ' + Math.round(model.total) + ' soniya'); return true;
-  }catch(e){ msg('Ssenariyda xato: ' + e.message, true); return false; }
+    showSrc(sc); render(0); msg('Yuklandi: ' + sc.title + ' · ' + Math.round(model.total) + ' soniya' + (warns.length ? ' (' + warns.length + ' ta ogohlantirish)' : ''));
+    const eb = $('scnErr'); eb.style.display = warns.length ? 'block' : 'none'; eb.className = 'msg'; eb.style.color = '#f0d58a'; eb.textContent = warns.length ? 'Diqqat (video baribir tayyor):\n• ' + warns.slice(0, 8).join('\n• ') : '';
+    return true;
+  }catch(e){ msg('Ssenariyda xato — pastga qarang.', true); const eb = $('scnErr'); eb.style.display = 'block'; eb.className = 'msg err'; eb.style.color = ''; eb.textContent = '❌ ' + e.message; return false; }
 }
 function showSrc(sc){
   const box = $('srcBox'); const has = sc.note || (sc.sources && sc.sources.length);
