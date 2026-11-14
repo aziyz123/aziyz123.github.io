@@ -109,17 +109,18 @@ const DEMO = {
   sides: [
     { name: "Temuriylar", color: "#C62828", commander: "Amir Temur",
       groups: [
-        { id: "t1", name: "Markaz", kind: "piyoda", count: 40000, x: 46, y: 80, commander: true },
-        { id: "t2", name: "O'ng qanot (otliq)", kind: "otliq", count: 35000, x: 76, y: 78 },
-        { id: "t3", name: "Chap qanot (otliq)", kind: "otliq", count: 35000, x: 16, y: 78 },
-        { id: "t4", name: "Zaxira", kind: "kamonchi", count: 20000, x: 46, y: 92 }
+        { id: "t1", name: "Markaz", kind: "piyoda", weapon: "nayza, qilich", count: 40000, x: 46, y: 80, commander: true },
+        { id: "t2", name: "O'ng qanot (otliq)", kind: "otliq", weapon: "kamon, qilich", count: 35000, x: 76, y: 78 },
+        { id: "t3", name: "Chap qanot (otliq)", kind: "otliq", weapon: "kamon, qilich", count: 35000, x: 16, y: 78 },
+        { id: "t4", name: "Zaxira", kind: "kamonchi", weapon: "kamon", count: 20000, x: 46, y: 92 },
+        { id: "t5", name: "Jang fillari", kind: "fil", count: 8, x: 60, y: 88 }
       ] },
     { name: "Usmoniylar", color: "#2E9E4F", commander: "Yildirim Boyazid",
       groups: [
-        { id: "u1", name: "Markaz (yanichar)", kind: "piyoda", count: 25000, x: 46, y: 34, commander: true },
-        { id: "u2", name: "Serb otliqlari", kind: "otliq", count: 10000, x: 22, y: 30 },
-        { id: "u3", name: "Anadolu beklari qo'shini", kind: "otliq", count: 40000, x: 74, y: 30 },
-        { id: "u4", name: "Kamonchilar", kind: "kamonchi", count: 10000, x: 46, y: 20 }
+        { id: "u1", name: "Markaz (yanichar)", kind: "piyoda", weapon: "kamon, qilich", count: 25000, x: 46, y: 34, commander: true },
+        { id: "u2", name: "Serb otliqlari", kind: "otliq", weapon: "nayza, qilich", count: 10000, x: 22, y: 30 },
+        { id: "u3", name: "Anadolu beklari qo'shini", kind: "otliq", weapon: "kamon, qilich", count: 40000, x: 74, y: 30 },
+        { id: "u4", name: "Kamonchilar", kind: "kamonchi", weapon: "kamon", count: 10000, x: 46, y: 20 }
       ] }
   ],
   stages: [
@@ -149,25 +150,27 @@ const PYR = {
   sides: [
     { name: "Fransiya", color: "#2F5DA8", commander: "Napoleon Bonapart",
       groups: [
-        { id: "f1", name: "Desaix bo'linmasi", kind: "piyoda", count: 4500, x: 16, y: 22 },
-        { id: "f2", name: "Reynier bo'linmasi", kind: "piyoda", count: 4500, x: 32, y: 20 },
-        { id: "f3", name: "Dugua bo'linmasi", kind: "piyoda", count: 4500, x: 48, y: 20 },
-        { id: "f4", name: "Vial bo'linmasi", kind: "piyoda", count: 4000, x: 62, y: 20 },
-        { id: "f5", name: "Bon bo'linmasi", kind: "piyoda", count: 4500, x: 76, y: 22 },
-        { id: "fc", name: "Otliq (kvadratlar orasida)", kind: "otliq", count: 3000, x: 46, y: 10, commander: true }
+        { id: "f1", name: "Desaix bo'linmasi", kind: "miltiqchi", weapon: "miltiq, shtik", count: 4500, x: 16, y: 22 },
+        { id: "f2", name: "Reynier bo'linmasi", kind: "miltiqchi", weapon: "miltiq, shtik", count: 4500, x: 32, y: 20 },
+        { id: "f3", name: "Dugua bo'linmasi", kind: "miltiqchi", weapon: "miltiq, shtik", count: 4500, x: 48, y: 20 },
+        { id: "f4", name: "Vial bo'linmasi", kind: "miltiqchi", weapon: "miltiq, shtik", count: 4000, x: 62, y: 20 },
+        { id: "f5", name: "Bon bo'linmasi", kind: "miltiqchi", weapon: "miltiq, shtik", count: 4500, x: 76, y: 22 },
+        { id: "fa", name: "Fransuz to'plari (kvadrat burchaklarida)", kind: "top", weapon: "dala to'pi", count: 6, x: 46, y: 24 },
+        { id: "fc", name: "Otliq (kvadratlar orasida)", kind: "otliq", weapon: "qilich, to'pponcha", count: 3000, x: 46, y: 10, commander: true }
       ] },
     { name: "Mamluklar", color: "#D8A21E", commander: "Murod bey",
       groups: [
-        { id: "m1", name: "Mamluk otliqlari (chap)", kind: "otliq", count: 3000, x: 28, y: 66 },
-        { id: "m2", name: "Mamluk otliqlari (markaz)", kind: "otliq", count: 3000, x: 50, y: 66, commander: true },
-        { id: "mg", name: "Imbaba garnizoni", kind: "piyoda", count: 10000, x: 78, y: 76 },
-        { id: "ml", name: "Bikatil piyodalari", kind: "piyoda", count: 5000, x: 12, y: 72 }
+        { id: "m1", name: "Mamluk otliqlari (chap)", kind: "otliq", weapon: "qilich, nayza, to'pponcha", count: 3000, x: 28, y: 66 },
+        { id: "m2", name: "Mamluk otliqlari (markaz)", kind: "otliq", weapon: "qilich, nayza, to'pponcha", count: 3000, x: 50, y: 66, commander: true },
+        { id: "mg", name: "Imbaba garnizoni", kind: "piyoda", weapon: "qilich, eski miltiq", count: 10000, x: 78, y: 76 },
+        { id: "mt", name: "Imbaba mudofaa to'plari", kind: "top", weapon: "qal'a to'pi", count: 5, x: 74, y: 80 },
+        { id: "ml", name: "Bikatil piyodalari", kind: "piyoda", weapon: "qilich, nayza", count: 5000, x: 12, y: 72 }
       ] }
   ],
   stages: [
     { text: "Napoleon Nil bo'yida, Imbaba qishlog'i yaqinida Murod bey qo'shiniga yetib keladi.", cam: [50,56,0.8], dur: 5 },
     { text: "Fransuzlar 5 ta bo'sh to'rtburchak (kvadrat) saf tuzadi: ichida otliq va yuk, burchaklarda to'p.", cam: [48,34,1.1], dur: 6,
-      moves: [{ g: "f1", to: [16,30] }, { g: "f2", to: [32,28] }, { g: "f3", to: [48,28] }, { g: "f4", to: [62,28] }, { g: "f5", to: [76,30] }, { g: "fc", to: [46,18] }] },
+      moves: [{ g: "f1", to: [16,30] }, { g: "f2", to: [32,28] }, { g: "f3", to: [48,28] }, { g: "f4", to: [62,28] }, { g: "f5", to: [76,30] }, { g: "fc", to: [46,18] }, { g: "fa", to: [46,34] }] },
     { text: "Mamluk otliqlari kvadratlarga qayta-qayta hujum qiladi.", cam: [46,42,1.3], dur: 6, arrows: true,
       moves: [{ g: "m1", to: [30,40] }, { g: "m2", to: [52,38] }] },
     { text: "Miltiq va to'p o'qi hujumni qaytaradi — otliq katta talafot ko'radi.", cam: [44,38,1.6], dur: 6,
@@ -175,15 +178,15 @@ const PYR = {
     { text: "Ayyub bey boshchiligidagi umumiy hujum ham muvaffaqiyatsiz tugaydi.", cam: [40,38,1.5], dur: 5,
       moves: [{ g: "m1", to: [24,36] }, { g: "m2", to: [44,36] }], losses: { m1: 0.25, m2: 0.3 } },
     { text: "Bon bo'linmasi ustun bo'lib hujum qilib, Imbaba qishlog'ini egallaydi.", cam: [72,62,1.6], dur: 6,
-      moves: [{ g: "f5", to: [76,66] }, { g: "f4", to: [64,62] }], losses: { mg: 0.4 }, arrows: true },
+      moves: [{ g: "f5", to: [76,66] }, { g: "f4", to: [64,62] }, { g: "fa", to: [66,50] }], losses: { mg: 0.4, mt: 0.3 }, arrows: true },
     { text: "Qochganlarning ko'pi Nilda cho'kadi. Yarador Murod bey Yuqori Misrga chekinadi.", cam: [70,66,1.4], dur: 6,
-      losses: { mg: 0.12, ml: 0.35, m1: 0.2, m2: 0.25 } }
+      losses: { mg: 0.12, ml: 0.35, m1: 0.2, m2: 0.25, mt: 0 } }
   ],
   result: "Fransiya g'alaba qozondi (~300 talafot); mamluklar taxminan 10 ming talafot ko'rdi. 24-iyulda Qohira egallandi.",
-  note: "Manbalarda qo'shin soni farq qiladi: fransuzlar ~20–25 ming, mamluk-usmonli qo'shin 21–54 ming (animatsiyada o'rta variant olindi).",
+  note: "Manbalarda qo'shin soni farq qiladi: fransuzlar ~20–25 ming, mamluk-usmonli qo'shin 21–54 ming (animatsiyada o'rta variant olindi). To'plar soni shartli (belgi sifatida).",
   sources: ["https://en.wikipedia.org/wiki/Battle_of_the_Pyramids", "https://napoleonguide.com/battle_pyramids.htm"]
 };
-DEMO.note = "Manbalarda qo'shin soni farq qiladi; raqamlar taxminiy. Darslikka solishtiring.";
+DEMO.note = "Manbalarda qo'shin soni farq qiladi; raqamlar taxminiy, fillar soni shartli. XV asr boshida to'p va miltiq jangning hal qiluvchi quroli emas edi — asosiy qurol kamon, qilich va nayza. Darslikka solishtiring.";
 const LIB = { anqara: DEMO, ehromlar: PYR };
 
 function cleanJson(raw){
@@ -210,26 +213,27 @@ function lerp(a, b, k){ return a + (b - a) * k; }
 function mulberry(a){ return function(){ a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
 
 // ---------- Ssenariyni modelga aylantirish ----------
-const KIND_ASPECT = { otliq: 3.2, piyoda: 2.2, kamonchi: 3, fil: 2, default: 2.4 };
+const SYM = { top: 1, fil: 1 };   // soni — to'p/fil dona (belgi sifatida)
+const KIND_ASPECT = { miltiqchi: 4, top: 3, otliq: 3.2, piyoda: 2.2, kamonchi: 3, fil: 2, default: 2.4 };
 function buildModel(sc){
   if(!sc || !Array.isArray(sc.sides) || sc.sides.length < 2) throw new Error('"sides" da kamida 2 ta tomon bo\'lishi kerak.');
   if(!Array.isArray(sc.stages) || !sc.stages.length) throw new Error('"stages" (bosqichlar) bo\'sh.');
   const groups = {}; const order = [];
   let total = 0;
-  sc.sides.forEach((sd, si) => (sd.groups || []).forEach(g => { total += +g.count || 0; }));
+  sc.sides.forEach((sd, si) => (sd.groups || []).forEach(g => { if(!SYM[g.kind]) total += +g.count || 0; }));
   const per = Math.max(1, total / 520);   // bitta nuqta = per jangchi
   sc.sides.forEach((sd, si) => (sd.groups || []).forEach((g, gi) => {
     const id = g.id || (si + '_' + gi);
-    const n = Math.max(6, Math.round((+g.count || 100) / per));
+    const sym = !!SYM[g.kind]; const n = sym ? Math.min(14, Math.max(3, +g.count || 4)) : Math.max(6, Math.round((+g.count || 100) / per)); const sp = sym ? 2.8 : 1.25;
     const rnd = mulberry(1000 * si + gi + 7);
     const asp = KIND_ASPECT[g.kind] || KIND_ASPECT.default;
     const cols = Math.max(2, Math.round(Math.sqrt(n * asp)));
     const dots = [];
     for(let i = 0; i < n; i++){
       const c = i % cols, r = Math.floor(i / cols), rows = Math.ceil(n / cols);
-      dots.push({ ox: (c - (cols - 1) / 2) * 1.25 + (rnd() - .5) * .5, oy: (r - (rows - 1) / 2) * 1.25 + (rnd() - .5) * .5, rn: rnd(), ph: rnd() * 6.28 });
+      dots.push({ ox: (c - (cols - 1) / 2) * sp + (rnd() - .5) * .5, oy: (r - (rows - 1) / 2) * sp + (rnd() - .5) * .5, rn: rnd(), ph: rnd() * 6.28 });
     }
-    groups[id] = { id, name: g.name || id, kind: g.kind || 'piyoda', count: +g.count || 0, side0: si, commander: !!g.commander, dots };
+    groups[id] = { id, name: g.name || id, weapon: g.weapon || '', kind: g.kind || 'piyoda', count: +g.count || 0, side0: si, commander: !!g.commander, dots };
     order.push(id);
   }));
   // bosqichlar bo'yicha holatlar (boshlanish/tugash)
@@ -297,11 +301,26 @@ function drawTerrain(v){
   vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, 'rgba(25,15,5,.55)');
   ctx.fillStyle = vg; ctx.fillRect(0, 0, W, H);
 }
-function drawDot(kind, x, y, r, col){
+function drawDot(kind, x, y, r, col, ang){
+  ang = ang == null ? -Math.PI / 2 : ang;
   ctx.fillStyle = col;
   if(kind === 'otliq'){ ctx.beginPath(); ctx.moveTo(x, y - r * 1.3); ctx.lineTo(x + r * 1.1, y); ctx.lineTo(x, y + r * 1.3); ctx.lineTo(x - r * 1.1, y); ctx.closePath(); ctx.fill(); }
-  else if(kind === 'fil'){ ctx.fillRect(x - r * 1.4, y - r * 1.4, r * 2.8, r * 2.8); }
-  else { ctx.beginPath(); ctx.arc(x, y, r, 0, 6.28); ctx.fill(); if(kind === 'kamonchi'){ ctx.strokeStyle = 'rgba(255,255,255,.7)'; ctx.lineWidth = Math.max(1, r * .35); ctx.stroke(); } }
+  else if(kind === 'top'){
+    ctx.save(); ctx.translate(x, y); ctx.rotate(ang + Math.PI / 2);
+    ctx.fillStyle = '#2a2a2a'; ctx.fillRect(-r * .45, -r * 3, r * .9, r * 3.2);
+    ctx.fillStyle = col; ctx.beginPath(); ctx.arc(0, 0, r * 1.6, 0, 6.28); ctx.fill();
+    ctx.strokeStyle = '#111'; ctx.lineWidth = Math.max(1, r * .3); ctx.stroke(); ctx.restore();
+  }
+  else if(kind === 'fil'){
+    ctx.fillStyle = '#8b8378'; ctx.beginPath(); ctx.ellipse(x, y, r * 2.6, r * 1.8, 0, 0, 6.28); ctx.fill();
+    ctx.fillStyle = col; ctx.beginPath(); ctx.arc(x, y - r * .2, r * 1.0, 0, 6.28); ctx.fill();
+    ctx.strokeStyle = '#6e675d'; ctx.lineWidth = r * .7; ctx.beginPath(); ctx.moveTo(x + Math.cos(ang) * r * 2.4, y + Math.sin(ang) * r * 1.6); ctx.lineTo(x + Math.cos(ang) * r * 4, y + Math.sin(ang) * r * 3); ctx.stroke();
+  }
+  else {
+    ctx.beginPath(); ctx.arc(x, y, r, 0, 6.28); ctx.fill();
+    if(kind === 'kamonchi'){ ctx.strokeStyle = 'rgba(255,255,255,.7)'; ctx.lineWidth = Math.max(1, r * .35); ctx.stroke(); }
+    if(kind === 'miltiqchi'){ ctx.strokeStyle = '#1b1b1b'; ctx.lineWidth = Math.max(1, r * .4); ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + Math.cos(ang) * r * 2.6, y + Math.sin(ang) * r * 2.6); ctx.stroke(); }
+  }
 }
 function star(x, y, R){ ctx.fillStyle = '#FFC93C'; ctx.strokeStyle = '#6b4b00'; ctx.lineWidth = Math.max(1, R * .12); ctx.beginPath(); for(let i = 0; i < 10; i++){ const a = -Math.PI / 2 + i * Math.PI / 5, r = i % 2 ? R * .45 : R; ctx.lineTo(x + Math.cos(a) * r, y + Math.sin(a) * r); } ctx.closePath(); ctx.fill(); ctx.stroke(); }
 function pill(text, x, y, size, opts){
@@ -327,6 +346,37 @@ function stateAt(tm){
   let k = sts.findIndex(s => tm >= s.t0 && tm < s.t1);
   if(k < 0) k = tm < sts[0].t0 ? -1 : sts.length;
   return k;
+}
+function nearestEnemy(id, gn){
+  const st = gn[id]; let best = null, bd = 1e9;
+  model.order.forEach(o => { const s2 = gn[o]; if(!s2 || s2.side === st.side || s2.alive < .05) return; const d = Math.hypot(s2.x - st.x, s2.y - st.y); if(d < bd){ bd = d; best = s2; } });
+  return best ? { st: best, d: bd } : null;
+}
+// to'p va miltiq o'qlari: o'q, olov, tutun
+function fireFX(tm, v, gn, k, r){
+  if(k < 0 || k >= model.stages.length) return;
+  model.order.forEach(id => {
+    const g = model.groups[id]; if(g.kind !== 'top' && g.kind !== 'miltiqchi') return;
+    const st = gn[id]; if(st.alive < .05) return;
+    const ne = nearestEnemy(id, gn); if(!ne) return;
+    const gun = g.kind === 'top', range = gun ? 60 : 30; if(ne.d > range) return;
+    const cyc = gun ? 3.4 : 2.4, ang = Math.atan2(ne.st.y - st.y, ne.st.x - st.x);
+    g.dots.forEach(d => {
+      if(d.rn >= st.alive || (!gun && d.rn > .3)) return;
+      const ph = (((tm + d.ph * .8) % cyc) + cyc) % cyc;
+      const bx = (st.x + d.ox) * v.s + v.ox, by = (st.y + d.oy) * v.s + v.oy;
+      const tx = (ne.st.x + (d.ox * .8)) * v.s + v.ox, ty = (ne.st.y + (d.oy * .8)) * v.s + v.oy;
+      const mx = bx + Math.cos(ang) * r * (gun ? 3.2 : 2.8), my = by + Math.sin(ang) * r * (gun ? 3.2 : 2.8);
+      if(ph < .14){ ctx.fillStyle = 'rgba(255,214,90,.95)'; ctx.beginPath(); ctx.arc(mx, my, r * (gun ? 2.6 : 1.6), 0, 6.28); ctx.fill(); ctx.fillStyle = 'rgba(255,255,255,.9)'; ctx.beginPath(); ctx.arc(mx, my, r * (gun ? 1.2 : .7), 0, 6.28); ctx.fill(); }
+      if(ph < 1.6){ const q = ph / 1.6; ctx.fillStyle = 'rgba(225,225,225,' + (.45 * (1 - q)) + ')'; ctx.beginPath(); ctx.arc(mx + Math.cos(ang) * q * r * 2, my + Math.sin(ang) * q * r * 2 - q * r * 2, r * (1.3 + q * (gun ? 3.2 : 1.8)), 0, 6.28); ctx.fill(); }
+      if(gun){
+        if(ph < .75){ const q = ph / .75; const px = lerp(mx, tx, q), py = lerp(my, ty, q) - Math.sin(Math.PI * q) * v.s * 5;
+          ctx.fillStyle = 'rgba(255,255,255,.35)'; ctx.beginPath(); ctx.arc(lerp(mx, tx, Math.max(0, q - .08)), lerp(my, ty, Math.max(0, q - .08)) - Math.sin(Math.PI * Math.max(0, q - .08)) * v.s * 5, r * .8, 0, 6.28); ctx.fill();
+          ctx.fillStyle = '#151515'; ctx.beginPath(); ctx.arc(px, py, r * .9, 0, 6.28); ctx.fill(); }
+        else if(ph < 1.05){ const q = (ph - .75) / .3; ctx.fillStyle = 'rgba(255,140,40,' + (.8 * (1 - q)) + ')'; ctx.beginPath(); ctx.arc(tx, ty, r * (1.5 + q * 3), 0, 6.28); ctx.fill(); ctx.fillStyle = 'rgba(70,60,50,' + (.5 * (1 - q)) + ')'; ctx.beginPath(); ctx.arc(tx, ty - q * r * 2, r * (2 + q * 3), 0, 6.28); ctx.fill(); }
+      }
+    });
+  });
 }
 function render(tm){
   if(!model) return;
@@ -367,15 +417,18 @@ function render(tm){
     const col = sc.sides[st.side].color;
     const moving = k >= 0 && k < sts.length && sts[k].to[id] && (sts[k].to[id].x !== sts[k].from[id].x || sts[k].to[id].y !== sts[k].from[id].y);
     const fighting = st.alive < 0.99 && k >= 0 && k < sts.length && sts[k].to[id].alive < sts[k].from[id].alive;
+    const ne = (g.kind === 'top' || g.kind === 'miltiqchi' || g.kind === 'fil') ? nearestEnemy(id, groupsNow) : null;
+    const face = ne ? Math.atan2(ne.st.y - st.y, ne.st.x - st.x) : (st.side === 0 ? -Math.PI / 2 : Math.PI / 2);
     g.dots.forEach(d => {
       if(d.rn >= st.alive) return;
       let jx = 0, jy = 0;
       if(fighting){ jx = Math.sin(tm * 9 + d.ph) * .7; jy = Math.cos(tm * 8 + d.ph) * .7; }
       else if(moving){ jy = Math.sin(tm * 6 + d.ph) * .25; }
-      drawDot(g.kind, (st.x + d.ox + jx) * v.s + v.ox, (st.y + d.oy + jy) * v.s + v.oy, r, col);
+      drawDot(g.kind, (st.x + d.ox + jx) * v.s + v.ox, (st.y + d.oy + jy) * v.s + v.oy, r, col, face);
     });
     if(g.commander && st.alive > .05) star((st.x) * v.s + v.ox, (st.y) * v.s + v.oy, v.s * 1.9);
   });
+  fireFX(tm, v, groupsNow, k, r);
   // yozuvlar
   drawOverlay(tm, k, groupsNow);
 }
@@ -400,13 +453,26 @@ function drawOverlay(tm, k, gn){
   // kichik portretlar + sonlar
   [0, 1].forEach(i => {
     const side = sc.sides[i];
-    let n = 0; model.order.forEach(id => { const g = model.groups[id]; const st = gn[id]; if(st && st.side === i) n += g.count * st.alive; });
+    let n = 0; model.order.forEach(id => { const g = model.groups[id]; const st = gn[id]; if(st && st.side === i && !SYM[g.kind]) n += g.count * st.alive; });
     const x = i ? W - 56 * u : 56 * u, y = 118 * u;
     portrait(i, x, y, 30 * u, side);
     ctx.font = '700 ' + 18 * u + 'px Arial'; ctx.fillStyle = '#fff'; ctx.strokeStyle = 'rgba(0,0,0,.7)'; ctx.lineWidth = 3 * u; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     const label = n >= 1000 ? '~' + Math.round(n / 1000) + ' ming' : '~' + Math.round(n / 10) * 10;
     ctx.strokeText(label, x, y + 46 * u); ctx.fillText(label, x, y + 46 * u);
   });
+  // belgilar (legend): qurol turlari
+  {
+    const KN = { piyoda: 'Piyoda', otliq: 'Otliq', kamonchi: 'Kamonchi', miltiqchi: 'Miltiqchi', top: "To'p", fil: 'Fil' };
+    const ent = {};
+    model.order.forEach(id => { const g = model.groups[id]; (ent[g.kind] = ent[g.kind] || new Set()); if(g.weapon) g.weapon.split(/\s*,\s*/).forEach(w => ent[g.kind].add(w)); });
+    const kinds = Object.keys(ent);
+    ctx.save(); ctx.font = '600 ' + 12.5 * u + 'px Arial'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+    const lines = kinds.map(kd => KN[kd] + (ent[kd].size ? ': ' + Array.from(ent[kd]).join(', ') : ''));
+    const lw = Math.min(W * .62, Math.max(...lines.map(l => ctx.measureText(l).width)) + 38 * u), lh = 22 * u, y0 = 188 * u;
+    ctx.fillStyle = 'rgba(15,12,8,.62)'; ctx.beginPath(); ctx.roundRect(10 * u, y0 - 10 * u, lw, lines.length * lh + 14 * u, 8 * u); ctx.fill();
+    lines.forEach((ln, i) => { drawDot(kinds[i], 26 * u, y0 + i * lh + 6 * u, 4.5 * u, '#d9d2c0', -Math.PI / 2); ctx.fillStyle = '#fff'; ctx.fillText(ln, 42 * u, y0 + i * lh + 6 * u, lw - 34 * u); });
+    ctx.restore();
+  }
   // bosqich matni
   let text = '';
   if(k >= 0 && k < sts.length) text = sts[k].text;
@@ -529,7 +595,7 @@ JSON:
  "title":"JANG NOMI (katta harf, qisqa)","year":"sana","topic":"MAVZU (katta harf)","terrain":"tekislik|daryo|tog'|cho'l|o'rmon",
  "features":[{"type":"river","name":"..","pts":[[x,y],...]},{"type":"mountain","x":..,"y":..,"r":..},{"type":"forest","x":..,"y":..,"r":..}],
  "sides":[
-  {"name":"1-tomon","color":"#C62828","commander":"Sarkarda ismi","groups":[{"id":"a1","name":"Markaz","kind":"piyoda","count":30000,"x":46,"y":80,"commander":true}]},
+  {"name":"1-tomon","color":"#C62828","commander":"Sarkarda ismi","groups":[{"id":"a1","name":"Markaz","kind":"piyoda","weapon":"nayza, qilich","count":30000,"x":46,"y":80,"commander":true}]},
   {"name":"2-tomon","color":"#2E9E4F","commander":"Sarkarda ismi","groups":[{"id":"b1","name":"Markaz","kind":"piyoda","count":25000,"x":46,"y":30,"commander":true}]}
  ],
  "stages":[{"text":"o'zbekcha, ≤90 belgi","cam":[50,55,1],"dur":5,"moves":[{"g":"a1","to":[46,60]}],"losses":{"b1":0.5},"defect":[{"g":"b3","to":0}],"arrows":true}],
@@ -540,7 +606,7 @@ JSON:
 
 QOIDALAR:
 - Koordinatalar 0..100: x — g'arbdan sharqqa, y — shimoldan janubga (y=0 tepada). Tomonlar xaritaning qarama-qarshi chetlarida, haqiqiy geografiyaga mos (daryo qaysi tomonda bo'lsa, shunga qo'y).
-- "kind": piyoda | otliq | kamonchi | fil. Har tomonda 3–6 guruh, har tomonda bitta "commander":true. "count" — manbalardagi son, guruhlar yig'indisi tomon umumiy soniga teng.
+- "kind": piyoda | otliq | kamonchi | miltiqchi | top | fil. Jang zamoniga mos qurol tanla: qadimda/o'rta asrda kamon, qilich, nayza, fil; to'p va miltiq faqat ular haqiqatan ishlatilgan davrda (XIV asrdan to'p, XVI asrdan miltiqli piyoda). Har guruhga "weapon" yoz (masalan "kamon, qilich"). "top" va "fil" guruhlarida "count" — dona (to'p/fil soni, ko'p bo'lsa 14 gacha), boshqalarida — jangchilar soni. Har tomonda 3–7 guruh, har tomonda bitta "commander":true. Piyoda/otliq/kamonchi/miltiqchi sonlari yig'indisi tomon umumiy soniga teng.
 - "stages": 6–8 ta, tarixiy ketma-ketlikda (joylashuv → yaqinlashish → hujum → hal qiluvchi lahza: xiyonat/pistirma/qurshov → natija). "moves" — faqat harakatlanayotgan guruhlar. "losses" — guruhning QOLGAN ulushi 0..1 (0 = yo'q bo'ldi). "defect" — guruh tomon almashtirsa (to: 0 yoki 1). "cam":[markazX,markazY,zoom 0.8–2].
 - "sources" — haqiqatan foydalangan sahifalar havolasi. Matnlar o'zbek (lotin), maktab o'quvchisiga tushunarli. Aniq bilmagan narsangni to'qima.${sk ? "\n\nBOSHLANG'ICH QORALAMA (kerak bo'lsa tuzat):\n" + sk : ''}`;
   navigator.clipboard.writeText(p).then(() => { $('pMsg').textContent = '✓ So\'rov nusxalandi. AI\'ga joylang, javobini yuqoridagi maydonga qo\'ying.'; }).catch(() => { $('scn').value = p; $('pMsg').textContent = 'Nusxalab bo\'lmadi — so\'rov yuqoridagi maydonga qo\'yildi, uni nusxalang.'; });
