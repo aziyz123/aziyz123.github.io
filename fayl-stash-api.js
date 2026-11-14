@@ -80,6 +80,17 @@
       return { exp: room.exp, quizzes: list };
     } catch (e) { throw new Error(friendly(e)); }
   }
+  /** Savollar to'plamlarini xonadan o'chiradi; xonada hech narsa qolmasa xonaning o'zini ham. */
+  async function removeQuizzes(code, ids) {
+    try {
+      var base = 'rooms/' + code + '/stash';
+      await Promise.all((ids || []).map(function (id) { return db().ref(base + '/quizzes/' + id).remove(); }));
+      var r = await Promise.all([db().ref(base + '/quizzes').once('value'), db().ref(base + '/files').once('value')]);
+      var q = r[0].val(), f = r[1].val();
+      if ((!q || !Object.keys(q).length) && (!f || !Object.keys(f).length)) await db().ref(base).remove();
+      return true;
+    } catch (e) { return false; }
+  }
   /** file: File|Blob (name berilsa File). Qaytaradi {code, exp}. */
   async function upload(file, name, onProg, existing) {
     try {
@@ -109,5 +120,5 @@
       return { code: code, exp: exp };
     } catch (e) { var err = new Error(friendly(e)); throw err; }
   }
-  window.FaylStashAPI = { upload: upload, saveQuiz: saveQuiz, getQuizzes: getQuizzes, openRoom: openRoom };
+  window.FaylStashAPI = { upload: upload, saveQuiz: saveQuiz, removeQuizzes: removeQuizzes, getQuizzes: getQuizzes, openRoom: openRoom };
 })();

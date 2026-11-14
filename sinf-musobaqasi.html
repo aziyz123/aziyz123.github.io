@@ -10,7 +10,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script src="fayl-stash-api.js?v=2"></script>
+<script src="fayl-stash-api.js?v=3"></script>
 <script src="quiz-prompt.js?v=1"></script>
 <style>
   :root{
@@ -315,6 +315,7 @@ Javob: 1336-yilda</div>
           <input type="text" id="stashLoadCode" inputmode="numeric" maxlength="6" placeholder="Xona kodi" style="flex:1;min-width:140px;padding:10px;">
           <button type="button" class="secondary-btn" id="stashLoadBtn">Xonadan savollarni olish</button>
         </div>
+        <label style="display:flex;gap:8px;align-items:flex-start;margin-top:10px;font-size:13px;line-height:1.4;"><input type="checkbox" id="stashDelAfter" style="margin-top:3px;"> <span>O'yin boshlangach, savollar xonadan o'chirilsin (o'sha kod bilan qayta olib bo'lmaydi)</span></label>
         <div id="stashLoadOut" class="hint" style="margin-top:8px;"></div>
       </div>
       <div class="error-box" id="setupError"></div>
@@ -792,6 +793,7 @@ if(window.QuizPrompt) QuizPrompt.mount(document.getElementById('qpHost'));
       const r = await FaylStashAPI.getQuizzes(code, qid);
       if(!r.quizzes.length){ out.textContent = 'Bu xonada savollar yo\'q.'; return false; }
       qaTextEl.value = r.quizzes.map(q => q.text).join('\n\n');
+      window.__stashLoaded = { code: code, ids: r.quizzes.map(q => q.id) };
       updatePreview();
       out.textContent = '✅ ' + r.quizzes.reduce((n,q)=>n+(q.count||0),0) + ' ta savol xonadan yuklandi. Quyida sozlamalarni tekshirib, «O\'yinni boshlash» ni bosing.';
       return true;
@@ -904,6 +906,7 @@ let board = null;   // { tiles, currentTeamIdx, timerInterval, timeLeft, activeT
 const TEAM_COLORS = ['var(--t1)','var(--t2)','var(--t3)','var(--t4)'];
 
 startBtn.addEventListener('click', () => {
+
   setupError.classList.remove('active');
   const text = qaTextEl.value.trim();
   const { questions: typedQuestions } = text.length >= 10 ? parseQA(text) : { questions: [] };
@@ -919,6 +922,10 @@ startBtn.addEventListener('click', () => {
     setupError.classList.add('active');
     return;
   }
+  try{
+    const sl = window.__stashLoaded, cb = document.getElementById('stashDelAfter');
+    if(sl && cb && cb.checked && window.FaylStashAPI){ window.__stashLoaded = null; FaylStashAPI.removeQuizzes(sl.code, sl.ids); }
+  }catch(e){}
 
   const teamNames = Array.from(document.querySelectorAll('.team-name-input')).map(inp => inp.value.trim() || 'Jamoa');
   const teams = teamNames.map((name, i) => ({ name, score: 0, colorVar: TEAM_COLORS[i % TEAM_COLORS.length] }));
