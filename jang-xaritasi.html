@@ -47,6 +47,7 @@
           <button id="playBtn">▶ Boshlash</button>
           <button class="alt" id="stopBtn">⏹</button>
           <button id="recBtn" class="alt">⏺ Videoga yozib olish</button>
+          <label class="chip" style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="sndOn" checked> 🔊 Ovoz</label>
           <select id="fmt" style="width:auto"><option value="v">Vertikal (Shorts/Telegram)</option><option value="h">Gorizontal (doska/proyektor)</option></select>
         </div>
         <div class="msg" id="msg"></div>
@@ -104,7 +105,8 @@ const DEMO = {
   terrain: "daryo",
   features: [
     { type: "river", pts: [[0,66],[22,60],[40,64],[60,58],[80,62],[100,56]], name: "Chubuk daryosi" },
-    { type: "mountain", x: 82, y: 14, r: 12 }, { type: "mountain", x: 66, y: 10, r: 9 }
+    { type: "mountain", x: 82, y: 14, r: 12 }, { type: "mountain", x: 66, y: 10, r: 9 },
+    { type: "place", kind: "city", name: "Anqara", x: 90, y: 40 }, { type: "hill", x: 20, y: 55, r: 14 }, { type: "hill", x: 70, y: 70, r: 12 }
   ],
   sides: [
     { name: "Temuriylar", color: "#C62828", commander: "Amir Temur",
@@ -145,7 +147,8 @@ const PYR = {
   title: "EHROMLAR JANGI", year: "1798-yil, 21-iyul", topic: "NAPOLEON MISRDA", terrain: "daryo",
   features: [
     { type: "river", name: "Nil", pts: [[90,0],[92,25],[88,50],[91,75],[89,100]] },
-    { type: "mountain", x: 10, y: 96, r: 6 }, { type: "mountain", x: 26, y: 98, r: 5 }
+    { type: "mountain", x: 10, y: 96, r: 6 }, { type: "mountain", x: 26, y: 98, r: 5 },
+    { type: "place", kind: "village", name: "Imbaba", x: 82, y: 82 }, { type: "place", kind: "fort", name: "Bikatil", x: 10, y: 80 }, { type: "hill", x: 40, y: 50, r: 14 }
   ],
   sides: [
     { name: "Fransiya", color: "#2F5DA8", commander: "Napoleon Bonapart",
@@ -233,7 +236,7 @@ function buildModel(sc){
       const c = i % cols, r = Math.floor(i / cols), rows = Math.ceil(n / cols);
       dots.push({ ox: (c - (cols - 1) / 2) * sp + (rnd() - .5) * .5, oy: (r - (rows - 1) / 2) * sp + (rnd() - .5) * .5, rn: rnd(), ph: rnd() * 6.28 });
     }
-    groups[id] = { id, name: g.name || id, weapon: g.weapon || '', kind: g.kind || 'piyoda', count: +g.count || 0, side0: si, commander: !!g.commander, dots };
+    const topOy = Math.min(...dots.map(q => q.oy)); groups[id] = { top: topOy, id, name: g.name || id, weapon: g.weapon || '', kind: g.kind || 'piyoda', count: +g.count || 0, side0: si, commander: !!g.commander, dots };
     order.push(id);
   }));
   // bosqichlar bo'yicha holatlar (boshlanish/tugash)
@@ -261,6 +264,16 @@ function worldView(cam){
   const z = cam[2] || 1;
   return { s: base * z, ox: W / 2 - cam[0] * base * z, oy: H / 2 - cam[1] * base * z };
 }
+const FX = { boom: false, volley: false, clash: false, hoof: false };
+let texCache = {};
+function terrainPattern(col){
+  const key = col.join();
+  if(texCache[key]) return texCache[key];
+  const c = document.createElement('canvas'); c.width = c.height = 512; const x = c.getContext('2d'); const rn = mulberry(5);
+  for(let i = 0; i < 1800; i++){ const px = rn() * 512, py = rn() * 512, rr = 1 + rn() * 3; x.fillStyle = rn() > .5 ? 'rgba(255,245,210,' + (.05 + rn() * .08) + ')' : 'rgba(60,40,10,' + (.05 + rn() * .09) + ')'; for(const dx of [-512, 0, 512]) for(const dy of [-512, 0, 512]){ x.beginPath(); x.arc(px + dx, py + dy, rr, 0, 6.28); x.fill(); } }
+  for(let i = 0; i < 40; i++){ const px = rn() * 512, py = rn() * 512, rr = 30 + rn() * 70; const g = x.createRadialGradient(px, py, 0, px, py, rr); const light = rn() > .5; g.addColorStop(0, light ? 'rgba(255,240,190,.10)' : 'rgba(50,35,10,.10)'); g.addColorStop(1, 'rgba(0,0,0,0)'); x.fillStyle = g; for(const dx of [-512, 0, 512]) for(const dy of [-512, 0, 512]){ x.save(); x.translate(dx, dy); x.fillRect(px - rr, py - rr, rr * 2, rr * 2); x.restore(); } }
+  return texCache[key] = ctx.createPattern(c, 'repeat');
+}
 function drawTerrain(v){
   const W = cv.width, H = cv.height;
   if(bgImg){
@@ -275,6 +288,7 @@ function drawTerrain(v){
     const g = ctx.createRadialGradient(W / 2, H / 2, 40, W / 2, H / 2, Math.max(W, H) * .75);
     g.addColorStop(0, col[0]); g.addColorStop(1, col[1]);
     ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    try{ const pt = terrainPattern(col); pt.setTransform(new DOMMatrix().translate(v.ox, v.oy).scale(v.s / 5)); ctx.fillStyle = pt; ctx.fillRect(0, 0, W, H); }catch(e){}
   }
   // xususiyatlar: daryo, tog', o'rmon
   (model.sc.features || []).forEach(f => {
@@ -289,8 +303,22 @@ function drawTerrain(v){
       ctx.restore();
     } else if(f.type === 'mountain'){
       const x = f.x * v.s + v.ox, y = f.y * v.s + v.oy, r = (f.r || 8) * v.s;
+      ctx.fillStyle = 'rgba(0,0,0,.18)'; ctx.beginPath(); ctx.ellipse(x + r * .15, y + r * .55, r * 1.1, r * .22, 0, 0, 6.28); ctx.fill();
       ctx.fillStyle = '#5b5240'; ctx.beginPath(); ctx.moveTo(x - r, y + r * .5); ctx.lineTo(x - r * .1, y - r * .7); ctx.lineTo(x + r * .35, y - r * .2); ctx.lineTo(x + r * .6, y - r * .5); ctx.lineTo(x + r, y + r * .5); ctx.closePath(); ctx.fill();
       ctx.fillStyle = 'rgba(255,255,255,.65)'; ctx.beginPath(); ctx.moveTo(x - r * .3, y - r * .45); ctx.lineTo(x - r * .1, y - r * .7); ctx.lineTo(x + r * .1, y - r * .4); ctx.closePath(); ctx.fill();
+    } else if(f.type === 'hill'){
+      const x = f.x * v.s + v.ox, y = f.y * v.s + v.oy, r = (f.r || 12) * v.s;
+      const g2 = ctx.createRadialGradient(x - r * .25, y - r * .3, r * .1, x, y, r);
+      g2.addColorStop(0, 'rgba(255,240,190,.20)'); g2.addColorStop(.6, 'rgba(120,95,50,.06)'); g2.addColorStop(1, 'rgba(40,25,5,.10)');
+      ctx.fillStyle = g2; ctx.beginPath(); ctx.ellipse(x, y, r, r * .7, 0, 0, 6.28); ctx.fill();
+    } else if(f.type === 'place'){
+      const x = f.x * v.s + v.ox, y = f.y * v.s + v.oy, u = v.s * 1.6;
+      ctx.save(); ctx.fillStyle = '#efe6cc'; ctx.strokeStyle = '#4a3b1c'; ctx.lineWidth = Math.max(1.5, u * .15);
+      if(f.kind === 'fort'){ ctx.fillRect(x - u, y - u * .8, u * 2, u * 1.6); ctx.strokeRect(x - u, y - u * .8, u * 2, u * 1.6); for(let i = -1; i <= 1; i++) ctx.fillRect(x + i * u * .75 - u * .22, y - u * 1.1, u * .44, u * .35); }
+      else if(f.kind === 'village'){ ctx.beginPath(); ctx.moveTo(x - u * .9, y + u * .6); ctx.lineTo(x - u * .9, y - u * .2); ctx.lineTo(x, y - u * 1.1); ctx.lineTo(x + u * .9, y - u * .2); ctx.lineTo(x + u * .9, y + u * .6); ctx.closePath(); ctx.fill(); ctx.stroke(); }
+      else { ctx.fillRect(x - u * 1.1, y - u * .6, u * 2.2, u * 1.2); ctx.strokeRect(x - u * 1.1, y - u * .6, u * 2.2, u * 1.2); ctx.beginPath(); ctx.moveTo(x - u * .5, y - u * .6); ctx.lineTo(x - u * .5, y - u * 1.4); ctx.lineTo(x, y - u * 1.0); ctx.lineTo(x + u * .5, y - u * 1.5); ctx.lineTo(x + u * .5, y - u * .6); ctx.fill(); ctx.stroke(); }
+      if(f.name){ ctx.font = '700 ' + Math.max(11, v.s * 2) + 'px Georgia,serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'top'; ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(255,245,220,.9)'; ctx.fillStyle = '#3a2c10'; ctx.strokeText(f.name, x, y + u * .9); ctx.fillText(f.name, x, y + u * .9); }
+      ctx.restore();
     } else if(f.type === 'forest'){
       const rn = mulberry(11); const x = f.x * v.s + v.ox, y = f.y * v.s + v.oy, r = (f.r || 10) * v.s;
       for(let i = 0; i < 40; i++){ const a = rn() * 6.28, d = Math.sqrt(rn()) * r; ctx.fillStyle = i % 2 ? '#3d5a2a' : '#4f6e35'; ctx.beginPath(); ctx.arc(x + Math.cos(a) * d, y + Math.sin(a) * d * .7, v.s * 1.1, 0, 6.28); ctx.fill(); }
@@ -360,6 +388,7 @@ function fireFX(tm, v, gn, k, r){
     const st = gn[id]; if(st.alive < .05) return;
     const ne = nearestEnemy(id, gn); if(!ne) return;
     const gun = g.kind === 'top', range = gun ? 60 : 30; if(ne.d > range) return;
+    if(gun) FX.boom = true; else FX.volley = true;
     const cyc = gun ? 3.4 : 2.4, ang = Math.atan2(ne.st.y - st.y, ne.st.x - st.x);
     g.dots.forEach(d => {
       if(d.rn >= st.alive || (!gun && d.rn > .3)) return;
@@ -380,6 +409,7 @@ function fireFX(tm, v, gn, k, r){
 }
 function render(tm){
   if(!model) return;
+  FX.boom = FX.volley = FX.clash = FX.hoof = false;
   const W = cv.width, H = cv.height, sts = model.stages, sc = model.sc;
   let k = stateAt(tm);
   let cam, groupsNow = {};
@@ -389,7 +419,9 @@ function render(tm){
   else {
     const s = sts[k], p = Math.min(1, (tm - s.t0) / (s.t1 - s.t0)), e = ease(Math.min(1, p * 1.25));
     const prevCam = k ? sts[k - 1].cam : [50, 50, 0.75];
-    cam = [lerp(prevCam[0], s.cam[0], ease(Math.min(1, p * 2))), lerp(prevCam[1], s.cam[1], ease(Math.min(1, p * 2))), lerp(prevCam[2] || 1, s.cam[2] || 1, ease(Math.min(1, p * 2)))];
+    const ce = ease(Math.min(1, p * 1.5));
+    cam = [lerp(prevCam[0], s.cam[0], ce), lerp(prevCam[1], s.cam[1], ce), lerp(prevCam[2] || 1, s.cam[2] || 1, ce) * (1 + .05 * p)];
+    if(Object.keys(s.to).some(id => s.to[id].alive < s.from[id].alive - .1) && p > .25 && p < .9){ const am = .35 * Math.sin(Math.PI * (p - .25) / .65); cam[0] += Math.sin(tm * 37) * am; cam[1] += Math.cos(tm * 29) * am; }
     model.order.forEach(id => {
       const a = s.from[id], b = s.to[id];
       groupsNow[id] = { x: lerp(a.x, b.x, e), y: lerp(a.y, b.y, e), alive: lerp(a.alive, b.alive, ease(Math.max(0, (p - .3) / .7))), side: p > .5 ? b.side : a.side, prog: p };
@@ -419,6 +451,12 @@ function render(tm){
     const fighting = st.alive < 0.99 && k >= 0 && k < sts.length && sts[k].to[id].alive < sts[k].from[id].alive;
     const ne = (g.kind === 'top' || g.kind === 'miltiqchi' || g.kind === 'fil') ? nearestEnemy(id, groupsNow) : null;
     const face = ne ? Math.atan2(ne.st.y - st.y, ne.st.x - st.x) : (st.side === 0 ? -Math.PI / 2 : Math.PI / 2);
+    if(fighting) FX.clash = true;
+    if(moving && g.kind === 'otliq') FX.hoof = true;
+    if(moving && !SYM[g.kind]){
+      const tgt = sts[k].to[id], ma = Math.atan2(tgt.y - sts[k].from[id].y, tgt.x - sts[k].from[id].x);
+      g.dots.forEach(d => { if(d.rn > (g.kind === 'otliq' ? .5 : .2) || d.rn >= st.alive) return; const q = ((tm * .8 + d.ph) % 1); ctx.fillStyle = 'rgba(214,196,150,' + (.22 * (1 - q)) + ')'; ctx.beginPath(); ctx.arc((st.x + d.ox) * v.s + v.ox - Math.cos(ma) * q * v.s * 3, (st.y + d.oy) * v.s + v.oy - Math.sin(ma) * q * v.s * 3, r * (1.2 + q * 2.4), 0, 6.28); ctx.fill(); });
+    }
     g.dots.forEach(d => {
       if(d.rn >= st.alive) return;
       let jx = 0, jy = 0;
@@ -430,9 +468,9 @@ function render(tm){
   });
   fireFX(tm, v, groupsNow, k, r);
   // yozuvlar
-  drawOverlay(tm, k, groupsNow);
+  drawOverlay(tm, k, groupsNow, v);
 }
-function drawOverlay(tm, k, gn){
+function drawOverlay(tm, k, gn, v){
   const W = cv.width, H = cv.height, sc = model.sc, u = W / 540;
   const topic = topicOverride || sc.topic || '';
   if(topic) pill(topic, W / 2, 62 * u, 24 * u);
@@ -444,7 +482,9 @@ function drawOverlay(tm, k, gn){
     portrait(0, W * .27, H * .34, 70 * u, sc.sides[0]); portrait(1, W * .73, H * .34, 70 * u, sc.sides[1]);
     ctx.font = '700 ' + 40 * u + 'px "Archivo Black",Impact,Arial'; ctx.fillStyle = '#fff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('VS', W / 2, H * .34);
     pill(sc.sides[0].name, W * .27, H * .34 + 100 * u, 18 * u, { bg: sc.sides[0].color, fg: '#fff' }); pill(sc.sides[1].name, W * .73, H * .34 + 100 * u, 18 * u, { bg: sc.sides[1].color, fg: '#fff' });
-    pill(sc.title + (sc.year ? ' · ' + sc.year : ''), W / 2, H * .62, 30 * u, { bg: 'rgba(240,240,240,.95)' });
+    { const tt = sc.title || ''; let fs = 30 * u; ctx.font = '700 ' + fs + 'px "Archivo Black",Impact,Arial'; while(ctx.measureText(tt).width > W - 70 * u && fs > 12 * u) { fs -= 2 * u; ctx.font = '700 ' + fs + 'px "Archivo Black",Impact,Arial'; }
+      pill(tt, W / 2, H * .62, fs, { bg: 'rgba(240,240,240,.95)' });
+      if(sc.year) pill(sc.year, W / 2, H * .62 + fs * 2.1, 20 * u, { bg: 'rgba(30,30,30,.85)', fg: '#fff' }); }
     ctx.restore();
     return;
   }
@@ -460,6 +500,48 @@ function drawOverlay(tm, k, gn){
     const label = n >= 1000 ? '~' + Math.round(n / 1000) + ' ming' : '~' + Math.round(n / 10) * 10;
     ctx.strokeText(label, x, y + 46 * u); ctx.fillText(label, x, y + 46 * u);
   });
+  // guruh yorliqlari va talafot yozuvi
+  {
+    const s0 = (k >= 0 && k < sts.length) ? sts[k] : null, p0 = s0 ? Math.min(1, (tm - s0.t0) / (s0.t1 - s0.t0)) : 0;
+    ctx.save(); ctx.textAlign = 'center'; ctx.textBaseline = 'bottom'; ctx.font = '700 ' + 11.5 * u + 'px Arial';
+    model.order.forEach(id => {
+      const g = model.groups[id], st = gn[id]; if(!st || st.alive < .2) return;
+      const sx = st.x * v.s + v.ox, sy = (st.y + g.top) * v.s + v.oy - 9 * u;
+      if(sx < -50 || sx > W + 50 || sy < 140 * u || sy > H - 60 * u) return;
+      const label = (g.name || id).replace(/\s*\(.*\)\s*/, '').slice(0, 26);
+      const w = ctx.measureText(label).width;
+      ctx.fillStyle = 'rgba(15,12,8,.6)'; ctx.beginPath(); ctx.roundRect(sx - w / 2 - 6 * u, sy - 15 * u, w + 12 * u, 17 * u, 5 * u); ctx.fill();
+      ctx.fillStyle = sc.sides[st.side].color; ctx.fillRect(sx - w / 2 - 6 * u, sy - 15 * u, 3 * u, 17 * u);
+      ctx.fillStyle = '#fff'; ctx.fillText(label, sx + 1.5 * u, sy);
+      if(s0 && s0.from[id] && s0.to[id]){
+        const dl = s0.from[id].alive - s0.to[id].alive;
+        if(dl >= .15 && p0 > .45){
+          const a = Math.min(1, (p0 - .45) / .12) * (p0 > .9 ? (1 - p0) / .1 : 1);
+          ctx.globalAlpha = Math.max(0, a); ctx.font = '800 ' + 16 * u + 'px Arial'; ctx.strokeStyle = 'rgba(0,0,0,.8)'; ctx.lineWidth = 4 * u; ctx.fillStyle = '#ff6b5e';
+          const ty = sy - 20 * u - (p0 - .45) * 22 * u; ctx.strokeText('−' + Math.round(dl * 100) + '%', sx, ty); ctx.fillText('−' + Math.round(dl * 100) + '%', sx, ty);
+          ctx.globalAlpha = 1; ctx.font = '700 ' + 11.5 * u + 'px Arial';
+        }
+      }
+    });
+    ctx.restore();
+  }
+  // kuch chizig'i (ikki tomon) va bosqich hisoblagichi
+  {
+    const tot = [0, 0], now = [0, 0];
+    model.order.forEach(id => { const g = model.groups[id]; if(SYM[g.kind]) return; const st = gn[id]; tot[g.side0] += g.count; if(st) now[st.side] += g.count * st.alive; });
+    const M = Math.max(tot[0], tot[1], 1), bx = 104 * u, bw = W - 208 * u, by = 114 * u, bh = 13 * u, half = bw / 2 - 4 * u;
+    ctx.fillStyle = 'rgba(15,12,8,.55)'; ctx.beginPath(); ctx.roundRect(bx - 3 * u, by - 3 * u, bw + 6 * u, bh + 6 * u, 8 * u); ctx.fill();
+    ctx.fillStyle = sc.sides[0].color; ctx.fillRect(bx, by, Math.max(0, now[0] / M * half), bh);
+    ctx.fillStyle = sc.sides[1].color; const w1 = Math.max(0, now[1] / M * half); ctx.fillRect(bx + bw - w1, by, w1, bh);
+    ctx.fillStyle = 'rgba(255,255,255,.7)'; ctx.fillRect(W / 2 - u, by - 2 * u, 2 * u, bh + 4 * u);
+    ctx.font = '700 ' + 12.5 * u + 'px Arial'; ctx.textAlign = 'center'; ctx.textBaseline = 'bottom'; ctx.fillStyle = '#fff'; ctx.strokeStyle = 'rgba(0,0,0,.7)'; ctx.lineWidth = 3 * u;
+    const ct = k >= 0 && k < sts.length ? 'Bosqich ' + (k + 1) + ' / ' + sts.length : (k === sts.length ? 'Natija' : '');
+    if(ct){ ctx.strokeText(ct, W / 2, by - 6 * u); ctx.fillText(ct, W / 2, by - 6 * u); }
+    // vaqt chizig'i
+    const ty = H - 6 * u; ctx.fillStyle = 'rgba(255,255,255,.18)'; ctx.fillRect(0, ty, W, 6 * u);
+    ctx.fillStyle = '#E8A33D'; ctx.fillRect(0, ty, W * Math.min(1, tm / model.total), 6 * u);
+    ctx.fillStyle = 'rgba(0,0,0,.6)'; sts.forEach(st2 => ctx.fillRect(W * st2.t0 / model.total - u / 2, ty, u, 6 * u));
+  }
   // belgilar (legend): qurol turlari
   {
     const KN = { piyoda: 'Piyoda', otliq: 'Otliq', kamonchi: 'Kamonchi', miltiqchi: 'Miltiqchi', top: "To'p", fil: 'Fil' };
@@ -504,17 +586,70 @@ function showSrc(sc){
   $('srcNote').textContent = sc.note || '';
   $('srcList').innerHTML = (sc.sources || []).map(u => /^https?:\/\//.test(u) ? '<div><a style="color:#E8A33D" target="_blank" rel="noopener" href="' + u.replace(/"/g, '') + '">' + u.replace(/^https?:\/\//, '').slice(0, 70) + '</a></div>' : '<div>' + String(u).replace(/[<>&]/g, '') + '</div>').join('');
 }
+
+// ---------- Ovoz (brauzerning o'zida sintez qilinadi, fayl kerak emas) ----------
+const Aud = { ac: null, acc: { beat: 0, boom: 0, volley: 0, clash: 0, hoof: 0 }, inten: .3, beat: 0 };
+function audInit(){
+  if(Aud.ac){ try{ Aud.ac.resume(); }catch(e){} return; }
+  const AC = window.AudioContext || window.webkitAudioContext; if(!AC) return;
+  const ac = Aud.ac = new AC();
+  Aud.master = ac.createGain(); Aud.master.gain.value = .8;
+  Aud.dest = ac.createMediaStreamDestination();
+  Aud.master.connect(ac.destination); Aud.master.connect(Aud.dest);
+  const o1 = ac.createOscillator(), o2 = ac.createOscillator(), o3 = ac.createOscillator(), g = ac.createGain(), f = ac.createBiquadFilter(), lfo = ac.createOscillator(), lg = ac.createGain();
+  o1.type = o2.type = 'sawtooth'; o3.type = 'sine'; o1.frequency.value = 55; o2.frequency.value = 55 * 1.4983; o3.frequency.value = 110 * 1.1892;
+  f.type = 'lowpass'; f.frequency.value = 260; g.gain.value = .05; lfo.frequency.value = .12; lg.gain.value = 90; lfo.connect(lg); lg.connect(f.frequency);
+  o1.connect(f); o2.connect(f); o3.connect(f); f.connect(g); g.connect(Aud.master); [o1, o2, o3, lfo].forEach(o => o.start());
+  Aud.droneG = g; Aud.droneF = f;
+  const nb = ac.createBuffer(1, ac.sampleRate, ac.sampleRate), ch = nb.getChannelData(0); for(let i = 0; i < ch.length; i++) ch[i] = Math.random() * 2 - 1; Aud.nb = nb;
+}
+function noiseBurst(dur, freq, q, vol, type){
+  const ac = Aud.ac; if(!ac) return; const src = ac.createBufferSource(); src.buffer = Aud.nb;
+  const f = ac.createBiquadFilter(); f.type = type || 'lowpass'; f.frequency.value = freq; f.Q.value = q || 1;
+  const g = ac.createGain(), t0 = ac.currentTime; g.gain.setValueAtTime(vol, t0); g.gain.exponentialRampToValueAtTime(.001, t0 + dur);
+  src.connect(f); f.connect(g); g.connect(Aud.master); src.start(t0, Math.random() * .5); src.stop(t0 + dur + .05);
+}
+function tone(f0, f1, dur, vol, type){
+  const ac = Aud.ac; if(!ac) return; const o = ac.createOscillator(), g = ac.createGain(), t0 = ac.currentTime;
+  o.type = type || 'sine'; o.frequency.setValueAtTime(f0, t0); o.frequency.exponentialRampToValueAtTime(Math.max(20, f1), t0 + dur);
+  g.gain.setValueAtTime(vol, t0); g.gain.exponentialRampToValueAtTime(.001, t0 + dur); o.connect(g); g.connect(Aud.master); o.start(t0); o.stop(t0 + dur + .05);
+}
+const SFX = {
+  drum(a){ tone(130, 45, .28, .55 * a, 'sine'); noiseBurst(.08, 400, 1, .12 * a); },
+  boom(){ noiseBurst(.7, 320, 1, .85); tone(95, 32, .6, .8, 'sine'); },
+  volley(){ for(let i = 0; i < 5; i++) setTimeout(() => noiseBurst(.09, 2400 + Math.random() * 1200, 1.2, .22, 'bandpass'), i * 45 + Math.random() * 40); },
+  clash(){ tone(1500 + Math.random() * 900, 900, .13, .10, 'square'); noiseBurst(.07, 4500, 1, .12, 'highpass'); },
+  hoof(){ noiseBurst(.08, 180, 2, .28); setTimeout(() => noiseBurst(.07, 160, 2, .2), 90); }
+};
+function audTick(dt){
+  if(!Aud.ac || !$('sndOn').checked){ if(Aud.master) Aud.master.gain.value = 0; return; }
+  Aud.master.gain.value = .8;
+  const k = model ? stateAt(t) : -1, st = model && k >= 0 && k < model.stages.length ? model.stages[k] : null;
+  const fight = st && Object.keys(st.to).some(id => st.to[id].alive < st.from[id].alive - .1);
+  const target = fight ? .95 : (st ? .5 : .25);
+  Aud.inten += (target - Aud.inten) * Math.min(1, dt * 1.2);
+  Aud.droneF.frequency.value = 200 + 500 * Aud.inten; Aud.droneG.gain.value = .035 + .04 * Aud.inten;
+  const A = Aud.acc; Object.keys(A).forEach(x => A[x] -= dt);
+  if(A.beat <= 0){ A.beat = .66 - .26 * Aud.inten; Aud.beat = (Aud.beat + 1) % 4; SFX.drum(Aud.beat === 0 ? 1 : .55); }
+  if(FX.boom && A.boom <= 0){ A.boom = .9 + Math.random() * 1.3; SFX.boom(); }
+  if(FX.volley && A.volley <= 0){ A.volley = 1.2 + Math.random() * 1.2; SFX.volley(); }
+  if(FX.clash && A.clash <= 0){ A.clash = .16 + Math.random() * .25; SFX.clash(); }
+  if(FX.hoof && A.hoof <= 0){ A.hoof = .2; SFX.hoof(); }
+}
+function audPause(on){ if(Aud.ac){ try{ on ? Aud.ac.suspend() : Aud.ac.resume(); }catch(e){} } }
+
 function frame(ts){
   if(!playing){ return; }
   const dt = Math.min(.1, (ts - lastTs) / 1000); lastTs = ts;
   t += dt;
   if(t >= model.total){ t = model.total; playing = false; $('playBtn').textContent = '▶ Qayta'; if(recorder) stopRec(); }
-  render(t); $('seek').value = Math.round(t / model.total * 1000);
+  render(t); audTick(dt); $('seek').value = Math.round(t / model.total * 1000);
+  if(!playing) audPause(true);
   if(playing) requestAnimationFrame(frame);
 }
-function play(){ if(!model) return; if(t >= model.total) t = 0; playing = true; lastTs = performance.now(); $('playBtn').textContent = '⏸ Pauza'; requestAnimationFrame(frame); }
-$('playBtn').onclick = () => { if(playing){ playing = false; $('playBtn').textContent = '▶ Davom'; } else play(); };
-$('stopBtn').onclick = () => { playing = false; t = 0; $('playBtn').textContent = '▶ Boshlash'; if(model) render(0); $('seek').value = 0; if(recorder) stopRec(); };
+function play(){ if(!model) return; if(t >= model.total) t = 0; playing = true; if($('sndOn').checked){ audInit(); audPause(false); } lastTs = performance.now(); $('playBtn').textContent = '⏸ Pauza'; requestAnimationFrame(frame); }
+$('playBtn').onclick = () => { if(playing){ playing = false; $('playBtn').textContent = '▶ Davom'; audPause(true); } else play(); };
+$('stopBtn').onclick = () => { playing = false; audPause(true); t = 0; $('playBtn').textContent = '▶ Boshlash'; if(model) render(0); $('seek').value = 0; if(recorder) stopRec(); };
 $('seek').oninput = e => { if(!model) return; playing = false; $('playBtn').textContent = '▶ Davom'; t = e.target.value / 1000 * model.total; render(t); };
 $('loadBtn').onclick = () => loadScenario($('scn').value);
 $('lib').onchange = () => { $('scn').value = JSON.stringify(LIB[$('lib').value], null, 1); loadScenario($('scn').value); };
@@ -530,9 +665,11 @@ function stopRec(){ try{ recorder.stop(); }catch(e){} }
 $('recBtn').onclick = () => {
   if(!model) return msg('Avval ssenariyni yuklang.', true);
   if(!cv.captureStream || typeof MediaRecorder === 'undefined') return msg('Brauzer videoga yozishni qo\'llamaydi. Chrome yoki Edge\'da oching.', true);
-  const types = ['video/mp4;codecs=avc1', 'video/mp4', 'video/webm;codecs=vp9', 'video/webm'];
+  const types = ['video/mp4;codecs=avc1,mp4a.40.2', 'video/mp4;codecs=avc1', 'video/mp4', 'video/webm;codecs=vp9', 'video/webm'];
   const mt = types.find(x => MediaRecorder.isTypeSupported(x)) || '';
-  const chunks = []; recorder = new MediaRecorder(cv.captureStream(30), mt ? { mimeType: mt, videoBitsPerSecond: 4e6 } : { videoBitsPerSecond: 4e6 });
+  if($('sndOn').checked) audInit();
+  const vs = cv.captureStream(30); if(Aud.dest && $('sndOn').checked) Aud.dest.stream.getAudioTracks().forEach(tr => vs.addTrack(tr));
+  const chunks = []; recorder = new MediaRecorder(vs, mt ? { mimeType: mt, videoBitsPerSecond: 4e6 } : { videoBitsPerSecond: 4e6 });
   recorder.ondataavailable = e => { if(e.data.size) chunks.push(e.data); };
   recorder.onstop = () => {
     const type = recorder.mimeType || 'video/webm'; recorder = null;
@@ -593,7 +730,7 @@ KEYIN javobni FAQAT bitta JSON obyekt qilib ber (kod bloki ichida bo'lishi mumki
 JSON:
 {
  "title":"JANG NOMI (katta harf, qisqa)","year":"sana","topic":"MAVZU (katta harf)","terrain":"tekislik|daryo|tog'|cho'l|o'rmon",
- "features":[{"type":"river","name":"..","pts":[[x,y],...]},{"type":"mountain","x":..,"y":..,"r":..},{"type":"forest","x":..,"y":..,"r":..}],
+ "features":[{"type":"river","name":"..","pts":[[x,y],...]},{"type":"mountain","x":..,"y":..,"r":..},{"type":"forest","x":..,"y":..,"r":..},{"type":"hill","x":..,"y":..,"r":..},{"type":"place","kind":"city|village|fort","name":"Joy nomi","x":..,"y":..}],
  "sides":[
   {"name":"1-tomon","color":"#C62828","commander":"Sarkarda ismi","groups":[{"id":"a1","name":"Markaz","kind":"piyoda","weapon":"nayza, qilich","count":30000,"x":46,"y":80,"commander":true}]},
   {"name":"2-tomon","color":"#2E9E4F","commander":"Sarkarda ismi","groups":[{"id":"b1","name":"Markaz","kind":"piyoda","count":25000,"x":46,"y":30,"commander":true}]}
