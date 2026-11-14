@@ -1,9 +1,9 @@
-const CACHE_NAME = 'oquv-vositalari-v4';
+const CACHE_NAME = 'oquv-vositalari-v5';
 
 // Sayt fayllari (oflayn ochilishi uchun oldindan saqlanadi).
 const LOCAL_ASSETS = [
   '/', '/index.html', '/manifest.json',
-  '/slayd-yaratuvchi.html', '/sinf-musobaqasi.html', '/imtihon.html', '/fayl-uzatish.html',
+  '/slayd-yaratuvchi.html', '/sinf-musobaqasi.html', '/imtihon.html', '/jang-xaritasi.html', '/fayl-uzatish.html',
   '/dars-jadvali.html', '/aqlli-takrorlash.html', '/yurishlar-xaritasi.html', '/amir-temur-kengayishi.html',
   '/fayl-core.js', '/fayl-ui.js', '/fayl-telegram.js', '/fayl-stash.js', '/fayl-stash-api.js', '/fayl-storage.js',
   '/aqlli-c1a.js', '/aqlli-c1b.js', '/aqlli-core2.js', '/aqlli-import.js',
