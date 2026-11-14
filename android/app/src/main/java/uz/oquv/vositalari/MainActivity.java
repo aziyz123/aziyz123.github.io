@@ -207,7 +207,25 @@ public class MainActivity extends Activity {
         }
     }
 
+    private boolean examLocked = false;
+
     private class Bridge {
+        /** Imtihon vaqtida ekranni qotiradi (screen pinning): Home/Recent tugmalari ishlamaydi. */
+        @JavascriptInterface
+        public void lockExam() {
+            runOnUiThread(() -> {
+                try { startLockTask(); examLocked = true; } catch (Exception ignored) { }
+            });
+        }
+
+        @JavascriptInterface
+        public void unlockExam() {
+            runOnUiThread(() -> {
+                try { stopLockTask(); } catch (Exception ignored) { }
+                examLocked = false;
+            });
+        }
+
         @JavascriptInterface
         public void save(String name, String mime, String b64) {
             saveBytes(name, mime, Base64.decode(b64, Base64.DEFAULT));
@@ -244,6 +262,7 @@ public class MainActivity extends Activity {
 
     @Override
     public void onBackPressed() {
+        if (examLocked) return;
         if (web.canGoBack()) web.goBack();
         else super.onBackPressed();
     }

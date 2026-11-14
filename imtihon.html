@@ -896,7 +896,7 @@ function runStudentView(roomCode){
             pos = p.currentIndex || 0; myScore = p.score || 0; testActive = true;
             startedAtLocal = p.startedAtLocal || Date.now(); qStart = p.qStart || Date.now();
             qOrder = p.variant.qOrder; variantId = p.variant.id;
-            showView('playScreen');
+            showView('playScreen'); nat('lockExam');
             registerLeave('sahifa qayta yuklandi'); // qayta yuklash ham chiqish hisoblanadi
             if(testActive) renderQuestion();
           } else { showView('waitScreen'); }
@@ -915,13 +915,14 @@ function runStudentView(roomCode){
     variantId = 'V' + Math.random().toString(36).slice(2, 6).toUpperCase();
     myRef.update({ status: 'in_progress', startedAtLocal, qStart, score: 0, currentIndex: 0, answers: null, finishedAt: null, endReason: null, away: false,
       variant: { id: variantId, qOrder } });
-    enterFullscreen();
+    enterFullscreen(); nat('lockExam');
     try{ history.pushState({ exam:1 }, '', location.href); }catch(e){}
     showView('playScreen');
     startTimer();
     renderQuestion();
   }
 
+  const nat = (m) => { try{ if(window.AndroidBridge && AndroidBridge[m]) AndroidBridge[m](); }catch(e){} };
   function enterFullscreen(){
     try{ const el = document.documentElement; (el.requestFullscreen || el.webkitRequestFullscreen || function(){ return Promise.reject(); }).call(el).catch(()=>{}); }catch(e){}
   }
@@ -1013,7 +1014,7 @@ function runStudentView(roomCode){
     leaveFullscreen();
     showView('doneScreen');
   }
-  function leaveFullscreen(){ try{ if(document.fullscreenElement) document.exitFullscreen(); }catch(e){} }
+  function leaveFullscreen(){ nat('unlockExam'); try{ if(document.fullscreenElement) document.exitFullscreen(); }catch(e){} }
 
   function retake(){
     examRef.child('status').once('value').then((snap) => {
@@ -1039,6 +1040,7 @@ function runStudentView(roomCode){
     if(leaves >= settings.maxLeaves){
       testActive = false; clearInterval(timerH);
       myRef.update({ status: 'violated', score: myScore, finishedAt: Date.now(), away: true });
+      leaveFullscreen();
       showView('violatedScreen');
       return;
     }

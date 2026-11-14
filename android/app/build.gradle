@@ -10,8 +10,8 @@ android {
         applicationId 'uz.oquv.vositalari'
         minSdk 24
         targetSdk 34
-        versionCode 3
-        versionName '1.2'
+        versionCode 4
+        versionName '1.3'
     }
 
     // Barqaror imzo: yangilanganda ilovani o'chirib qayta o'rnatish shart emas
