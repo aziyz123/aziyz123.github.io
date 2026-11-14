@@ -616,40 +616,37 @@ if(addRoomCode){
 
 
 function normalizeQA(raw){
-  // AI javobini tozalash: apostroflar, markdown, belgilar, "SAVOL:" tegi, qator uzilishlari
-  const lines = String(raw || '').replace(/\r/g,'')
+  // AI javobini tozalab, savollarni BO'SH QATORGA TAYANMAY, mazmuniga qarab bloklarga ajratadi
+  let lines = String(raw || '').replace(/\r/g,'')
     .replace(/[​-‍﻿]/g,'').replace(/[   ]/g,' ')
     .replace(/```/g,'').replace(/\*\*|__/g,'')
     .replace(/[ʻʼ’‘`´ʹ′]/g,"'").split('\n');
-  const Q_RE = /^(?:(?:savol|savoli|question|q)\s*\d*\s*[:.)\-–—]\s*|\d+\s*[.)\-–—]\s*(?:savol\s*[:.]?\s*)?)/i;
-  const A_RE = /^(?:to'g'ri\s+javob|togri\s+javob|tog'ri\s+javob|javobi|javob|correct\s+answer|answer)\s*[:\-–—=]?\s*(\S.*)$/i;
   // variantlar bir qatorga yozilgan bo'lsa ("A) x B) y C) z D) w"), ajratamiz
   const spread = [];
   lines.forEach(l => {
     if(/^[^\p{L}\p{N}(]*\(?[Aa][).:]\s.+\s\(?[Bb][).:]\s/u.test(l)) l.split(/\s+(?=\(?[B-Db-d][).:]\s)/).forEach(x => spread.push(x));
     else spread.push(l);
   });
-  lines.length = 0; spread.forEach(x => lines.push(x));
-  const out = []; let seenAnswer = false;
-  lines.forEach(l0 => {
-    // boshidagi emoji, ro'yxat belgilari va boshqa ortiqcha belgilarni olib tashlaymiz
-    let l = l0.replace(/^[^\p{L}\p{N}(\[]+/u, '').replace(/^\[|\]$/g,'').trim();
-    if(!l){ out.push(''); return; }
-    const isQ = Q_RE.test(l);
-    if(isQ && seenAnswer && out.length && out[out.length-1].trim() !== '') out.push('');
-    if(isQ){ seenAnswer = false; l = l.replace(Q_RE, '').trim(); }
-    else {
-      const am = l.match(A_RE);
-      if(am){ l = 'Javob: ' + am[1].trim().replace(/^[(\[]\s*/,''); seenAnswer = true; }
-      else {
-        // variantlar: (A) matn / A. matn / A) matn / A: matn  ->  A) matn
-        const om = l.match(/^\(?([A-Da-d])(?:\)|\.|:)\s*(\S.*)$/);
-        if(om) l = om[1].toUpperCase() + ') ' + om[2].trim();
-      }
-    }
-    out.push(l);
+  const Q_RE = /^(?:(?:savol|savoli|question|q)\s*\d*\s*[:.)\-–—]\s*|\d+\s*[.)\-–—]\s*(?:savol\s*[:.]?\s*)?)/i;
+  const A_RE = /^(?:to'g'ri\s+javob|togri\s+javob|tog'ri\s+javob|javobi|javob|correct\s+answer|answer)\s*[:\-–—=]?\s*(\S.*)$/i;
+  const SKIP_RE = /^(?:izoh|tushuntirish|eslatma|manba|explanation|note)\s*[:\-–—]/i;
+  const blocks = []; let cur = null;
+  const start = () => { cur = { q: '', opts: [], ans: null }; blocks.push(cur); };
+  spread.forEach(l0 => {
+    const l = l0.replace(/^[^\p{L}\p{N}(\[]+/u, '').replace(/^\[|\]$/g,'').trim();
+    if(!l) return;                                   // bo'sh qatorlarga e'tibor bermaymiz
+    if(Q_RE.test(l)){ start(); cur.q = l.replace(Q_RE, '').trim(); return; }
+    const am = l.match(A_RE);
+    if(am){ if(!cur) start(); if(cur.ans === null) cur.ans = am[1].trim().replace(/^[(\[]\s*/,''); return; }
+    if(SKIP_RE.test(l)) return;
+    const om = l.match(/^\(?([A-Da-d])(?:\)|\.|:)\s*(\S.*)$/);
+    if(om && cur && cur.ans === null){ cur.opts.push(om[2].trim()); return; }
+    // oddiy matn: yangi (tegsiz) savol yoki joriy savol/variantning davomi
+    if(!cur || cur.ans !== null){ start(); cur.q = l; return; }
+    if(cur.opts.length) cur.opts[cur.opts.length-1] += ' ' + l;
+    else cur.q = (cur.q ? cur.q + ' ' : '') + l;
   });
-  return out.join('\n').replace(/\n{3,}/g,'\n\n');
+  return blocks.map(b => [b.q].concat(b.opts.map((o,i) => String.fromCharCode(65+i) + ') ' + o)).concat(b.ans !== null ? ['Javob: ' + b.ans] : []).join('\n')).join('\n\n');
 }
 
 function parseQA(rawText){
@@ -760,9 +757,15 @@ function updatePreview(){
     return;
   }
   let msg = questions.length + ' ta savol aniqlandi.';
+  window.__qaList = questions.map((q,i) => (i+1) + '. ' + q.question.slice(0,70) + (q.type==='mc' ? '  [' + q.options.length + ' variant, javob ' + String.fromCharCode(65+q.correctIndex) + ']' : '  [ochiq]'));
   if(numGames > 1) msg += ' (' + numGames + ' o\'yinga bo\'linsa, har birida ~' + Math.floor(questions.length/numGames) + ' tadan)';
   if(warnings.length) msg += ' — ' + warnings.length + ' ta blokda muammo bor';
   parsedPreview.textContent = msg;
+  const det = document.createElement('details'); det.style.marginTop = '6px';
+  const sm = document.createElement('summary'); sm.textContent = "Aniqlangan savollar ro'yxati (tekshirish uchun)"; sm.style.cursor = 'pointer';
+  const pre = document.createElement('pre'); pre.style.cssText = 'white-space:pre-wrap;font-size:12px;margin:6px 0 0;'; pre.textContent = window.__qaList.join('\n');
+  det.appendChild(sm); det.appendChild(pre); parsedPreview.appendChild(det);
+  if(warnings.length){ const w = document.createElement('div'); w.style.cssText = 'font-size:12px;opacity:.8;margin-top:4px;'; w.textContent = warnings.slice(0,5).join(' '); parsedPreview.appendChild(w); }
 }
 qaTextEl.addEventListener('input', updatePreview);
 

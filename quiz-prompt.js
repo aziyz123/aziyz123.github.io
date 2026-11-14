@@ -1,7 +1,7 @@
 /*
  * Bilim Kechasi uchun AI so'rovi (prompt) yasovchi.
  * Ishlatish: QuizPrompt.mount(document.getElementById('joy'));
- * AI javobi "SAVOL:" tegli, Bilim Kechasi o'qiy oladigan formatda bo'ladi.
+ * AI javobi "SAVOL 1:, SAVOL 2:..." tegli, Bilim Kechasi o'qiy oladigan formatda bo'ladi.
  */
 (function () {
   'use strict';
@@ -16,18 +16,18 @@
     var typeRule, example;
     if (o.type === 'open') {
       typeRule = "Hamma savol OCHIQ turda bo'lsin: variantsiz, javobi 1-5 so'zli qisqa va aniq (ism, sana, joy nomi, atama).";
-      example = "SAVOL: Amir Temur qaysi yilda tug'ilgan?\nJavob: 1336-yilda\n\nSAVOL: Samarqanddagi uchta madrasali mashhur maydon qanday nomlanadi?\nJavob: Registon";
+      example = "SAVOL 1: Amir Temur qaysi yilda tug'ilgan?\nJavob: 1336-yilda\n\nSAVOL 2: Samarqanddagi uchta madrasali mashhur maydon qanday nomlanadi?\nJavob: Registon";
     } else if (o.type === 'mix') {
       typeRule = "Savollarning taxminan 80% i VARIANTLI (A, B, C, D), 20% i OCHIQ (variantsiz, javobi 1-5 so'zli qisqa) bo'lsin.";
-      example = "SAVOL: O'zbekiston poytaxti qaysi shahar?\nA) Samarqand\nB) Buxoro\nC) Toshkent\nD) Andijon\nJavob: C\n\nSAVOL: Amir Temur qaysi yilda tug'ilgan?\nJavob: 1336-yilda";
+      example = "SAVOL 1: O'zbekiston poytaxti qaysi shahar?\nA) Samarqand\nB) Buxoro\nC) Toshkent\nD) Andijon\nJavob: C\n\nSAVOL 2: Amir Temur qaysi yilda tug'ilgan?\nJavob: 1336-yilda";
     } else {
       typeRule = "Hamma savol VARIANTLI bo'lsin: aynan 4 ta variant (A, B, C, D), faqat bittasi to'g'ri.";
-      example = "SAVOL: O'zbekiston poytaxti qaysi shahar?\nA) Samarqand\nB) Buxoro\nC) Toshkent\nD) Andijon\nJavob: C\n\nSAVOL: Registon maydoni qaysi shaharda joylashgan?\nA) Buxoro\nB) Samarqand\nC) Xiva\nD) Termiz\nJavob: B";
+      example = "SAVOL 1: O'zbekiston poytaxti qaysi shahar?\nA) Samarqand\nB) Buxoro\nC) Toshkent\nD) Andijon\nJavob: C\n\nSAVOL 2: Registon maydoni qaysi shaharda joylashgan?\nA) Buxoro\nB) Samarqand\nC) Xiva\nD) Termiz\nJavob: B";
     }
     return "Sen o'qituvchi uchun viktorina (Bilim Kechasi) savollarini tayyorlaydigan yordamchisan. Mavzu: \"" + topic + "\"." + lvl + "\n\n" +
       n + " ta savol tayyorla" + (diff ? ", " + diff : "") + ". " + typeRule + "\n\n" +
       "Javobni o'zbek tilida (lotin yozuvida) va QAT'IY QUYIDAGI FORMATDA yoz:\n" +
-      "1) Har savol ALOHIDA QATORDA \"SAVOL: \" so'zi bilan boshlansin va savol matni shu qatorda tugasin.\n" +
+      "1) Har savol ALOHIDA QATORDA \"SAVOL 1:\", \"SAVOL 2:\", \"SAVOL 3:\" ... shaklida tartib raqami bilan boshlansin va savol matni shu qatorda tugasin. Oxirgi savolning raqami " + n + " bo'lishi shart.\n" +
       "2) Variantli savolda keyingi 4 qator: \"A) ...\", \"B) ...\", \"C) ...\", \"D) ...\". Oxirida alohida qatorda \"Javob: \" va FAQAT to'g'ri variant harfi (masalan: Javob: C).\n" +
       "3) Ochiq savolda variant bo'lmaydi, faqat \"Javob: \" va qisqa javob.\n" +
       "4) Savollar orasida BITTA BO'SH QATOR qoldir.\n" +
@@ -36,7 +36,7 @@
       "7) To'g'ri javob harflari (A, B, C, D) orasida teng taqsimlansin, ko'pchiligi bitta harfga tushmasin.\n" +
       "8) Savollar takrorlanmasin va turli jihatlarni qamrasin.\n" +
       "9) Faqat tekshirilgan, aniq ma'lumot yoz. Sana, raqam yoki ismga ishonching komil bo'lmasa, o'sha savolni tashlab, boshqasini yoz.\n" +
-      "10) Hech qanday bezak qo'shma: # belgisi, qalin yoki qiyshiq yozuv (** va *), nuqtali ro'yxat, jadval, emoji, havola bo'lmasin. Savollarni raqamlama.\n" +
+      "10) Hech qanday bezak qo'shma: # belgisi, qalin yoki qiyshiq yozuv (** va *), nuqtali ro'yxat, jadval, emoji, havola bo'lmasin. Tushuntirish yoki izoh qatori yozma.\n" +
       "11) Faqat tayyor savollarning o'zini ber. Oldidan va keyinidan tushuntirish, izoh yoki salomlashish yozma.\n\n" +
       "Namuna format:\n" + example;
   }
