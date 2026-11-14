@@ -64,12 +64,26 @@
       </div>
 
       <div class="card">
-        <h2>2 · AI uchun so'rov (prompt)</h2>
+        <h2>2 · Tayyor namuna / AI uchun so'rov</h2>
         <label for="pBattle">Jang nomi</label>
-        <input type="text" id="pBattle" placeholder="Masalan: Jaloliddin Manguberdi — Sind (Hind) daryosi jangi, 1221">
-        <label for="pExtra">Qo'shimcha (ixtiyoriy)</label>
-        <input type="text" id="pExtra" placeholder="Masalan: darslikdagi ma'lumotga tayan, 6 bosqich">
-        <div class="row"><button id="pBtn">📋 So'rovni nusxalash</button></div>
+        <input type="text" id="pBattle" placeholder="Masalan: Sind daryosi jangi">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <div><label for="pYear">Yili</label><input type="text" id="pYear" placeholder="1221-yil"></div>
+          <div><label for="pTerr">Joy</label><select id="pTerr"><option>tekislik</option><option>daryo</option><option>tog'</option><option>cho'l</option><option>o'rmon</option></select></div>
+          <div><label for="pS0">1-tomon</label><input type="text" id="pS0" placeholder="Xorazmshohlar"></div>
+          <div><label for="pS1">2-tomon</label><input type="text" id="pS1" placeholder="Mo'g'ullar"></div>
+          <div><label for="pC0">1-sarkarda</label><input type="text" id="pC0" placeholder="Jaloliddin Manguberdi"></div>
+          <div><label for="pC1">2-sarkarda</label><input type="text" id="pC1" placeholder="Chingizxon"></div>
+          <div><label for="pN0">1-tomon soni</label><input type="text" id="pN0" placeholder="30000"></div>
+          <div><label for="pN1">2-tomon soni</label><input type="text" id="pN1" placeholder="60000"></div>
+        </div>
+        <label for="pWin">G'olib</label>
+        <select id="pWin"><option value="0">1-tomon</option><option value="1">2-tomon</option></select>
+        <div class="row">
+          <button id="skBtn">⚡ Tayyor namuna yasash</button>
+          <button id="pBtn" class="alt">📋 AI uchun so'rov</button>
+        </div>
+        <div class="hint">«Tayyor namuna» — AI'siz, kiritgan ma'lumotingizdan darhol ishlaydigan jang yasaydi (qo'shin joylashuvi, yurishlar, yo'qotishlar avtomatik). «AI uchun so'rov» — shu namunani ham ichiga qo'shib, AI'ga tarixiy aniq variantga tuzatish buyuradi.</div>
         <div class="msg" id="pMsg"></div>
       </div>
 
@@ -398,37 +412,63 @@ $('recBtn').onclick = () => {
   t = 0; recorder.start(); play(); msg('⏺ Yozilmoqda... tugaguncha sahifani yopmang (' + Math.round(model.total) + ' soniya).');
 };
 
-// ---------- AI so'rovi ----------
+// ---------- Tayyor namuna va AI so'rovi ----------
+function formVals(){
+  const g = id => $(id).value.trim();
+  const num = (v, d) => { const n = parseInt(String(v).replace(/\D/g, ''), 10); return n > 0 ? n : d; };
+  return { name: g('pBattle'), year: g('pYear'), terr: g('pTerr'), s0: g('pS0') || '1-tomon', s1: g('pS1') || '2-tomon',
+    c0: g('pC0') || 'Sarkarda 1', c1: g('pC1') || 'Sarkarda 2', n0: num(g('pN0'), 30000), n1: num(g('pN1'), 30000), win: +$('pWin').value };
+}
+function makeSkeleton(f){
+  const mk = (n, i, ids) => {
+    const top = i === 1, Y = y => top ? 100 - y : y;
+    const sh = [['Markaz', 'piyoda', .4, 46, 80, true], ["O'ng qanot", 'otliq', .25, 76, 78], ['Chap qanot', 'otliq', .25, 16, 78], ['Zaxira (kamonchilar)', 'kamonchi', .1, 46, 92]];
+    return sh.map((r, k) => ({ id: ids[k], name: r[0], kind: r[1], count: Math.round(n * r[2] / 100) * 100, x: r[3], y: top ? 100 - r[4] : r[4], commander: !!r[5] }));
+  };
+  const A = ['a1', 'a2', 'a3', 'a4'], B = ['b1', 'b2', 'b3', 'b4'];
+  const terr = f.terr.toLowerCase(); const features = [];
+  if(/daryo/.test(terr)) features.push({ type: 'river', name: 'Daryo', pts: [[0, 55], [25, 49], [45, 54], [65, 47], [85, 52], [100, 46]] });
+  if(/tog/.test(terr)) features.push({ type: 'mountain', x: 84, y: 14, r: 12 }, { type: 'mountain', x: 14, y: 12, r: 10 }, { type: 'mountain', x: 88, y: 88, r: 10 });
+  if(/o'rmon/.test(terr)) features.push({ type: 'forest', x: 15, y: 50, r: 12 }, { type: 'forest', x: 85, y: 50, r: 12 });
+  const W = f.win, L = 1 - W, wi = W ? B : A, li = L ? B : A, ws = W ? f.s1 : f.s0, ls = L ? f.s1 : f.s0;
+  const stages = [
+    { text: f.s0 + ' va ' + f.s1 + ' qo\'shinlari jang maydonida saf tortadi.', cam: [50, 52, 0.85], dur: 5 },
+    { text: 'Qo\'shinlar bir-biriga yaqinlashadi.', cam: [50, 52, 1], dur: 5, moves: [{ g: 'a1', to: [46, 64] }, { g: 'a4', to: [46, 76] }, { g: 'b1', to: [46, 36] }, { g: 'b4', to: [46, 24] }] },
+    { text: 'Ikki tomon otliqlari qanotlarda hujumga o\'tadi.', cam: [50, 50, 1.1], dur: 6, moves: [{ g: 'a2', to: [76, 56] }, { g: 'a3', to: [16, 56] }, { g: 'b2', to: [76, 44] }, { g: 'b3', to: [16, 44] }] },
+    { text: 'Markazda shiddatli to\'qnashuv boshlanadi.', cam: [46, 50, 1.5], dur: 6, moves: [{ g: 'a1', to: [46, 55] }, { g: 'b1', to: [46, 45] }], losses: { a1: .7, b1: .7 } },
+    { text: ws + ' qanotlardan aylanib o\'tib, qurshov hosil qiladi.', cam: [46, 48, 1.4], dur: 7,
+      moves: wi.slice(1, 3).map((id, k) => ({ g: id, to: [k ? 30 : 62, 46] })), losses: Object.assign({}, ...li.map(id => ({ [id]: .25 })), ...wi.map(id => ({ [id]: .75 }))) },
+    { text: ls + ' safi buzilib, qo\'shin tor-mor qilinadi.', cam: [46, 48, 1.6], dur: 5, losses: Object.assign({}, ...li.map(id => ({ [id]: .03 })), ...wi.map(id => ({ [id]: .7 }))) }
+  ];
+  return { title: (f.name || 'JANG').toUpperCase(), year: f.year, topic: '', terrain: f.terr, features,
+    sides: [{ name: f.s0, color: '#C62828', commander: f.c0, groups: mk(f.n0, 0, A) }, { name: f.s1, color: '#2E9E4F', commander: f.c1, groups: mk(f.n1, 1, B) }],
+    stages, result: ws + ' g\'alaba qozondi, ' + ls + ' qo\'shini mag\'lub bo\'ldi.' };
+}
+$('skBtn').onclick = () => {
+  const f = formVals(); if(!f.name){ $('pMsg').textContent = 'Jang nomini kiriting.'; return; }
+  $('scn').value = JSON.stringify(makeSkeleton(f), null, 1);
+  if(loadScenario($('scn').value)) $('pMsg').textContent = '✓ Namuna tayyor va yuklandi. Tarixiy aniqlik uchun «AI uchun so\'rov»dan foydalaning.';
+};
 $('pBtn').onclick = () => {
-  const b = $('pBattle').value.trim(); if(!b){ $('pMsg').textContent = 'Jang nomini kiriting.'; return; }
-  const ex = $('pExtra').value.trim();
+  const f = formVals(); if(!f.name){ $('pMsg').textContent = 'Jang nomini kiriting.'; return; }
+  const sk = JSON.stringify(makeSkeleton(f));
   const p = `Sen tarixchi va xarita rejissyorisan. Quyidagi jangni xaritada animatsiya qilish uchun FAQAT bitta JSON obyekt qaytar (izoh, markdown, \`\`\` belgisisiz).
 
-JANG: ${b}${ex ? '\nQO\'SHIMCHA: ' + ex : ''}
+JANG: ${f.name}${f.year ? ' (' + f.year + ')' : ''}
+Foydalanuvchi bergan ma'lumot: 1-tomon — ${f.s0} (sarkarda: ${f.c0}, ~${f.n0}); 2-tomon — ${f.s1} (sarkarda: ${f.c1}, ~${f.n1}); joy: ${f.terr}; g'olib: ${f.win ? f.s1 : f.s0}.
 
-JSON tuzilishi:
-{
- "title": "JANG NOMI (katta harf, qisqa)", "year": "1402-yil, 20-iyul", "topic": "MAVZU (katta harf)",
- "terrain": "tekislik | daryo | tog' | cho'l | o'rmon",
- "features": [ {"type":"river","name":"Daryo nomi","pts":[[0,60],[30,55],[60,62],[100,58]]}, {"type":"mountain","x":80,"y":15,"r":10}, {"type":"forest","x":20,"y":20,"r":10} ],
- "sides": [
-  {"name":"1-tomon nomi","color":"#C62828","commander":"Sarkarda ismi","groups":[ {"id":"a1","name":"Markaz","kind":"piyoda","count":30000,"x":46,"y":80,"commander":true}, ... ]},
-  {"name":"2-tomon nomi","color":"#2E9E4F","commander":"Sarkarda ismi","groups":[ ... ]}
- ],
- "stages": [
-  {"text":"Bosqich tavsifi (o'zbekcha, 90 belgidan oshmasin)","cam":[50,55,1],"dur":5,
-   "moves":[{"g":"a1","to":[46,60]}], "losses":{"b1":0.5}, "defect":[{"g":"b3","to":0}]}
- ],
- "result":"Natija (bir gap)"
-}
+Pastda BOSHLANG'ICH QORALAMA berilgan. Uni tarixiy manbalar bo'yicha TUZAT va to'ldir: tomonlar nomi, sarkardalar, haqiqiy qo'shin sonlari (manbalar farq qilsa o'rtacha), guruhlar (turi, soni, joyi), joy xususiyatlari (daryo, tog', o'rmon), 5–8 ta bosqich (haqiqiy taktika: pistirma, xiyonat, qurshov, qanot hujumi va h.k.), natija. Format va maydon nomlarini o'zgartirma.
 
-QOIDALAR:
-- Xarita koordinatalari 0..100: x — g'arbdan sharqqa, y — shimoldan janubga (y=0 tepada). 1-tomon pastda (y 65–95), 2-tomon tepada (y 5–35) joylashsin, yoki jang geografiyasiga mos qilib.
-- "kind": piyoda | otliq | kamonchi | fil. "count" — tarixiy manbalardagi taxminiy son (manbalar farq qilsa o'rtacha son ol). Har tomonda 3–6 guruh, har tomonda bitta "commander":true guruh.
-- "stages": 5–8 ta, tarixiy ketma-ketlikda: joylashuv → yaqinlashish → qanotlardan hujum → hal qiluvchi lahza (xiyonat, pistirma, qurshov) → natija. "moves" faqat harakatlanayotgan guruhlar. "losses" — guruhning qolgan ulushi (0..1, 0 = yo'q bo'ldi). "defect" — guruh tomon almashtirsa (to: tomon indeksi 0 yoki 1). "cam":[markazX, markazY, zoom 0.8–2].
-- Daryo, tog', o'rmon — jang o'tgan haqiqiy joyga mos. Ma'lumotni to'qima: aniq bilmasang, mavjud manbalardagi eng ehtimoliy variantni ol.
-- Matnlar o'zbek tilida (lotin), qisqa va tushunarli, maktab o'quvchisiga mos.`;
-  navigator.clipboard.writeText(p).then(() => { $('pMsg').textContent = '✓ Nusxalandi. AI\'ga joylang, javobdagi JSON\'ni 1-bo\'limga qo\'ying.'; }).catch(() => { $('scn').value = p; $('pMsg').textContent = 'Nusxalab bo\'lmadi — so\'rov 1-bo\'lim maydoniga qo\'yildi, uni nusxalang.'; });
+FORMAT QOIDALARI:
+- Koordinatalar 0..100: x — g'arbdan sharqqa, y — shimoldan janubga (y=0 tepada). Tomonlar xarita ikki chetida (yoki geografiyaga mos).
+- "kind": piyoda | otliq | kamonchi | fil. Har tomonda 3–6 guruh, har tomonda bitta "commander":true.
+- features: {"type":"river","name":"..","pts":[[x,y],...]} | {"type":"mountain","x":..,"y":..,"r":..} | {"type":"forest","x":..,"y":..,"r":..}.
+- stages: {"text":"o'zbekcha, ≤90 belgi","cam":[markazX,markazY,zoom 0.8–2],"dur":4–7,"moves":[{"g":"id","to":[x,y]}],"losses":{"id":qolganUlush 0..1},"defect":[{"g":"id","to":tomonIndeksi}]}.
+- Aniq bilmasang to'qima, eng ehtimoliy variantni ol. Matnlar o'zbek (lotin), maktab o'quvchisiga mos.
+
+BOSHLANG'ICH QORALAMA:
+${sk}`;
+  navigator.clipboard.writeText(p).then(() => { $('pMsg').textContent = '✓ So\'rov nusxalandi (ichida tayyor namuna ham bor). AI\'ga joylang, javobdagi JSON\'ni 1-bo\'limga qo\'ying.'; }).catch(() => { $('scn').value = p; $('pMsg').textContent = 'Nusxalab bo\'lmadi — so\'rov 1-bo\'lim maydoniga qo\'yildi, uni nusxalang.'; });
 };
 
 $('scn').value = JSON.stringify(DEMO, null, 1); loadScenario($('scn').value);
