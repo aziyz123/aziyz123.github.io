@@ -9,6 +9,8 @@
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
   :root{
     --stage:#12151C; --stage-2:#1B2029; --stage-3:#262D3A;
@@ -133,6 +135,19 @@
     display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px;
   }
   .app-footer a{ color: var(--gold-2); text-decoration:none; }
+  .lb-sub{ flex-basis:100%; font-size:11px; color:rgba(243,239,228,0.5); margin:4px 0 0 44px; }
+  .set-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .set-grid label{ margin-top:0; }
+  .chk{ display:flex; align-items:center; gap:8px; margin-top:12px; font-size:14px; }
+  .chk input{ width:auto; margin:0; }
+  #leaveToasts{ position:fixed; top:12px; left:12px; right:12px; z-index:50; display:flex; flex-direction:column; gap:8px; pointer-events:none; }
+  .toast{ background:#B23A3A; color:#fff; padding:12px 14px; border-radius:10px; font-weight:700; font-size:14px; box-shadow:0 6px 20px rgba(0,0,0,.4); }
+  .timerRow{ display:flex; justify-content:space-between; font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--gold-2); margin-top:8px; }
+  .tbar{ height:6px; background:rgba(255,255,255,0.1); border-radius:4px; margin-top:6px; overflow:hidden; }
+  .tbar i{ display:block; height:100%; width:100%; background:var(--gold); transition:width .25s linear; }
+  .tbar i.low{ background:#E5534B; }
+  #warnBar{ display:none; background:#B23A3A; color:#fff; padding:10px 12px; border-radius:8px; margin-top:12px; font-size:13px; font-weight:600; line-height:1.4; }
+  #playScreen{ user-select:none; -webkit-user-select:none; }
 </style>
 </head>
 <body>
@@ -169,6 +184,20 @@ Javob: C</div>
       <div class="parsed-preview" id="examPreview"></div>
       <div class="error-box" id="hostError"></div>
     </div>
+    <div class="card">
+      <h2>2 · Vaqt va qoidalar</h2>
+      <div class="set-grid">
+        <div><label for="setPerQ">Har bir savolga (soniya)</label><input type="number" id="setPerQ" value="45" min="10" max="600"></div>
+        <div><label for="setTotal">Umumiy vaqt (daqiqa)</label><input type="number" id="setTotal" placeholder="avtomatik" min="1" max="300"></div>
+      </div>
+      <div class="hint" id="autoTotal"></div>
+      <div class="hint">Xalqaro amaliyot: test savoliga odatda 30–60 soniya (hisob-kitobli savolga 90 soniyagacha); umumiy vaqt = savollar soni × savolga ajratilgan vaqt. Variantsiz (ochiq) savolga ikki baravar vaqt beriladi.</div>
+      <div class="set-grid" style="margin-top:12px;">
+        <div><label for="setMaxLeaves">Necha marta chiqsa test yopiladi</label><input type="number" id="setMaxLeaves" value="3" min="1" max="20"></div>
+      </div>
+      <label class="chk"><input type="checkbox" id="setShuffleQ" checked> Har bir o'quvchiga savollar tartibi turlicha (variant)</label>
+      <div class="hint">Javob variantlari (A, B, C, D) har doim aralashtiriladi va o'quvchi ilovadan chiqib qaytsa qayta aralashadi. Savollar faqat ketma-ket: javob bermay keyingisiga o'tib bo'lmaydi, orqaga qaytib bo'lmaydi.</div>
+    </div>
     <button class="primary" id="createExamBtn">Test yaratish</button>
   </div>
 
@@ -180,6 +209,7 @@ Javob: C</div>
         <div>
           <div class="room-code" id="roomCodeDisplay"></div>
           <div class="hint" id="roomUrlDisplay"></div>
+          <div class="hint" id="lobbyRules"></div>
         </div>
       </div>
     </div>
@@ -190,6 +220,7 @@ Javob: C</div>
     <button class="primary" id="startExamBtn">Testni boshlash</button>
   </div>
 
+  <div id="leaveToasts"></div>
   <div id="hostMonitor" style="display:none;">
     <div class="card">
       <h2>Jarayon (<span id="pCount2">0</span> ishtirokchi)</h2>
@@ -202,9 +233,10 @@ Javob: C</div>
     <div class="card">
       <h2>🏆 Yakuniy reyting</h2>
       <div id="leaderboardList"></div>
-      <div style="display:flex; gap:10px; margin-top:16px;">
-        <button class="primary" id="exportPdfBtn" style="margin-top:0;">🖨 PDF (chop etish)</button>
-        <button class="primary" id="exportWordBtn" style="margin-top:0; background:linear-gradient(135deg, var(--t2), var(--t4)); color:#fff;">📄 Word yuklab olish</button>
+      <div style="display:flex; gap:10px; margin-top:16px; flex-wrap:wrap;">
+        <button class="primary" id="exportExcelBtn" style="margin-top:0; background:linear-gradient(135deg,#1D6F42,#2E8B5C); color:#fff;">📊 Excel</button>
+        <button class="primary" id="exportPdfBtn" style="margin-top:0;">🖨 PDF</button>
+        <button class="primary" id="exportWordBtn" style="margin-top:0; background:linear-gradient(135deg, var(--t2), var(--t4)); color:#fff;">📄 Word (.docx)</button>
       </div>
     </div>
     <button class="primary" id="newExamBtn">Yangi test yaratish</button>
@@ -243,6 +275,9 @@ Javob: C</div>
 
   <div id="playScreen" class="wrap narrow">
     <div class="qtag" id="qProgress">Savol 1 / 10</div>
+    <div class="timerRow"><span id="qTimeTxt">⏱</span><span id="totTimeTxt"></span></div>
+    <div class="tbar"><i id="tbarFill"></i></div>
+    <div id="warnBar"></div>
     <div class="qtext" id="qText"></div>
     <div id="qOptions"></div>
   </div>
@@ -258,9 +293,7 @@ Javob: C</div>
   <div id="violatedScreen" class="wrap narrow">
     <div class="big-icon">⚠️</div>
     <div class="center-title">Test yopildi</div>
-    <div class="center-sub">Boshqa oyna yoki ilovaga o'tganingiz sababli test avtomatik yakunlandi.</div>
-    <button class="primary" id="retakeBtn2" style="display:none;">🔁 Qayta boshlash</button>
-    <div class="center-sub" id="retakeNote2" style="display:none;">Test yakunlandi, qayta ishlash imkoni yo'q.</div>
+    <div class="center-sub">Ilovadan bir necha marta chiqqaningiz sababli test yakunlandi. O'qituvchi bu haqda xabardor qilindi.</div>
   </div>
 
 </div>
@@ -284,53 +317,120 @@ function generateRoomCode(){ return String(Math.floor(1000 + Math.random() * 900
 function escapeHtml(str){ const d = document.createElement('div'); d.textContent = str; return d.innerHTML; }
 
 // ================= Parsing (shared) =================
+function normalizeQA(raw){
+  // AI javobini tozalab, savollarni BO'SH QATORGA TAYANMAY, mazmuniga qarab bloklarga ajratadi
+  let lines = String(raw || '').replace(/\r/g,'')
+    .replace(/[​-‍﻿]/g,'').replace(/[   ]/g,' ')
+    .replace(/```/g,'').replace(/\*\*|__/g,'')
+    .replace(/[ʻʼ’‘`´ʹ′]/g,"'").split('\n');
+  // variantlar bir qatorga yozilgan bo'lsa ("A) x B) y C) z D) w"), ajratamiz
+  const spread = [];
+  lines.forEach(l => {
+    if(/^[^\p{L}\p{N}(]*\(?[Aa][).:]\s.+\s\(?[Bb][).:]\s/u.test(l)) l.split(/\s+(?=\(?[B-Db-d][).:]\s)/).forEach(x => spread.push(x));
+    else spread.push(l);
+  });
+  const Q_RE = /^(?:(?:savol|savoli|question|q)\s*\d*\s*[:.)\-–—]\s*|\d+\s*[.)\-–—]\s*(?:savol\s*[:.]?\s*)?)/i;
+  const A_RE = /^(?:to'g'ri\s+javob|togri\s+javob|tog'ri\s+javob|javobi|javob|correct\s+answer|answer)\s*[:\-–—=]?\s*(\S.*)$/i;
+  const SKIP_RE = /^(?:izoh|tushuntirish|eslatma|manba|explanation|note)\s*[:\-–—]/i;
+  const blocks = []; let cur = null;
+  const start = () => { cur = { q: '', opts: [], ans: null }; blocks.push(cur); };
+  spread.forEach(l0 => {
+    const l = l0.replace(/^[^\p{L}\p{N}(\[]+/u, '').replace(/^\[|\]$/g,'').trim();
+    if(!l) return;                                   // bo'sh qatorlarga e'tibor bermaymiz
+    if(Q_RE.test(l)){ start(); cur.q = l.replace(Q_RE, '').trim(); return; }
+    const am = l.match(A_RE);
+    if(am){ if(!cur) start(); if(cur.ans === null) cur.ans = am[1].trim().replace(/^[(\[]\s*/,''); return; }
+    if(SKIP_RE.test(l)) return;
+    const om = l.match(/^\(?([A-Da-d])(?:\)|\.|:)\s*(\S.*)$/);
+    if(om && cur && cur.ans === null){ cur.opts.push(om[2].trim()); return; }
+    // oddiy matn: yangi (tegsiz) savol yoki joriy savol/variantning davomi
+    if(!cur || cur.ans !== null){ start(); cur.q = l; return; }
+    if(cur.opts.length) cur.opts[cur.opts.length-1] += ' ' + l;
+    else cur.q = (cur.q ? cur.q + ' ' : '') + l;
+  });
+  return blocks.map(b => [b.q].concat(b.opts.map((o,i) => String.fromCharCode(65+i) + ') ' + o)).concat(b.ans !== null ? ['Javob: ' + b.ans] : []).join('\n')).join('\n\n');
+}
+
 function parseQA(rawText){
+  rawText = normalizeQA(rawText);
   const blocks = rawText.split(/\n\s*\n+/).map(b => b.trim()).filter(Boolean);
   const questions = [];
   const warnings = [];
+
   blocks.forEach((block, bi) => {
     const lines = block.split('\n').map(l => l.trim()).filter(Boolean);
     if(lines.length === 0) return;
+
     let questionLine = lines[0].replace(/^\d+[\.\)]\s*/, '').trim();
     const options = [];
     let answerRaw = null;
+
     for(let i = 1; i < lines.length; i++){
       const line = lines[i];
       const optMatch = line.match(/^([A-Da-d])[\.\)]\s*(.+)$/);
       const ansMatch = line.match(/^(javob|to'g'ri javob|togri javob|answer|javobi)\s*[:\-–]?\s*(.+)$/i);
-      if(ansMatch){ answerRaw = ansMatch[2].trim(); }
-      else if(optMatch){ options.push(optMatch[2].trim()); }
+      if(ansMatch){
+        answerRaw = ansMatch[2].trim();
+      } else if(optMatch){
+        options.push(optMatch[2].trim());
+      }
     }
-    if(!questionLine){ warnings.push((bi+1) + '-blok: savol topilmadi.'); return; }
+
+    if(!questionLine){ warnings.push((bi+1) + '-blok: savol matni topilmadi, o\'tkazib yuborildi.'); return; }
+
     if(options.length >= 2){
       let correctIndex = -1;
       if(answerRaw){
         const letterMatch = answerRaw.match(/^([A-Da-d])\b/);
-        if(letterMatch){ correctIndex = letterMatch[1].toUpperCase().charCodeAt(0) - 65; }
-        else {
+        if(letterMatch){
+          correctIndex = letterMatch[1].toUpperCase().charCodeAt(0) - 65;
+        } else {
           correctIndex = options.findIndex(o => o.toLowerCase() === answerRaw.toLowerCase());
-          if(correctIndex === -1) correctIndex = options.findIndex(o => o.toLowerCase().includes(answerRaw.toLowerCase()));
+          if(correctIndex === -1){
+            correctIndex = options.findIndex(o => o.toLowerCase().includes(answerRaw.toLowerCase()));
+          }
         }
       }
-      if(correctIndex === -1 || correctIndex >= options.length) correctIndex = 0;
+      if(correctIndex === -1 || correctIndex >= options.length){
+        warnings.push((bi+1) + '-blok ("' + questionLine.slice(0,40) + '..."): to\'g\'ri javob aniqlanmadi, birinchi variant belgilandi.');
+        correctIndex = 0;
+      }
       questions.push({ type: 'mc', question: questionLine, options, correctIndex });
     } else if(answerRaw){
       questions.push({ type: 'open', question: questionLine, answer: answerRaw });
     } else {
-      warnings.push((bi+1) + '-blok: javob topilmadi.');
+      warnings.push((bi+1) + '-blok ("' + questionLine.slice(0,40) + '..."): javob topilmadi, o\'tkazib yuborildi.');
     }
   });
+
   return { questions, warnings };
 }
 
 const urlParams = new URLSearchParams(location.search);
 const examRoom = urlParams.get('exam');
+if(examRoom){ runStudentView(examRoom); } else { runHostView(); }
 
-if(examRoom){
-  runStudentView(examRoom);
-} else {
-  runHostView();
+const LETTERS = 'ABCDEFGH';
+function fmtT(s){ s = Math.max(0, Math.round(s)); return Math.floor(s/60) + ':' + String(s%60).padStart(2,'0'); }
+function fmtDur(s){ if(s == null || isNaN(s)) return '—'; s = Math.round(s); return s >= 60 ? Math.floor(s/60) + ' daq ' + (s%60) + ' s' : s + ' s'; }
+function shuffled(n){ const a = Array.from({length:n}, (_,i)=>i); for(let i=n-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]] = [a[j],a[i]]; } return a; }
+// "Hammasi to'g'ri", "A va B" kabi variantlar tartibga bog'liq — bunday savolda variantlar aralashtirilmaydi
+const ORDER_DEP = /(yuqoridagi|hammasi|barchasi|ikkalasi|hech biri|a va b|b va c|a va c|all of the|none of the|both)/i;
+function canShuffleOpts(q){ return q.type === 'mc' && !q.options.some(o => ORDER_DEP.test(o)); }
+function newPerm(q){
+  const n = q.options.length;
+  if(!canShuffleOpts(q)) return Array.from({length:n}, (_,i)=>i);
+  return shuffled(n);
 }
+function permStr(p){ return p.map(i => LETTERS[i]).join(''); }
+function getSettings(exam){
+  const s = (exam && exam.settings) || {};
+  const n = ((exam && exam.questions) || []).length;
+  const perQ = +s.perQ || 45;
+  const totalSec = (+s.totalMin ? +s.totalMin * 60 : n * perQ);
+  return { perQ, totalSec, shuffleQ: s.shuffleQ !== false, maxLeaves: s.maxLeaves == null ? 3 : +s.maxLeaves };
+}
+function qLimit(q, st){ return q.type === 'open' ? st.perQ * 2 : st.perQ; }
 
 // =========================================================
 // HOST VIEW
@@ -343,7 +443,15 @@ function runHostView(){
   examTextEl.addEventListener('input', () => {
     const { questions } = parseQA(examTextEl.value.trim());
     document.getElementById('examPreview').textContent = questions.length ? questions.length + ' ta savol aniqlandi.' : '';
+    updAuto();
   });
+  const perQEl = document.getElementById('setPerQ'), totEl = document.getElementById('setTotal');
+  function updAuto(){
+    const n = parseQA(examTextEl.value.trim()).questions.length;
+    const pq = +perQEl.value || 45;
+    document.getElementById('autoTotal').textContent = n ? ('Bo\'sh qoldirilsa: ' + n + ' × ' + pq + ' s = ' + Math.ceil(n*pq/60) + ' daqiqa') : '';
+  }
+  perQEl.addEventListener('input', updAuto);
 
   // ---- Load saved tests ----
   getDb().ref('savedTests').limitToLast(20).once('value').then((snap) => {
@@ -368,11 +476,10 @@ function runHostView(){
         window.scrollTo({ top: 0, behavior: 'smooth' });
       });
     });
-  });
+  }).catch(()=>{ document.getElementById('savedTestsCard').style.display = 'none'; });
 
-  let roomCode = null;
-  let examQuestions = [];
-  let participantsRef = null;
+  let roomCode = null, examQuestions = [], examSettings = null, participantsRef = null;
+  let lastParticipants = {}, prevLeaves = {}, firstSnap = true;
 
   document.getElementById('createExamBtn').addEventListener('click', () => {
     const errEl = document.getElementById('hostError');
@@ -383,44 +490,75 @@ function runHostView(){
     if(questions.length === 0){ errEl.textContent = 'Hech qanday savol aniqlanmadi.'; errEl.classList.add('active'); return; }
 
     const testName = document.getElementById('testNameInput').value.trim();
-    if(testName){
-      getDb().ref('savedTests').push({ name: testName, rawText: text, createdAt: Date.now() });
-    }
+    if(testName){ getDb().ref('savedTests').push({ name: testName, rawText: text, createdAt: Date.now() }); }
 
+    const settings = {
+      perQ: Math.min(600, Math.max(10, +perQEl.value || 45)),
+      totalMin: totEl.value ? Math.min(300, Math.max(1, +totEl.value)) : 0,
+      shuffleQ: document.getElementById('setShuffleQ').checked,
+      maxLeaves: Math.min(20, Math.max(1, +document.getElementById('setMaxLeaves').value || 3))
+    };
     roomCode = generateRoomCode();
-    examQuestions = questions;
+    examQuestions = questions; examSettings = getSettings({ questions, settings });
     const examUrl = location.origin + location.pathname + '?exam=' + roomCode;
 
     getDb().ref('rooms/' + roomCode + '/exam').set({
-      questions: questions,
-      status: 'waiting',
-      createdAt: Date.now()
+      questions, settings, name: testName || '', status: 'waiting', createdAt: Date.now()
     }).then(() => {
       document.getElementById('hostSetup').style.display = 'none';
       document.getElementById('hostLobby').style.display = 'block';
       document.getElementById('roomCodeDisplay').textContent = roomCode;
       document.getElementById('roomUrlDisplay').textContent = examUrl;
+      document.getElementById('lobbyRules').textContent =
+        questions.length + ' savol · har savolga ' + examSettings.perQ + ' s · jami ' + Math.ceil(examSettings.totalSec/60) + ' daqiqa · ' +
+        examSettings.maxLeaves + ' marta chiqsa test yopiladi';
       document.getElementById('qrcodeBox').innerHTML = '';
       new QRCode(document.getElementById('qrcodeBox'), { text: examUrl, width: 150, height: 150, colorDark:'#12151C', colorLight:'#ffffff' });
-
       participantsRef = getDb().ref('rooms/' + roomCode + '/exam/participants');
-      participantsRef.on('value', (snap) => {
-        renderParticipants(snap.val() || {}, examQuestions.length);
-      });
-    });
+      participantsRef.on('value', (snap) => { lastParticipants = snap.val() || {}; renderParticipants(lastParticipants); notifyLeaves(lastParticipants); });
+    }).catch((e) => { errEl.textContent = 'Saqlab bo\'lmadi: ' + (e && e.message || e); errEl.classList.add('active'); });
   });
 
-  function renderParticipants(participants, totalQ){
+  // ---- chiqib ketganlar haqida jonli xabar ----
+  function beep(){
+    try{
+      const ac = new (window.AudioContext || window.webkitAudioContext)();
+      const o = ac.createOscillator(), g = ac.createGain();
+      o.frequency.value = 880; o.connect(g); g.connect(ac.destination); g.gain.value = 0.15;
+      o.start(); setTimeout(() => { o.stop(); ac.close(); }, 250);
+    }catch(e){}
+  }
+  function toast(msg){
+    const box = document.getElementById('leaveToasts');
+    const d = document.createElement('div'); d.className = 'toast'; d.textContent = msg;
+    box.appendChild(d); setTimeout(() => d.remove(), 9000);
+  }
+  function notifyLeaves(ps){
+    Object.entries(ps).forEach(([id, p]) => {
+      const l = p.leaves || 0;
+      if(!firstSnap && l > (prevLeaves[id] || 0)){
+        const st = examSettings || { maxLeaves: 3 };
+        toast('⚠️ ' + p.name + ' testdan chiqdi (' + l + '/' + st.maxLeaves + ')' + (p.status === 'violated' ? ' — test yopildi' : ''));
+        beep();
+      }
+      prevLeaves[id] = l;
+    });
+    firstSnap = false;
+  }
+
+  function renderParticipants(participants){
+    const totalQ = examQuestions.length;
     const entries = Object.entries(participants);
     document.getElementById('pCount').textContent = entries.length;
     document.getElementById('pCount2').textContent = entries.length;
-
     const listHtml = entries.length === 0
       ? '<div class="empty-note">Hali hech kim qo\'shilmadi...</div>'
       : entries.map(([id, p]) => {
-          const statusLabel = { waiting:'Kutmoqda', in_progress:'Ishlamoqda', finished:'Tugatdi', violated:'Chiqib ketdi' }[p.status] || p.status;
+          const statusLabel = { waiting:'Kutmoqda', in_progress: p.away ? 'Ilovadan chiqdi!' : 'Ishlamoqda', finished:'Tugatdi', violated:'Chiqib ketdi' }[p.status] || p.status;
           const progress = p.status === 'in_progress' ? (' (' + (p.currentIndex||0) + '/' + totalQ + ')') : '';
-          return '<div class="participant-row"><span>' + escapeHtml(p.name) + progress + '</span><span class="p-status ' + p.status + '">' + statusLabel + '</span></div>';
+          const lv = p.leaves ? ' <span class="lb-flag" title="Ilovadan chiqishlar">⚠️×' + p.leaves + '</span>' : '';
+          const cls = p.away ? 'violated' : p.status;
+          return '<div class="participant-row"><span>' + escapeHtml(p.name) + progress + lv + '</span><span class="p-status ' + cls + '">' + statusLabel + '</span></div>';
         }).join('');
     document.getElementById('participantList').innerHTML = listHtml;
     document.getElementById('participantList2').innerHTML = listHtml;
@@ -434,68 +572,171 @@ function runHostView(){
 
   document.getElementById('finishExamBtn').addEventListener('click', () => {
     getDb().ref('rooms/' + roomCode + '/exam').update({ status: 'finished' });
-    getDb().ref('rooms/' + roomCode + '/exam/participants').once('value').then((snap) => {
-      const participants = snap.val() || {};
-      showLeaderboard(participants);
-    });
+    setTimeout(() => {
+      getDb().ref('rooms/' + roomCode + '/exam/participants').once('value').then((snap) => {
+        showLeaderboard(snap.val() || {});
+      });
+    }, 900);
   });
 
-  let lastLeaderboardEntries = [];
+  // ---------- Natijalarni hisoblash ----------
+  let R = null; // {title, head, rows, qstat, details}
+  function compute(participants){
+    const n = examQuestions.length;
+    const list = Object.values(participants).filter(p => p.status !== 'waiting' || p.startedAtLocal);
+    const out = list.map(p => {
+      const ans = p.answers || {};
+      const wrong = [];
+      let sumT = 0, okc = 0;
+      for(let qi = 0; qi < n; qi++){
+        const a = ans[qi];
+        if(a && a.ok) okc++; else wrong.push(qi + 1);
+        if(a && a.t) sumT += a.t;
+      }
+      const dur = p.finishedAt && p.startedAtLocal ? (p.finishedAt - p.startedAtLocal) / 1000 : (sumT || null);
+      return { p, ans, wrong, score: okc, dur, leaves: p.leaves || 0 };
+    });
+    out.sort((a, b) => b.score - a.score || (a.dur == null) - (b.dur == null) || (a.dur||0) - (b.dur||0) || a.leaves - b.leaves);
+    return out;
+  }
+  function statusStr(p){
+    if(p.status === 'violated') return 'Chiqib ketgani uchun yopildi';
+    if(p.status === 'finished') return p.endReason === 'timeout' ? 'Vaqt tugadi' : 'Tugatdi';
+    return 'Tugatmagan';
+  }
+  function varStr(p){
+    const v = p.variant; if(!v) return '—';
+    return v.id + (v.qOrder ? ' (savol tartibi: ' + v.qOrder.map(i => i + 1).join('-') + ')' : '');
+  }
+  function buildReport(participants){
+    const n = examQuestions.length;
+    const res = compute(participants);
+    const testName = document.getElementById('testNameInput').value.trim() || 'Test';
+    const head = ['O\'rin','Ism','To\'g\'ri','Foiz','Ishlagan vaqt','Variant','Chiqishlar','Topa olmagan savollar','Holat'];
+    const rows = res.map((r, i) => [
+      i + 1, r.p.name, r.score + ' / ' + n, Math.round(r.score / n * 100) + '%', fmtDur(r.dur), r.p.variant ? r.p.variant.id : '—',
+      r.leaves, r.wrong.length ? r.wrong.join(', ') : 'Hammasini topdi', statusStr(r.p)
+    ]);
+    // savollar tahlili
+    const qHead = ['№','Savol','To\'g\'ri javob','To\'g\'ri topganlar','Foiz'];
+    const qRows = examQuestions.map((q, qi) => {
+      const ok = res.filter(r => r.ans[qi] && r.ans[qi].ok).length;
+      const corr = q.type === 'mc' ? LETTERS[q.correctIndex] + ') ' + q.options[q.correctIndex] : q.answer;
+      return [qi + 1, q.question, corr, ok + ' / ' + res.length, res.length ? Math.round(ok / res.length * 100) + '%' : '—'];
+    });
+    // har bir o'quvchi bo'yicha batafsil
+    const dHead = ['№','Savol (qisqa)','To\'g\'ri javob (o\'quvchi ko\'rgan harfda)','O\'quvchi javobi','Natija','Vaqt (s)','Ko\'rsatilgan variantlar tartibi'];
+    const details = res.map((r, i) => ({
+      title: (i + 1) + '. ' + r.p.name + ' — ' + r.score + '/' + n + ', variant ' + (r.p.variant ? r.p.variant.id : '—') + ', savol tartibi: ' + (r.p.variant && r.p.variant.qOrder ? r.p.variant.qOrder.map(x => x + 1).join('-') : '—'),
+      rows: examQuestions.map((q, qi) => {
+        const a = r.ans[qi];
+        let corr = q.type === 'mc' ? LETTERS[q.correctIndex] + ') ' + q.options[q.correctIndex] : q.answer;
+        if(q.type === 'mc' && a && a.ord){ const sh = a.ord.indexOf(LETTERS[q.correctIndex]); if(sh >= 0) corr = LETTERS[sh] + ') ' + q.options[q.correctIndex]; }
+        let given = '— (javob berilmadi)', resTxt = '✗';
+        if(a){
+          given = a.to ? '— (vaqt tugadi)' : (a.txt != null ? a.txt : '—');
+          resTxt = a.ok ? '✓' : '✗';
+        }
+        return [qi + 1, q.question.length > 70 ? q.question.slice(0, 70) + '…' : q.question, corr, given, resTxt, a && a.t != null ? a.t : '', a && a.ord ? a.ord : ''];
+      })
+    }));
+    return { title: testName + ' — natijalar', date: new Date().toLocaleString('uz-UZ'), head, rows, qHead, qRows, dHead, details, res };
+  }
+
   function showLeaderboard(participants){
     document.getElementById('hostMonitor').style.display = 'none';
     document.getElementById('hostLeaderboard').style.display = 'block';
-    const entries = Object.values(participants);
-    entries.sort((a, b) => {
-      if((b.score||0) !== (a.score||0)) return (b.score||0) - (a.score||0);
-      const at = (a.finishedAt||Infinity) - (a.startedAtLocal||0);
-      const bt = (b.finishedAt||Infinity) - (b.startedAtLocal||0);
-      return at - bt;
-    });
-    lastLeaderboardEntries = entries;
+    R = buildReport(participants);
     const medals = ['🥇','🥈','🥉'];
-    document.getElementById('leaderboardList').innerHTML = entries.map((p, i) => {
-      const timeStr = p.finishedAt && p.startedAtLocal ? Math.round((p.finishedAt - p.startedAtLocal)/1000) + 's' : '—';
-      const flag = p.status === 'violated' ? '<span class="lb-flag">⚠️</span>' : '';
-      return '<div class="leaderboard-row' + (i===0?' top1':'') + '">' +
+    document.getElementById('leaderboardList').innerHTML = R.res.length ? R.res.map((r, i) => {
+      const flag = r.leaves ? '<span class="lb-flag">⚠️×' + r.leaves + '</span>' : '';
+      return '<div class="leaderboard-row' + (i===0?' top1':'') + '" style="flex-wrap:wrap;">' +
         '<div class="lb-rank">' + (medals[i] || (i+1)) + '</div>' +
-        '<div class="lb-name">' + escapeHtml(p.name) + ' ' + flag + '</div>' +
-        '<div class="lb-time">' + timeStr + '</div>' +
-        '<div class="lb-score">' + (p.score||0) + ' / ' + examQuestions.length + '</div>' +
+        '<div class="lb-name">' + escapeHtml(r.p.name) + ' ' + flag + '</div>' +
+        '<div class="lb-time">' + fmtDur(r.dur) + '</div>' +
+        '<div class="lb-score">' + r.score + ' / ' + examQuestions.length + '</div>' +
+        '<div class="lb-sub">Variant ' + (r.p.variant ? r.p.variant.id : '—') + ' · Topa olmagan: ' + (r.wrong.length ? r.wrong.join(', ') : '—') + '</div>' +
         '</div>';
-    }).join('');
+    }).join('') : '<div class="empty-note">Hech kim testni ishlamadi.</div>';
   }
 
-  function buildResultsTableHtml(){
-    const testName = document.getElementById('testNameInput').value.trim() || 'Test natijalari';
-    const rows = lastLeaderboardEntries.map((p, i) => {
-      const timeStr = p.finishedAt && p.startedAtLocal ? Math.round((p.finishedAt - p.startedAtLocal)/1000) + ' soniya' : '—';
-      const statusStr = p.status === 'violated' ? 'Chiqib ketdi ⚠️' : 'Tugatdi';
-      return '<tr><td>' + (i+1) + '</td><td>' + escapeHtml(p.name) + '</td><td>' + (p.score||0) + ' / ' + examQuestions.length + '</td><td>' + timeStr + '</td><td>' + statusStr + '</td></tr>';
-    }).join('');
-    return '<h2 style="font-family:Arial,sans-serif;">' + escapeHtml(testName) + ' — natijalar</h2>' +
-      '<p style="font-family:Arial,sans-serif; color:#555;">Sana: ' + new Date().toLocaleDateString('uz-UZ') + '</p>' +
-      '<table border="1" cellspacing="0" cellpadding="8" style="border-collapse:collapse; font-family:Arial,sans-serif; width:100%;">' +
-      '<tr style="background:#eee; font-weight:bold;"><td>O\'rin</td><td>Ism</td><td>Ball</td><td>Vaqt</td><td>Holat</td></tr>' +
-      rows + '</table>';
+  // ---------- Eksport ----------
+  const fileBase = () => (document.getElementById('testNameInput').value.trim() || 'test-natijalari').replace(/[\\/:*?"<>|]+/g, '_');
+  function download(blob, name){
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = name;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(a.href), 4000);
   }
-
+  function htmlTable(head, rows){
+    return '<table><tr>' + head.map(h => '<th>' + escapeHtml(String(h)) + '</th>').join('') + '</tr>' +
+      rows.map(r => '<tr>' + r.map(c => '<td>' + escapeHtml(String(c)) + '</td>').join('') + '</tr>').join('') + '</table>';
+  }
+  function reportHtml(){
+    let h = '<h1>' + escapeHtml(R.title) + '</h1><p class="m">Sana: ' + escapeHtml(R.date) + '</p>';
+    h += '<h2>Reyting</h2>' + htmlTable(R.head, R.rows);
+    h += '<h2>Savollar tahlili</h2>' + htmlTable(R.qHead, R.qRows);
+    R.details.forEach(d => { h += '<div class="pb"><h3>' + escapeHtml(d.title) + '</h3>' + htmlTable(R.dHead, d.rows) + '</div>'; });
+    return h;
+  }
+  const CSS = '@page{size:A4 landscape;margin:12mm}body{font-family:Arial,sans-serif;font-size:11px;color:#111}h1{font-size:20px}h2{font-size:15px;margin-top:20px}h3{font-size:12px;margin:14px 0 6px}.m{color:#555}table{border-collapse:collapse;width:100%;margin-bottom:8px}th,td{border:1px solid #888;padding:4px 6px;text-align:left;vertical-align:top}th{background:#e8e8e8}.pb{page-break-inside:avoid}';
   document.getElementById('exportPdfBtn').addEventListener('click', () => {
+    if(!R) return;
     const w = window.open('', '_blank');
-    w.document.write('<html><head><meta charset="UTF-8"><title>Natijalar</title></head><body>' + buildResultsTableHtml() + '</body></html>');
+    if(!w){ alert('Brauzer yangi oynani blokladi. Ruxsat bering.'); return; }
+    w.document.write('<html><head><meta charset="UTF-8"><title>' + escapeHtml(R.title) + '</title><style>' + CSS + '</style></head><body>' + reportHtml() + '</body></html>');
     w.document.close();
-    setTimeout(() => { w.print(); }, 300);
+    setTimeout(() => { w.focus(); w.print(); }, 400);
   });
 
+  document.getElementById('exportExcelBtn').addEventListener('click', () => {
+    if(!R) return;
+    if(typeof XLSX === 'undefined'){ alert('Excel kutubxonasi yuklanmadi (internet kerak). Qayta urinib ko\'ring.'); return; }
+    const wb = XLSX.utils.book_new();
+    const s1 = XLSX.utils.aoa_to_sheet([[R.title], ['Sana: ' + R.date], [], R.head].concat(R.rows));
+    s1['!cols'] = [6,24,10,8,14,10,10,36,24].map(w => ({ wch: w }));
+    XLSX.utils.book_append_sheet(wb, s1, 'Reyting');
+    const s2 = XLSX.utils.aoa_to_sheet([R.qHead].concat(R.qRows));
+    s2['!cols'] = [5,60,30,16,8].map(w => ({ wch: w }));
+    XLSX.utils.book_append_sheet(wb, s2, 'Savollar tahlili');
+    const det = [];
+    R.details.forEach(d => { det.push([d.title]); det.push(R.dHead); d.rows.forEach(r => det.push(r)); det.push([]); });
+    const s3 = XLSX.utils.aoa_to_sheet(det);
+    s3['!cols'] = [5,50,30,30,8,9,22].map(w => ({ wch: w }));
+    XLSX.utils.book_append_sheet(wb, s3, 'Batafsil');
+    XLSX.writeFile(wb, fileBase() + '.xlsx');
+  });
+
+  // Haqiqiy .docx (JSZip bilan)
+  const X = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])).replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/g,'');
+  function dPara(t, o){ o = o || {}; return '<w:p><w:pPr>' + (o.keep ? '<w:keepNext/>' : '') + '<w:spacing w:before="' + (o.before||60) + '" w:after="60"/></w:pPr><w:r><w:rPr>' + (o.b ? '<w:b/>' : '') + '<w:sz w:val="' + (o.sz||20) + '"/></w:rPr><w:t xml:space="preserve">' + X(t) + '</w:t></w:r></w:p>'; }
+  function dTable(head, rows, widths){
+    const tot = widths.reduce((a,b)=>a+b,0);
+    const cell = (t, w, hd) => '<w:tc><w:tcPr><w:tcW w:w="' + w + '" w:type="dxa"/>' + (hd ? '<w:shd w:val="clear" w:color="auto" w:fill="E6E6E6"/>' : '') + '</w:tcPr><w:p><w:pPr><w:spacing w:before="20" w:after="20"/></w:pPr><w:r><w:rPr>' + (hd ? '<w:b/>' : '') + '<w:sz w:val="17"/></w:rPr><w:t xml:space="preserve">' + X(t) + '</w:t></w:r></w:p></w:tc>';
+    const bd = ['top','left','bottom','right','insideH','insideV'].map(s => '<w:' + s + ' w:val="single" w:sz="4" w:space="0" w:color="888888"/>').join('');
+    return '<w:tbl><w:tblPr><w:tblW w:w="' + tot + '" w:type="dxa"/><w:tblBorders>' + bd + '</w:tblBorders><w:tblLayout w:type="fixed"/></w:tblPr>' +
+      '<w:tblGrid>' + widths.map(w => '<w:gridCol w:w="' + w + '"/>').join('') + '</w:tblGrid>' +
+      '<w:tr><w:trPr><w:tblHeader/></w:trPr>' + head.map((h,i) => cell(h, widths[i], true)).join('') + '</w:tr>' +
+      rows.map(r => '<w:tr><w:trPr><w:cantSplit/></w:trPr>' + r.map((c,i) => cell(c, widths[i], false)).join('') + '</w:tr>').join('') + '</w:tbl>';
+  }
   document.getElementById('exportWordBtn').addEventListener('click', () => {
-    const html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">' +
-      '<head><meta charset="UTF-8"></head><body>' + buildResultsTableHtml() + '</body></html>';
-    const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = (document.getElementById('testNameInput').value.trim() || 'test-natijalari') + '.doc';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    if(!R) return;
+    if(typeof JSZip === 'undefined'){ alert('Word kutubxonasi yuklanmadi (internet kerak). Qayta urinib ko\'ring.'); return; }
+    let body = dPara(R.title, { b:true, sz:36 }) + dPara('Sana: ' + R.date) + dPara('Reyting', { b:true, sz:26, before:200, keep:true });
+    body += dTable(R.head, R.rows, [650,2300,1000,800,1300,1000,950,3600,2300]);
+    body += dPara('Savollar tahlili', { b:true, sz:26, before:300, keep:true });
+    body += dTable(R.qHead, R.qRows, [500,6500,3000,1600,1000]);
+    R.details.forEach(d => {
+      body += '<w:p><w:r><w:br w:type="page"/></w:r></w:p>' + dPara(d.title, { b:true, sz:22 });
+      body += dTable(R.dHead, d.rows, [500,4300,2400,2400,800,800,2000]);
+    });
+    const sect = '<w:sectPr><w:pgSz w:w="16838" w:h="11906" w:orient="landscape"/><w:pgMar w:top="900" w:right="900" w:bottom="900" w:left="900" w:header="400" w:footer="400" w:gutter="0"/></w:sectPr>';
+    const doc = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>' + body + sect + '</w:body></w:document>';
+    const zip = new JSZip();
+    zip.file('[Content_Types].xml', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>');
+    zip.file('_rels/.rels', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>');
+    zip.file('word/document.xml', doc);
+    zip.generateAsync({ type:'blob', mimeType:'application/vnd.openxmlformats-officedocument.wordprocessingml.document' }).then(b => download(b, fileBase() + '.docx'));
   });
 
   document.getElementById('newExamBtn').addEventListener('click', () => location.reload());
@@ -519,34 +760,39 @@ function runStudentView(roomCode){
 
   const examRef = getDb().ref('rooms/' + roomCode + '/exam');
   const storageKey = 'examIdentity_' + roomCode;
-  let myId = null, myRef = null, questions = [], currentIndex = 0, myScore = 0, testActive = false, startedAtLocal = null;
+  let myId = null, myRef = null, questions = [], settings = null;
+  let pos = 0, myScore = 0, testActive = false, startedAtLocal = null, qStart = 0;
+  let qOrder = [], perm = [], variantId = '', answered = false, leaves = 0, away = false, timerH = null;
 
   function watchExamStatus(){
     examRef.child('status').on('value', (statusSnap) => {
       const status = statusSnap.val();
-      if(status === 'started' && !testActive && document.getElementById('waitScreen').classList.contains('active-view')){
-        beginTest();
-      }
-      updateRetakeButtons(status);
+      if(status === 'started' && !testActive && document.getElementById('waitScreen').classList.contains('active-view')){ beginTest(); }
+      if(status === 'finished' && testActive){ finishTest('host'); }
+      updateRetakeButton(status);
     });
   }
+  function updateRetakeButton(status){
+    const allow = status === 'started';
+    document.getElementById('retakeBtn1').style.display = allow ? 'inline-block' : 'none';
+    document.getElementById('retakeNote1').style.display = allow ? 'none' : 'block';
+  }
 
-  function updateRetakeButtons(status){
-    const allowRetake = status === 'started';
-    [['retakeBtn1','retakeNote1'], ['retakeBtn2','retakeNote2']].forEach(([btnId, noteId]) => {
-      document.getElementById(btnId).style.display = allowRetake ? 'inline-block' : 'none';
-      document.getElementById(noteId).style.display = allowRetake ? 'none' : 'block';
+  function loadExam(cb){
+    examRef.once('value').then((snap) => {
+      const exam = snap.val();
+      if(!exam){ cb(null); return; }
+      questions = exam.questions || []; settings = getSettings(exam);
+      cb(exam);
     });
   }
 
   function startFresh(name){
-    questions = [];
-    examRef.once('value').then((snap) => {
-      const exam = snap.val();
-      questions = exam.questions || [];
+    loadExam((exam) => {
+      if(!exam) return;
       myId = 'p_' + Date.now() + '_' + Math.random().toString(36).slice(2,8);
       myRef = getDb().ref('rooms/' + roomCode + '/exam/participants/' + myId);
-      myRef.set({ name, score: 0, currentIndex: 0, status: 'waiting', joinedAt: Date.now() });
+      myRef.set({ name, score: 0, currentIndex: 0, status: 'waiting', leaves: 0, joinedAt: Date.now() });
       localStorage.setItem(storageKey, JSON.stringify({ myId, name }));
       showView('waitScreen');
       watchExamStatus();
@@ -563,112 +809,205 @@ function runStudentView(roomCode){
     });
   });
 
-  // ---- Resume identity if this device already joined this room ----
+  // ---- Shu qurilma avval qo'shilgan bo'lsa, davom ettirish ----
   const saved = localStorage.getItem(storageKey);
   if(saved){
     try{
       const parsed = JSON.parse(saved);
-      examRef.once('value').then((snap) => {
-        const exam = snap.val();
-        if(!exam){ return; } // room gone, fall back to join screen
-        questions = exam.questions || [];
+      loadExam((exam) => {
+        if(!exam){ showView('joinScreen'); return; }
         myId = parsed.myId;
         myRef = getDb().ref('rooms/' + roomCode + '/exam/participants/' + myId);
         myRef.once('value').then((pSnap) => {
           const p = pSnap.val();
-          if(!p){ return; } // participant record missing, fall back to join screen
+          if(!p){ showView('joinScreen'); return; }
+          leaves = p.leaves || 0;
           if(p.status === 'finished'){ showView('doneScreen'); }
           else if(p.status === 'violated'){ showView('violatedScreen'); }
-          else if(p.status === 'in_progress' && exam.status === 'started'){
-            currentIndex = p.currentIndex || 0; myScore = p.score || 0; testActive = true; startedAtLocal = p.startedAtLocal || Date.now();
-            showView('playScreen'); renderQuestion();
-          } else {
-            showView('waitScreen');
-          }
+          else if(p.status === 'in_progress' && exam.status === 'started' && p.variant && p.variant.qOrder){
+            pos = p.currentIndex || 0; myScore = p.score || 0; testActive = true;
+            startedAtLocal = p.startedAtLocal || Date.now(); qStart = p.qStart || Date.now();
+            qOrder = p.variant.qOrder; variantId = p.variant.id;
+            showView('playScreen');
+            registerLeave('sahifa qayta yuklandi'); // qayta yuklash ham chiqish hisoblanadi
+            if(testActive) renderQuestion();
+          } else { showView('waitScreen'); }
           watchExamStatus();
         });
       });
-    }catch(e){ /* fall through to join screen */ }
-  } else {
-    showView('joinScreen');
-  }
+    }catch(e){ showView('joinScreen'); }
+  } else { showView('joinScreen'); }
 
+  // ---- Boshlash ----
   function beginTest(){
-    testActive = true;
-    startedAtLocal = Date.now();
-    currentIndex = 0;
-    myScore = 0;
-    myRef.update({ status: 'in_progress', startedAtLocal });
+    testActive = true; answered = false;
+    startedAtLocal = Date.now(); qStart = startedAtLocal;
+    pos = 0; myScore = 0;
+    qOrder = settings.shuffleQ ? shuffled(questions.length) : questions.map((_, i) => i);
+    variantId = 'V' + Math.random().toString(36).slice(2, 6).toUpperCase();
+    myRef.update({ status: 'in_progress', startedAtLocal, qStart, score: 0, currentIndex: 0, answers: null, finishedAt: null, endReason: null, away: false,
+      variant: { id: variantId, qOrder } });
+    enterFullscreen();
+    try{ history.pushState({ exam:1 }, '', location.href); }catch(e){}
     showView('playScreen');
+    startTimer();
     renderQuestion();
   }
 
+  function enterFullscreen(){
+    try{ const el = document.documentElement; (el.requestFullscreen || el.webkitRequestFullscreen || function(){ return Promise.reject(); }).call(el).catch(()=>{}); }catch(e){}
+  }
+
+  // ---- Savolni chizish ----
   function renderQuestion(){
-    if(currentIndex >= questions.length){ finishTest(); return; }
-    const q = questions[currentIndex];
-    document.getElementById('qProgress').textContent = 'Savol ' + (currentIndex+1) + ' / ' + questions.length;
+    if(pos >= questions.length){ finishTest('done'); return; }
+    answered = false;
+    const qi = qOrder[pos], q = questions[qi];
+    perm = newPerm(q);
+    drawQuestion();
+  }
+  function drawQuestion(){
+    const qi = qOrder[pos], q = questions[qi];
+    document.getElementById('qProgress').textContent = 'Savol ' + (pos+1) + ' / ' + questions.length;
     document.getElementById('qText').textContent = q.question;
     const optsWrap = document.getElementById('qOptions');
     optsWrap.innerHTML = '';
-
     if(q.type === 'mc'){
-      q.options.forEach((opt, i) => {
+      perm.forEach((orig, shown) => {
         const btn = document.createElement('button');
         btn.className = 'opt-btn';
-        btn.innerHTML = '<span class="opt-letter">' + String.fromCharCode(65+i) + ')</span>' + escapeHtml(opt);
+        btn.innerHTML = '<span class="opt-letter">' + LETTERS[shown] + ')</span>' + escapeHtml(q.options[orig]);
         btn.addEventListener('click', () => {
+          if(answered) return; answered = true;
           Array.from(optsWrap.children).forEach(b => b.disabled = true);
-          if(i === q.correctIndex) myScore++;
-          nextQuestion();
+          submitAnswer({ ok: orig === q.correctIndex, txt: LETTERS[shown] + ') ' + q.options[orig], ord: permStr(perm) }, false);
         });
         optsWrap.appendChild(btn);
       });
     } else {
       const input = document.createElement('input');
-      input.type = 'text'; input.placeholder = 'Javobingiz...';
+      input.type = 'text'; input.placeholder = 'Javobingiz...'; input.autocomplete = 'off';
       const btn = document.createElement('button');
       btn.className = 'primary'; btn.textContent = 'Javob berish'; btn.style.marginTop = '14px';
       btn.addEventListener('click', () => {
-        const val = input.value.trim().toLowerCase();
-        const correct = (q.answer||'').trim().toLowerCase();
-        if(val && (val === correct || val.includes(correct) || correct.includes(val))) myScore++;
+        if(answered) return; answered = true;
+        const val = input.value.trim().toLowerCase(), correct = (q.answer||'').trim().toLowerCase();
+        const ok = !!(val && (val === correct || val.includes(correct) || correct.includes(val)));
         btn.disabled = true; input.disabled = true;
-        nextQuestion();
+        submitAnswer({ ok, txt: input.value.trim(), ord: '' }, false);
       });
-      optsWrap.appendChild(input);
-      optsWrap.appendChild(btn);
+      optsWrap.appendChild(input); optsWrap.appendChild(btn);
     }
   }
 
-  function nextQuestion(){
-    currentIndex++;
-    myRef.update({ currentIndex, score: myScore });
-    setTimeout(renderQuestion, 350);
+  function submitAnswer(a, timedOut){
+    const qi = qOrder[pos], q = questions[qi];
+    const t = Math.min(qLimit(q, settings), Math.round((Date.now() - qStart) / 100) / 10);
+    const rec = { ok: a.ok ? 1 : 0, t, txt: a.txt || '', ord: a.ord || '', to: timedOut ? 1 : 0 };
+    if(a.ok) myScore++;
+    pos++; qStart = Date.now();
+    myRef.child('answers/' + qi).set(rec);
+    myRef.update({ currentIndex: pos, score: myScore, qStart });
+    setTimeout(() => { if(testActive) renderQuestion(); }, 300);
   }
 
-  function finishTest(){
-    testActive = false;
-    myRef.update({ status: 'finished', score: myScore, finishedAt: Date.now() });
+  // ---- Taymer: har savolga va umumiy ----
+  function startTimer(){
+    clearInterval(timerH);
+    timerH = setInterval(tick, 250);
+    tick();
+  }
+  function tick(){
+    if(!testActive || !settings) return;
+    const now = Date.now();
+    const totalLeft = settings.totalSec - (now - startedAtLocal) / 1000;
+    if(totalLeft <= 0){ finishTest('timeout'); return; }
+    if(pos >= questions.length) return;
+    const q = questions[qOrder[pos]], lim = qLimit(q, settings);
+    const left = lim - (now - qStart) / 1000;
+    document.getElementById('qTimeTxt').textContent = '⏱ ' + fmtT(left);
+    document.getElementById('totTimeTxt').textContent = 'Jami: ' + fmtT(totalLeft);
+    const f = document.getElementById('tbarFill');
+    f.style.width = Math.max(0, Math.min(100, left / lim * 100)) + '%';
+    f.className = left < 10 ? 'low' : '';
+    if(left <= 0 && !answered){
+      answered = true;
+      Array.from(document.getElementById('qOptions').children).forEach(b => b.disabled = true);
+      submitAnswer({ ok:false, txt:'', ord: perm.length && q.type === 'mc' ? permStr(perm) : '' }, true);
+    }
+  }
+
+  function finishTest(reason){
+    if(!testActive) return;
+    testActive = false; clearInterval(timerH);
+    // javob berilmagan savollar xato hisoblanadi (host hisobotda "javob berilmadi" ko'radi)
+    myRef.update({ status: 'finished', score: myScore, finishedAt: Date.now(), endReason: reason, away: false });
+    leaveFullscreen();
     showView('doneScreen');
   }
+  function leaveFullscreen(){ try{ if(document.fullscreenElement) document.exitFullscreen(); }catch(e){} }
 
   function retake(){
     examRef.child('status').once('value').then((snap) => {
-      if(snap.val() !== 'started'){ return; } // teacher already finished, no retake allowed
+      if(snap.val() !== 'started') return;
       beginTest();
     });
   }
   document.getElementById('retakeBtn1').addEventListener('click', retake);
-  document.getElementById('retakeBtn2').addEventListener('click', retake);
 
-  // ---- Anti-cheat: tab/app switch detection ----
-  document.addEventListener('visibilitychange', () => {
-    if(document.hidden && testActive){
-      testActive = false;
-      myRef.update({ status: 'violated', score: myScore, finishedAt: Date.now() });
+  // ---- Chiqishni aniqlash ----
+  function showWarn(msg){
+    const w = document.getElementById('warnBar');
+    w.textContent = msg; w.style.display = 'block';
+    clearTimeout(showWarn.h); showWarn.h = setTimeout(() => { w.style.display = 'none'; }, 8000);
+  }
+  // chiqib ketish paytida: sanaymiz va o'qituvchiga yuboramiz
+  function registerLeave(why){
+    if(!testActive || away) return;
+    away = true; leaves++;
+    const upd = { leaves, away: true, lastLeaveAt: Date.now() };
+    myRef.update(upd);
+    myRef.child('leaveLog').push({ at: Date.now(), q: pos + 1, why });
+    if(leaves >= settings.maxLeaves){
+      testActive = false; clearInterval(timerH);
+      myRef.update({ status: 'violated', score: myScore, finishedAt: Date.now(), away: true });
       showView('violatedScreen');
+      return;
     }
+  }
+  // qaytganda: variantlar tartibini o'zgartiramiz (qayta ko'rib javobni eslab qolmasin)
+  function registerReturn(){
+    if(!away) return;
+    away = false;
+    if(!testActive) return;
+    myRef.update({ away: false });
+    if(pos < questions.length && !answered){
+      const q = questions[qOrder[pos]];
+      perm = newPerm(q);
+      drawQuestion();
+    }
+    showWarn('⚠️ Ogohlantirish: ilovadan chiqdingiz (' + leaves + '/' + settings.maxLeaves + '). Variantlar o\'zgartirildi. Yana ' + (settings.maxLeaves - leaves) + ' marta chiqsangiz test yopiladi.');
+    enterFullscreen();
+  }
+  document.addEventListener('visibilitychange', () => { document.hidden ? registerLeave('boshqa ilova/oyna') : registerReturn(); });
+  window.addEventListener('pagehide', () => registerLeave('sahifa yopildi'));
+  let blurH = null;
+  window.addEventListener('blur', () => { clearTimeout(blurH); blurH = setTimeout(() => { if(!document.hasFocus()) registerLeave('oyna fokusdan chiqdi'); }, 900); });
+  window.addEventListener('focus', () => { clearTimeout(blurH); if(!document.hidden) registerReturn(); });
+
+  // ---- Qo'shimcha himoya ----
+  window.addEventListener('beforeunload', (e) => { if(testActive){ e.preventDefault(); e.returnValue = ''; } });
+  window.addEventListener('popstate', () => { if(testActive){ try{ history.pushState({ exam:1 }, '', location.href); }catch(e){} showWarn('Test davomida orqaga qaytib bo\'lmaydi.'); } });
+  ['contextmenu','copy','cut','paste','dragstart','selectstart'].forEach(ev => {
+    document.addEventListener(ev, (e) => { if(testActive && !(e.target && e.target.tagName === 'INPUT')) e.preventDefault(); });
   });
+  document.addEventListener('keydown', (e) => {
+    if(testActive && (e.key === 'F12' || (e.ctrlKey && ['c','u','s','p','a'].includes(e.key.toLowerCase())))) e.preventDefault();
+  });
+  document.addEventListener('fullscreenchange', () => {
+    if(testActive && !document.fullscreenElement) showWarn('To\'liq ekrandan chiqdingiz. Ekranga bir marta bosing — to\'liq ekran qaytadi.');
+  });
+  document.addEventListener('click', () => { if(testActive && !document.fullscreenElement) enterFullscreen(); });
 }
 </script>
 </body>

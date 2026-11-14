@@ -1,4 +1,4 @@
-const CACHE_NAME = 'oquv-vositalari-v3';
+const CACHE_NAME = 'oquv-vositalari-v4';
 
 // Sayt fayllari (oflayn ochilishi uchun oldindan saqlanadi).
 const LOCAL_ASSETS = [
@@ -21,6 +21,8 @@ const CDN_ASSETS = [
   'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js',
   'https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js',
   'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js',
+  'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js',
+  'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js',
   'https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js',
   'https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js',
   'https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js'
