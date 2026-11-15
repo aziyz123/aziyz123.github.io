@@ -102,6 +102,7 @@
   </div>
 </div>
 
+<script src="temur-janglari.js"></script>
 <script>
 const DEMO = {
   title: "ANQARA JANGI", year: "1402-yil, 20-iyul", topic: "TEMURIYLAR VA USMONIYLAR",
@@ -194,6 +195,7 @@ const PYR = {
 };
 DEMO.note = "Manbalarda qo'shin soni farq qiladi; raqamlar taxminiy, fillar soni shartli. XV asr boshida to'p va miltiq jangning hal qiluvchi quroli emas edi — asosiy qurol kamon, qilich va nayza. Darslikka solishtiring.";
 const LIB = { anqara: DEMO, ehromlar: PYR };
+try{ (window.TEMUR_JANGLARI||[]).forEach(function(x){ LIB[x.k] = x.s; var o=document.createElement('option'); o.value=x.k; o.textContent=x.n; document.getElementById('lib').appendChild(o); }); }catch(e){}
 
 function cleanJson(raw){
   let x = String(raw || '').replace(/[“”„‟]/g, '"').replace(/[‘’‚‛]/g, "'").replace(/ /g, ' ').replace(/[​-‍﻿]/g, '');
