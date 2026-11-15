@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jang Xaritasi</title>
+<meta name="description" content="Tarixiy jangni xaritada animatsiya qilish: qo'shinlar, sarkardalar, joy va taktika. Videoga yozib olinadi.">
+<style>
+  :root{ --bg:#14161C; --card:#1D2029; --paper:#F3EFE4; --gold:#E8A33D; --line:rgba(255,255,255,.12); }
+  *{ box-sizing:border-box; }
+  body{ margin:0; background:var(--bg); color:var(--paper); font-family:Inter,system-ui,Arial,sans-serif; }
+  .wrap{ max-width:1100px; margin:0 auto; padding:18px 16px 60px; }
+  h1{ font-size:26px; margin:6px 0 2px; } .sub{ color:rgba(243,239,228,.55); font-size:14px; margin-bottom:16px; }
+  a.back{ color:var(--gold); text-decoration:none; font-size:14px; }
+  .grid{ display:grid; grid-template-columns:minmax(0,1fr) 340px; gap:16px; align-items:start; }
+  @media(max-width:860px){ .grid{ grid-template-columns:1fr; } }
+  .card{ background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px; margin-bottom:14px; }
+  .card h2{ font-size:15px; margin:0 0 10px; }
+  label{ display:block; font-size:12px; color:rgba(243,239,228,.55); margin:10px 0 4px; }
+  input[type=text],textarea,select{ width:100%; background:#12141A; color:var(--paper); border:1px solid var(--line); border-radius:8px; padding:9px 10px; font:inherit; font-size:14px; }
+  textarea{ min-height:150px; font-family:ui-monospace,monospace; font-size:12px; }
+  button{ background:var(--gold); color:#1a1208; border:0; border-radius:8px; padding:10px 14px; font-weight:700; font-size:14px; cursor:pointer; }
+  button.alt{ background:#2A2F3B; color:var(--paper); border:1px solid var(--line); }
+  button:disabled{ opacity:.5; }
+  .row{ display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
+  .stage{ display:flex; justify-content:center; background:#000; border-radius:12px; padding:8px; }
+  canvas{ max-width:100%; height:auto; max-height:78vh; border-radius:8px; background:#2b2a20; }
+  .msg{ font-size:13px; margin-top:8px; color:#9be3b0; } .msg.err{ color:#ff9a8f; }
+  .hint{ font-size:12px; color:rgba(243,239,228,.45); line-height:1.5; margin-top:6px; }
+  input[type=range]{ width:100%; }
+  .chips{ display:flex; gap:6px; flex-wrap:wrap; }
+  .chip{ font-size:12px; padding:4px 8px; border-radius:999px; background:#2A2F3B; border:1px solid var(--line); }
+  .tl-wrap{ margin-top:10px; }
+  .tl-steps{ display:flex; gap:6px; flex-wrap:wrap; margin-top:8px; }
+  .tl-step{
+    flex:1 1 auto; min-width:120px; max-width:100%; text-align:left; padding:8px 10px;
+    border-radius:10px; border:1px solid rgba(255,255,255,.12); background:#2A2F3B;
+    color:rgba(243,239,228,.88); font-size:12px; cursor:pointer; line-height:1.35;
+  }
+  .tl-step b{ display:block; font-size:11px; color:rgba(232,163,61,.9); margin-bottom:2px; }
+  .tl-step.on{ border-color:rgba(232,163,61,.65); background:rgba(232,163,61,.16); color:#fff; }
+  .tl-step:hover{ border-color:rgba(255,255,255,.28); }
+  .stage-nav{ display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; align-items:center; }
+  .stage-nav .chip-info{ font-size:12px; color:rgba(243,239,228,.7); flex:1; min-width:140px; }
+</style>
+<link rel="stylesheet" href="theme.css">
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="index.html">← Bosh sahifa</a>
+  <h1>⚔️ Jang xaritasi</h1>
+  <div class="sub">Jang nomi va ma'lumotlar → xaritada qo'shinlar harakati → video. Tarixiy ma'lumotni o'zingiz tekshiring.</div>
+  <div class="grid">
+    <div>
+      <div class="stage"><canvas id="cv" width="540" height="960"></canvas></div>
+      <div class="card" style="margin-top:12px;">
+        <input type="range" id="seek" min="0" max="1000" value="0">
+        <div class="row">
+          <button id="playBtn">▶ Boshlash</button>
+          <button class="alt" id="stopBtn">⏹</button>
+          <button id="recBtn" class="alt">⏺ Videoga yozib olish</button>
+          <label class="chip" style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="sndOn" checked> 🔊 Ovoz</label>
+          <select id="fmt" style="width:auto"><option value="v">Vertikal</option><option value="h">Gorizontal</option></select>
+        </div>
+        <div class="stage-nav">
+          <button class="alt" id="prevStageBtn" type="button">← Bosqich</button>
+          <button class="alt" id="nextStageBtn" type="button">Bosqich →</button>
+          <span class="chip-info" id="stageInfo">Bosqich: —</span>
+        </div>
+        <div class="tl-wrap"><div class="tl-steps" id="tlSteps"></div></div>
+        <div class="msg" id="msg"></div>
+      </div>
+      <div class="card" id="srcBox" style="display:none;"><h2>📚 Ma'lumot manbalari</h2><div class="hint" id="srcNote" style="font-size:13px;"></div><div id="srcList" class="hint" style="font-size:13px;"></div></div>
+    </div>
+    <div>
+      <div class="card">
+        <h2>1 · Jang ssenariysi</h2>
+        <label for="lib">Tayyor janglar</label>
+        <select id="lib"><option value="anqara">Anqara jangi (1402)</option><option value="ehromlar">Ehromlar jangi (1798)</option></select>
+        <label for="scn">Yangi jang: AI javobini shu yerga joylang (o'zi yuklanadi)</label>
+        <textarea id="scn" spellcheck="false" placeholder="AI bergan javobni shu yerga qo'ying — kod yozishingiz shart emas"></textarea>
+        <div class="row"><button id="loadBtn" class="alt">Yuklash</button></div>
+        <div class="msg err" id="scnErr" style="display:none;white-space:pre-wrap;font-size:12px;"></div>
+      </div>
+      <div class="card">
+        <h2>2 · Yangi jang (AI o'zi topadi)</h2>
+        <label for="pBattle">Jang nomi</label>
+        <input type="text" id="pBattle" placeholder="Masalan: Napoleon Misrda jangi">
+        <div class="row"><button id="pBtn">📋 AI uchun so'rovni nusxalash</button></div>
+        <div class="hint">1) Tugmani bosing. 2) So'rovni ishonchli manbalarni qidira oladigan AI'ga (Claude, ChatGPT, Gemini) joylang — u jangchilar soni, sarkardalar va joyni o'zi topadi. 3) AI javobini yuqoridagi maydonga joylang — video o'zi yasaladi.</div>
+        <div class="msg" id="pMsg"></div>
+        <details style="margin-top:12px;"><summary style="cursor:pointer;font-size:13px;color:var(--gold)">Qo'lda sozlash (ixtiyoriy)</summary>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <div><label for="pYear">Yili</label><input type="text" id="pYear" placeholder="1221-yil"></div>
+          <div><label for="pTerr">Joy</label><select id="pTerr"><option>tekislik</option><option>daryo</option><option>tog'</option><option>cho'l</option><option>o'rmon</option></select></div>
+          <div><label for="pS0">1-tomon</label><input type="text" id="pS0"></div>
+          <div><label for="pS1">2-tomon</label><input type="text" id="pS1"></div>
+          <div><label for="pC0">1-sarkarda</label><input type="text" id="pC0"></div>
+          <div><label for="pC1">2-sarkarda</label><input type="text" id="pC1"></div>
+          <div><label for="pN0">1-soni</label><input type="text" id="pN0"></div>
+          <div><label for="pN1">2-soni</label><input type="text" id="pN1"></div>
+        </div>
+        <label for="pWin">G'olib</label>
+        <select id="pWin"><option value="0">1-tomon</option><option value="1">2-tomon</option></select>
+        <div class="row"><button id="skBtn" class="alt">⚡ Shu ma'lumotdan oddiy namuna yasash</button></div></details>
+      </div>
+      <div class="card">
+        <h2>3 · Rasmlar</h2>
+        <label>Orqa fon (xarita yoki joy rasmi)</label><input type="file" id="bgFile" accept="image/*">
+        <label>1-sarkarda portreti</label><input type="file" id="p0File" accept="image/*">
+        <label>2-sarkarda portreti</label><input type="file" id="p1File" accept="image/*">
+        <label for="topic">Yuqoridagi yozuv (mavzu)</label><input type="text" id="topic" placeholder="Masalan: AMIR TEMUR DAVRI">
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="jang-core.js?v=2"></script>
+<script src="theme.js"></script>
+</body>
+</html>
