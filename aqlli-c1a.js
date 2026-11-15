@@ -1,5 +1,6 @@
 // ================= Parsing =================
 function parseQA(rawText){
+  rawText = String(rawText).replace(/\*\*|__/g,'').replace(/^[ \t]*(#+|>|[-•*])[ \t]+/gm,'');
   const blocks = rawText.split(/\n\s*\n+/).map(b => b.trim()).filter(Boolean);
   const questions = [];
   blocks.forEach((block) => {
@@ -71,6 +72,7 @@ document.getElementById('deckFileInput').addEventListener('change', async (e) =>
   statusEl.className = 'file-status';
   statusEl.textContent = 'Fayl o\'qilmoqda...';
   try{
+    if(/\.json$/i.test(file.name)){ document.getElementById('jsonPasteInput').value = await file.text(); statusEl.className = 'file-status ok'; statusEl.textContent = '✓ ' + file.name + ' JSON maydoniga qo\'yildi — "JSON dan yuklash" tugmasini bosing'; return; }
     const text = await extractTextFromFile(file);
     const cleaned = text.replace(/\s+\n/g,'\n').replace(/\n{3,}/g,'\n\n').trim();
     if(cleaned.length < 10) throw new Error('Fayldan matn topilmadi.');
