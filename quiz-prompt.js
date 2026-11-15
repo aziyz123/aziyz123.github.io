@@ -45,7 +45,7 @@
     if (!host || host.__qp) return; host.__qp = true;
     var wrap = el('div', 'margin-top:10px;');
     wrap.appendChild(el('div', 'font-weight:700;font-size:14px;', "🤖 AI bilan savol yaratish (tayyor so'rov)"));
-    wrap.appendChild(el('div', 'font-size:12px;opacity:.75;margin:4px 0 8px;line-height:1.5;', "Mavzuni yozing, so'rovni nusxalab ChatGPT, Gemini yoki Claude'ga qo'ying. U sizga tayyor savollar beradi, ularni savollar maydoniga qo'yasiz."));
+    wrap.appendChild(el('div', 'font-size:12px;opacity:1;margin:4px 0 8px;line-height:1.5;', "Mavzuni yozing, so'rovni nusxalab ChatGPT, Gemini yoki Claude'ga qo'ying. U sizga tayyor savollar beradi, ularni savollar maydoniga qo'yasiz."));
     var row = el('div', 'display:flex;gap:8px;flex-wrap:wrap;');
     var topic = el('input', FIELD + 'flex:2;min-width:180px;'); topic.type = 'text'; topic.placeholder = 'Mavzu, masalan: Amir Temur yurishlari';
     var count = el('input', FIELD + 'width:80px;'); count.type = 'number'; count.min = 3; count.max = 60; count.value = 10; count.title = 'Savollar soni';

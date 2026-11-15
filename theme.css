@@ -52,3 +52,15 @@ html.app button,html.app .btn,html.app a.btn{ min-height:44px; }
 
 .homebtn{display:none}
 html.app .homebtn{display:flex;position:fixed;z-index:9000;left:max(10px,env(safe-area-inset-left));top:max(10px,env(safe-area-inset-top));width:44px;height:44px;border-radius:50%;background:rgba(20,33,58,.92);color:#E6CF98;text-decoration:none;align-items:center;justify-content:center;font-size:20px;box-shadow:0 8px 18px rgba(0,0,0,.35)}
+
+/* Kontrast tuzatishlari (och fonda xira yozuvlar) */
+.hint,.example-box,.empty-note,.divider-or,.char-count,.empty-hist,.sub small,small,.tg-foot-note{ color:rgba(20,33,58,.74) !important; }
+.sub,h2,.mode-tab.active,.btn-secondary,.secondary-btn,label.btn-secondary{ color:#7A5C20 !important; }
+.btn-primary,.primary-btn,button.primary,.step,.num-badge{ color:#14213A !important; }
+footer span,footer small,.foot span,.page-foot span{ color:rgba(20,33,58,.72) !important; }
+footer a,.foot a,a[href*="byaziyz"]:not(.tg-foot a):not(.appnav a){ color:#7A5C20 !important; }
+.example-box *{ color:inherit; }
+span:has(> a[href*="byaziyz"]), span:has(> a[href="/"]){ color:rgba(20,33,58,.78) !important; }
+span > a[href="/"]{ color:#7A5C20 !important; }
+button.secondary-btn{ color:#14213A !important; border-color:#B8903E !important; background:rgba(184,144,62,.14) !important; }
+button.secondary-btn:hover{ background:rgba(184,144,62,.26) !important; }
