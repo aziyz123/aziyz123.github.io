@@ -1,4 +1,4 @@
-const CACHE_NAME = 'oquv-vositalari-v15';
+const CACHE_NAME = 'oquv-vositalari-v16';
 
 // Sayt fayllari (oflayn ochilishi uchun oldindan saqlanadi).
 const LOCAL_ASSETS = [
@@ -85,25 +85,20 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Sayt fayllari: avval yangisini oladi (4 soniya kutadi), internet yo'q bo'lsa keshdan.
+  // Sayt fayllari: darhol keshdan beradi, orqada yangisini yuklab qo'yadi (tez ochilish uchun).
+  const refresh = () => fetchWithTimeout(req, 8000).then((res) => {
+    const cacheable = res && res.status === 200 && res.type === 'basic' &&
+      (!url.search || req.destination === 'script' || req.destination === 'style' || req.destination === 'image');
+    if (cacheable) { const copy = res.clone(); caches.open(CACHE_NAME).then((c) => c.put(req, copy)); }
+    return res;
+  });
   event.respondWith(
-    fetchWithTimeout(req, 4000)
-      .then((res) => {
-        // ?exam=1234 kabi sahifa havolalari keshga yozilmaydi, ?v=1 li skriptlar yoziladi.
-        const cacheable = res && res.status === 200 && res.type === 'basic' &&
-          (!url.search || req.destination === 'script' || req.destination === 'style' || req.destination === 'image');
-        if (cacheable) {
-          const copy = res.clone();
-          caches.open(CACHE_NAME).then((c) => c.put(req, copy));
-        }
-        return res;
-      })
-      .catch(() =>
-        caches.match(req, { ignoreSearch: true }).then((hit) => {
-          if (hit) return hit;
-          if (req.mode === 'navigate') return caches.match('/index.html');
-          return Response.error();
-        })
-      )
+    caches.match(req, { ignoreSearch: !!(url.search && req.mode === 'navigate') }).then((hit) => {
+      if (hit && !(req.mode === 'navigate' && /[?&]exam=/.test(url.search))) { event.waitUntil(refresh().catch(() => {})); return hit; }
+      return refresh().catch(() => {
+        if (req.mode === 'navigate') return caches.match('/index.html');
+        return Response.error();
+      });
+    })
   );
 });
