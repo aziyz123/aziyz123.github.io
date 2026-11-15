@@ -27,7 +27,7 @@ button:disabled{ opacity:.5; }
 code,pre{ background:#E7E3D9; color:#14213A; border-radius:8px; }
 details > summary{ color:#7A5A1E; }
 /* Telegram kanal belgisi (hamma sahifada) */
-.tg-foot{ display:flex; justify-content:center; padding:26px 16px 34px; }
+.tg-foot{ display:flex; flex-wrap:wrap; gap:10px; justify-content:center; padding:26px 16px 34px; }
 .tg-foot a{ display:inline-flex; align-items:center; gap:8px; background:#1F3354; color:#E3C77E !important; text-decoration:none; font-size:13px; font-weight:600; padding:10px 18px; border-radius:999px; box-shadow:0 8px 18px rgba(20,33,58,.2); }
 .tg-foot a:hover{ filter:brightness(1.12); }
 
