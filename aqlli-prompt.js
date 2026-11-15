@@ -35,7 +35,7 @@
     '<h2>🤖 AI bilan test yaratish</h2>' +
     '<div class="hint">So\'rovni nusxalab ChatGPT, Gemini yoki Claude\'ga qo\'ying. Natijani pastdagi "Savollar" maydoniga qo\'ying yoki AI bergan faylni "Fayldan yuklash" orqali oching.</div>' +
     '<label for="apSrc">Savollar nimaga asoslansin?</label>' +
-    '<select id="apSrc"><option value="topic">Mavzu bo\'yicha (AI o\'zi manba topadi)</option><option value="file">Men manbani AI\'ga o\'zim yuboraman (PDF, rasm, matn)</option></select>' +
+    '<select id="apSrc" style="width:100%;max-width:100%;"><option value="topic">Mavzu bo\'yicha (AI o\'zi manba topadi)</option><option value="file">Men manbani AI\'ga o\'zim yuboraman (PDF, rasm, matn)</option></select>' +
     '<div id="apTopicBox"><label for="apTopic">Mavzu</label><input type="text" id="apTopic" placeholder="Masalan: Amir Temur yurishlari"></div>' +
     '<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:6px;">' +
       '<div style="flex:1;min-width:110px;"><label for="apCount">Savollar soni</label><input type="number" id="apCount" min="3" max="100" value="10"></div>' +

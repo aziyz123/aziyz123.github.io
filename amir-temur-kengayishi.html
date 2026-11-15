@@ -154,5 +154,6 @@ $('dx').onclick=()=>$('dlg').close();$('dlg').addEventListener('click',e=>{if(e.
 Promise.all([fetch('data/campaigns/timur.json').then(r=>r.json()),fetch('data/campaigns/timur-storyboard.json').then(r=>r.json())]).then(([t,s])=>{battles=t.battles;S=s;build()}).catch(()=>{$('grid').innerHTML='<p style="color:#9aabc2">Ma’lumot yuklanmadi. Sahifani server orqali oching.</p>'});
 })();
 </script>
+<script src="theme.js" data-home-only></script>
 </body>
 </html>
