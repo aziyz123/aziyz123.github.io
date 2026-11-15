@@ -47,6 +47,7 @@
   <a class="back" href="index.html">← Bosh sahifa</a>
   <h1>⚔️ Jang xaritasi</h1>
   <div class="sub">Jang nomi va ma'lumotlar → xaritada qo'shinlar harakati → video. Tarixiy ma'lumotni o'zingiz tekshiring.</div>
+
   <div class="grid">
     <div>
       <div class="stage"><canvas id="cv" width="540" height="960"></canvas></div>
@@ -69,6 +70,7 @@
       </div>
       <div class="card" id="srcBox" style="display:none;"><h2>📚 Ma'lumot manbalari</h2><div class="hint" id="srcNote" style="font-size:13px;"></div><div id="srcList" class="hint" style="font-size:13px;"></div></div>
     </div>
+
     <div>
       <div class="card">
         <h2>1 · Jang ssenariysi</h2>
@@ -79,26 +81,42 @@
         <div class="row"><button id="loadBtn" class="alt">Yuklash</button></div>
         <div class="msg err" id="scnErr" style="display:none;white-space:pre-wrap;font-size:12px;"></div>
       </div>
+
       <div class="card">
         <h2>2 · Yangi jang (AI o'zi topadi)</h2>
         <label for="pBattle">Jang nomi</label>
         <input type="text" id="pBattle" placeholder="Masalan: Napoleon Misrda jangi">
         <div class="row"><button id="pBtn">📋 AI uchun so'rovni nusxalash</button></div>
-        <div class="hint">1) Tugmani bosing. 2) So'rovni ishonchli manbalarni qidira oladigan AI'ga joylang. 3) AI javobini yuqoridagi maydonga joylang.</div>
+        <div class="hint">1) Tugmani bosing. 2) So'rovni ishonchli manbalarni qidira oladigan AI'ga (Claude, ChatGPT, Gemini) joylang — u jangchilar soni, sarkardalar va joyni o'zi topadi. 3) AI javobini yuqoridagi maydonga joylang — video o'zi yasaladi.</div>
         <div class="msg" id="pMsg"></div>
+        <details style="margin-top:12px;"><summary style="cursor:pointer;font-size:13px;color:var(--gold)">Qo'lda sozlash (ixtiyoriy)</summary>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <div><label for="pYear">Yili</label><input type="text" id="pYear" placeholder="1221-yil"></div>
+          <div><label for="pTerr">Joy</label><select id="pTerr"><option>tekislik</option><option>daryo</option><option>tog'</option><option>cho'l</option><option>o'rmon</option></select></div>
+          <div><label for="pS0">1-tomon</label><input type="text" id="pS0"></div>
+          <div><label for="pS1">2-tomon</label><input type="text" id="pS1"></div>
+          <div><label for="pC0">1-sarkarda</label><input type="text" id="pC0"></div>
+          <div><label for="pC1">2-sarkarda</label><input type="text" id="pC1"></div>
+          <div><label for="pN0">1-tomon soni</label><input type="text" id="pN0" placeholder="30000"></div>
+          <div><label for="pN1">2-tomon soni</label><input type="text" id="pN1" placeholder="60000"></div>
+        </div>
+        <label for="pWin">G'olib</label>
+        <select id="pWin"><option value="0">1-tomon</option><option value="1">2-tomon</option></select>
+        <div class="row"><button id="skBtn" class="alt">⚡ Shu ma'lumotdan oddiy namuna yasash</button></div></details>
       </div>
+
       <div class="card">
         <h2>3 · Rasmlar</h2>
-        <label>Orqa fon</label><input type="file" id="bgFile" accept="image/*">
+        <label>Orqa fon (xarita yoki joy rasmi)</label><input type="file" id="bgFile" accept="image/*">
         <label>1-sarkarda portreti</label><input type="file" id="p0File" accept="image/*">
         <label>2-sarkarda portreti</label><input type="file" id="p1File" accept="image/*">
-        <label for="topic">Yuqoridagi yozuv</label><input type="text" id="topic" placeholder="Masalan: AMIR TEMUR DAVRI">
+        <label for="topic">Yuqoridagi yozuv (mavzu)</label><input type="text" id="topic" placeholder="Masalan: AMIR TEMUR DAVRI">
       </div>
     </div>
   </div>
 </div>
-<script src="https://cdn.jsdelivr.net/gh/aziyz123/aziyz123.github.io@56411d2068fb0adb99d35ac53eaf80fd973ef6d3/jang-xaritasi.html"></script>
-<p style="color:#f66;padding:20px">Yuklanmoqda... Agar ochilmasa, sahifani yangilang.</p>
+
+<script src="jang-core.js?v=1"></script>
 <script src="jang-enhance.js?v=1"></script>
 <script src="theme.js"></script>
 </body>
