@@ -35,3 +35,4 @@ details > summary{ color:#7A5A1E; }
 .p-status.finished{ color:#1F6A45 !important; background:rgba(47,122,82,.16) !important; }
 .p-status.waiting{ color:#7A5A1E !important; }
 .p-status.in_progress{ color:#2E4A78 !important; background:rgba(46,74,120,.13) !important; }
+.chip{ background:#E7E3D9 !important; color:#14213A !important; }

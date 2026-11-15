@@ -3,47 +3,812 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Jang Xaritasi yuklanmoqda...</title>
+<title>Jang Xaritasi</title>
+<meta name="description" content="Tarixiy jangni xaritada animatsiya qilish: qo'shinlar, sarkardalar, joy va taktika. Videoga yozib olinadi.">
 <style>
-body{margin:0;background:#14161C;color:#F3EFE4;font-family:system-ui;display:grid;place-items:center;min-height:100vh}
-.box{text-align:center;padding:24px}
-.gold{color:#E8A33D}
+  :root{ --bg:#14161C; --card:#1D2029; --paper:#F3EFE4; --gold:#E8A33D; --line:rgba(255,255,255,.12); }
+  *{ box-sizing:border-box; }
+  body{ margin:0; background:var(--bg); color:var(--paper); font-family:Inter,system-ui,Arial,sans-serif; }
+  .wrap{ max-width:1100px; margin:0 auto; padding:18px 16px 60px; }
+  h1{ font-size:26px; margin:6px 0 2px; } .sub{ color:rgba(20,33,58,.6); font-size:14px; margin-bottom:16px; }
+  a.back{ color:var(--gold); text-decoration:none; font-size:14px; }
+  .grid{ display:grid; grid-template-columns:minmax(0,1fr) 340px; gap:16px; align-items:start; }
+  @media(max-width:860px){ .grid{ grid-template-columns:1fr; } }
+  .card{ background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px; margin-bottom:14px; }
+  .card h2{ font-size:15px; margin:0 0 10px; }
+  label{ display:block; font-size:12px; color:rgba(20,33,58,.65); margin:10px 0 4px; }
+  input[type=text],textarea,select{ width:100%; background:#12141A; color:var(--paper); border:1px solid var(--line); border-radius:8px; padding:9px 10px; font:inherit; font-size:14px; }
+  textarea{ min-height:150px; font-family:'IBM Plex Mono',ui-monospace,monospace; font-size:12px; }
+  button{ background:var(--gold); color:#1a1208; border:0; border-radius:8px; padding:10px 14px; font-weight:700; font-size:14px; cursor:pointer; }
+  button.alt{ background:#2A2F3B; color:var(--paper); border:1px solid var(--line); }
+  button:disabled{ opacity:.5; }
+  .row{ display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
+  .stage{ display:flex; justify-content:center; background:#000; border-radius:12px; padding:8px; }
+  canvas{ max-width:100%; height:auto; max-height:78vh; border-radius:8px; background:#2b2a20; }
+  .msg{ font-size:13px; margin-top:8px; color:#1F6A45; } .msg.err{ color:#9A2B25; }
+  .hint{ font-size:12px; color:rgba(20,33,58,.55); line-height:1.5; margin-top:6px; }
+  input[type=range]{ width:100%; }
+  .chips{ display:flex; gap:6px; flex-wrap:wrap; }
+  .chip{ font-size:12px; padding:4px 8px; border-radius:999px; background:#2A2F3B; border:1px solid var(--line); }
 </style>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="theme.css">
 </head>
 <body>
-<div class="box">
-  <div class="gold" style="font-size:28px;margin-bottom:12px">⚔️ Jang xaritasi</div>
-  <div id="st">Yuklanmoqda...</div>
+<div class="wrap">
+  <a class="back" href="index.html">← Bosh sahifa</a>
+  <h1>⚔️ Jang xaritasi</h1>
+  <div class="sub">Jang nomi va ma'lumotlar → xaritada qo'shinlar harakati → video. Tarixiy ma'lumotni o'zingiz tekshiring.</div>
+
+  <div class="grid">
+    <div>
+      <div class="stage"><canvas id="cv" width="540" height="960"></canvas></div>
+      <div class="card" style="margin-top:12px;">
+        <input type="range" id="seek" min="0" max="1000" value="0">
+        <div class="row">
+          <button id="playBtn">▶ Boshlash</button>
+          <button class="alt" id="stopBtn">⏹</button>
+          <button id="recBtn" class="alt">⏺ Videoga yozib olish</button>
+          <label class="chip" style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="sndOn" checked> 🔊 Ovoz</label>
+          <select id="fmt" style="width:auto"><option value="v">Vertikal (Shorts/Telegram)</option><option value="h">Gorizontal (doska/proyektor)</option></select>
+        </div>
+        <div class="msg" id="msg"></div>
+      </div>
+      <div class="card" id="srcBox" style="display:none;"><h2>📚 Ma'lumot manbalari</h2><div class="hint" id="srcNote" style="font-size:13px;"></div><div id="srcList" class="hint" style="font-size:13px;"></div></div>
+    </div>
+
+    <div>
+      <div class="card">
+        <h2>1 · Jang ssenariysi</h2>
+        <label for="lib">Tayyor janglar</label>
+        <select id="lib"><option value="anqara">Anqara jangi (1402)</option><option value="ehromlar">Ehromlar jangi (1798)</option></select>
+        <label for="scn">Yangi jang: AI javobini shu yerga joylang (o'zi yuklanadi)</label>
+        <textarea id="scn" spellcheck="false" placeholder="AI bergan javobni shu yerga qo'ying — kod yozishingiz shart emas"></textarea>
+        <div class="row"><button id="loadBtn" class="alt">Yuklash</button></div>
+        <div class="msg err" id="scnErr" style="display:none;white-space:pre-wrap;font-size:12px;"></div>
+      </div>
+
+      <div class="card">
+        <h2>2 · Yangi jang (AI o'zi topadi)</h2>
+        <label for="pBattle">Jang nomi</label>
+        <input type="text" id="pBattle" placeholder="Masalan: Napoleon Misrda jangi">
+        <div class="row"><button id="pBtn">📋 AI uchun so'rovni nusxalash</button></div>
+        <div class="hint">1) Tugmani bosing. 2) So'rovni ishonchli manbalarni qidira oladigan AI'ga (Claude, ChatGPT, Gemini) joylang — u jangchilar soni, sarkardalar va joyni o'zi topadi. 3) AI javobini yuqoridagi maydonga joylang — video o'zi yasaladi.</div>
+        <div class="msg" id="pMsg"></div>
+        <details style="margin-top:12px;"><summary style="cursor:pointer;font-size:13px;color:var(--gold)">Qo'lda sozlash (ixtiyoriy)</summary>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <div><label for="pYear">Yili</label><input type="text" id="pYear" placeholder="1221-yil"></div>
+          <div><label for="pTerr">Joy</label><select id="pTerr"><option>tekislik</option><option>daryo</option><option>tog'</option><option>cho'l</option><option>o'rmon</option></select></div>
+          <div><label for="pS0">1-tomon</label><input type="text" id="pS0"></div>
+          <div><label for="pS1">2-tomon</label><input type="text" id="pS1"></div>
+          <div><label for="pC0">1-sarkarda</label><input type="text" id="pC0"></div>
+          <div><label for="pC1">2-sarkarda</label><input type="text" id="pC1"></div>
+          <div><label for="pN0">1-tomon soni</label><input type="text" id="pN0" placeholder="30000"></div>
+          <div><label for="pN1">2-tomon soni</label><input type="text" id="pN1" placeholder="60000"></div>
+        </div>
+        <label for="pWin">G'olib</label>
+        <select id="pWin"><option value="0">1-tomon</option><option value="1">2-tomon</option></select>
+        <div class="row"><button id="skBtn" class="alt">⚡ Shu ma'lumotdan oddiy namuna yasash</button></div></details>
+      </div>
+
+      <div class="card">
+        <h2>3 · Rasmlar</h2>
+        <label>Orqa fon (xarita yoki joy rasmi)</label><input type="file" id="bgFile" accept="image/*">
+        <label>1-sarkarda portreti</label><input type="file" id="p0File" accept="image/*">
+        <label>2-sarkarda portreti</label><input type="file" id="p1File" accept="image/*">
+        <label for="topic">Yuqoridagi yozuv (mavzu)</label><input type="text" id="topic" placeholder="Masalan: AMIR TEMUR DAVRI">
+      </div>
+    </div>
+  </div>
 </div>
-<script src="html-b64-0.js?v=8"></script>
-<script src="html-b64-1.js?v=8"></script>
-<script src="html-b64-2.js?v=8"></script>
-<script src="html-b64-3.js?v=8"></script>
-<script src="html-b64-4.js?v=8"></script>
-<script src="html-b64-5.js?v=8"></script>
-<script src="html-b64-6.js?v=8"></script>
-<script src="html-b64-7.js?v=8"></script>
-<script src="html-b64-8.js?v=8"></script>
-<script src="html-b64-9.js?v=8"></script>
-<script src="html-b64-10.js?v=8"></script>
+
 <script>
-(function(){
-  var st = document.getElementById('st');
-  try {
-    var parts = window.__JANG_HTML_B64 || [];
-    if(parts.length < 11){ st.textContent = 'Qismlar yetarli emas ('+parts.length+'/11). Sahifani yangilang.'; return; }
-    st.textContent = 'Qayta yig\'ilmoqda...';
-    var b64 = parts.join('');
-    var html = decodeURIComponent(escape(atob(b64)));
-    st.textContent = 'Ochilmoqda...';
-    document.open();
-    document.write(html);
-    document.close();
-  } catch(e) {
-    st.textContent = 'Xato: ' + e.message;
-    console.error(e);
+const DEMO = {
+  title: "ANQARA JANGI", year: "1402-yil, 20-iyul", topic: "TEMURIYLAR VA USMONIYLAR",
+  terrain: "daryo",
+  features: [
+    { type: "river", pts: [[0,66],[22,60],[40,64],[60,58],[80,62],[100,56]], name: "Chubuk daryosi" },
+    { type: "mountain", x: 82, y: 14, r: 12 }, { type: "mountain", x: 66, y: 10, r: 9 },
+    { type: "place", kind: "city", name: "Anqara", x: 90, y: 40 }, { type: "hill", x: 20, y: 55, r: 14 }, { type: "hill", x: 70, y: 70, r: 12 }
+  ],
+  sides: [
+    { name: "Temuriylar", color: "#C62828", commander: "Amir Temur",
+      groups: [
+        { id: "t1", name: "Markaz", kind: "piyoda", weapon: "nayza, qilich", count: 40000, x: 46, y: 80, commander: true },
+        { id: "t2", name: "O'ng qanot (otliq)", kind: "otliq", weapon: "kamon, qilich", count: 35000, x: 76, y: 78 },
+        { id: "t3", name: "Chap qanot (otliq)", kind: "otliq", weapon: "kamon, qilich", count: 35000, x: 16, y: 78 },
+        { id: "t4", name: "Zaxira", kind: "kamonchi", weapon: "kamon", count: 20000, x: 46, y: 92 },
+        { id: "t5", name: "Jang fillari", kind: "fil", count: 8, x: 60, y: 88 }
+      ] },
+    { name: "Usmoniylar", color: "#2E9E4F", commander: "Yildirim Boyazid",
+      groups: [
+        { id: "u1", name: "Markaz (yanichar)", kind: "piyoda", weapon: "kamon, qilich", count: 25000, x: 46, y: 34, commander: true },
+        { id: "u2", name: "Serb otliqlari", kind: "otliq", weapon: "nayza, qilich", count: 10000, x: 22, y: 30 },
+        { id: "u3", name: "Anadolu beklari qo'shini", kind: "otliq", weapon: "kamon, qilich", count: 40000, x: 74, y: 30 },
+        { id: "u4", name: "Kamonchilar", kind: "kamonchi", weapon: "kamon", count: 10000, x: 46, y: 20 }
+      ] }
+  ],
+  stages: [
+    { text: "Temur qo'shini Anqara yaqinida joylashadi, daryo suvi Temur nazoratida.", cam: [50,55,0.8], dur: 5 },
+    { text: "Usmoniylar suvsizlikdan charchab, tekislikka yurishga majbur bo'ladi.", cam: [50,48,1], dur: 5,
+      moves: [{ g: "u1", to: [46,46] }, { g: "u2", to: [22,44] }, { g: "u3", to: [74,44] }, { g: "u4", to: [46,32] }] },
+    { text: "Temur otliqlari ikki qanotdan hujumga o'tadi.", cam: [50,56,1.1], dur: 6,
+      moves: [{ g: "t2", to: [76,52] }, { g: "t3", to: [16,52] }, { g: "t1", to: [46,62] }], arrows: true },
+    { text: "Anadolu beklarining tatar otliqlari Temur tomoniga o'tib ketadi.", cam: [74,48,1.5], dur: 5,
+      defect: [{ g: "u3", to: 0 }], moves: [{ g: "u3", to: [70,52] }] },
+    { text: "Serb otliqlari Stefan Lazarevich boshchiligida qattiq qarshilik ko'rsatadi.", cam: [24,48,1.5], dur: 6,
+      moves: [{ g: "t3", to: [24,46] }], losses: { u2: 0.3, t3: 0.8 } },
+    { text: "Markaz qurshovga olinadi, yanicharlar oxirgi nafasgacha jang qiladi.", cam: [46,46,1.4], dur: 7,
+      moves: [{ g: "t2", to: [52,40] }, { g: "t3", to: [40,40] }, { g: "t1", to: [46,44] }], losses: { u1: 0.08, u4: 0.1 } },
+    { text: "Yildirim Boyazid asirga olinadi.", cam: [46,44,1.8], dur: 5, losses: { u1: 0, u4: 0 } }
+  ],
+  result: "Temur g'alaba qozondi. Sulton Boyazid asir tushdi."
+};
+
+
+const PYR = {
+  title: "EHROMLAR JANGI", year: "1798-yil, 21-iyul", topic: "NAPOLEON MISRDA", terrain: "daryo",
+  features: [
+    { type: "river", name: "Nil", pts: [[90,0],[92,25],[88,50],[91,75],[89,100]] },
+    { type: "mountain", x: 10, y: 96, r: 6 }, { type: "mountain", x: 26, y: 98, r: 5 },
+    { type: "place", kind: "village", name: "Imbaba", x: 82, y: 82 }, { type: "place", kind: "fort", name: "Bikatil", x: 10, y: 80 }, { type: "hill", x: 40, y: 50, r: 14 }
+  ],
+  sides: [
+    { name: "Fransiya", color: "#2F5DA8", commander: "Napoleon Bonapart",
+      groups: [
+        { id: "f1", name: "Desaix bo'linmasi", kind: "miltiqchi", weapon: "miltiq, shtik", count: 4500, x: 16, y: 22 },
+        { id: "f2", name: "Reynier bo'linmasi", kind: "miltiqchi", weapon: "miltiq, shtik", count: 4500, x: 32, y: 20 },
+        { id: "f3", name: "Dugua bo'linmasi", kind: "miltiqchi", weapon: "miltiq, shtik", count: 4500, x: 48, y: 20 },
+        { id: "f4", name: "Vial bo'linmasi", kind: "miltiqchi", weapon: "miltiq, shtik", count: 4000, x: 62, y: 20 },
+        { id: "f5", name: "Bon bo'linmasi", kind: "miltiqchi", weapon: "miltiq, shtik", count: 4500, x: 76, y: 22 },
+        { id: "fa", name: "Fransuz to'plari (kvadrat burchaklarida)", kind: "top", weapon: "dala to'pi", count: 6, x: 46, y: 24 },
+        { id: "fc", name: "Otliq (kvadratlar orasida)", kind: "otliq", weapon: "qilich, to'pponcha", count: 3000, x: 46, y: 10, commander: true }
+      ] },
+    { name: "Mamluklar", color: "#D8A21E", commander: "Murod bey",
+      groups: [
+        { id: "m1", name: "Mamluk otliqlari (chap)", kind: "otliq", weapon: "qilich, nayza, to'pponcha", count: 3000, x: 28, y: 66 },
+        { id: "m2", name: "Mamluk otliqlari (markaz)", kind: "otliq", weapon: "qilich, nayza, to'pponcha", count: 3000, x: 50, y: 66, commander: true },
+        { id: "mg", name: "Imbaba garnizoni", kind: "piyoda", weapon: "qilich, eski miltiq", count: 10000, x: 78, y: 76 },
+        { id: "mt", name: "Imbaba mudofaa to'plari", kind: "top", weapon: "qal'a to'pi", count: 5, x: 74, y: 80 },
+        { id: "ml", name: "Bikatil piyodalari", kind: "piyoda", weapon: "qilich, nayza", count: 5000, x: 12, y: 72 }
+      ] }
+  ],
+  stages: [
+    { text: "Napoleon Nil bo'yida, Imbaba qishlog'i yaqinida Murod bey qo'shiniga yetib keladi.", cam: [50,56,0.8], dur: 5 },
+    { text: "Fransuzlar 5 ta bo'sh to'rtburchak (kvadrat) saf tuzadi: ichida otliq va yuk, burchaklarda to'p.", cam: [48,34,1.1], dur: 6,
+      moves: [{ g: "f1", to: [16,30] }, { g: "f2", to: [32,28] }, { g: "f3", to: [48,28] }, { g: "f4", to: [62,28] }, { g: "f5", to: [76,30] }, { g: "fc", to: [46,18] }, { g: "fa", to: [46,34] }] },
+    { text: "Mamluk otliqlari kvadratlarga qayta-qayta hujum qiladi.", cam: [46,42,1.3], dur: 6, arrows: true,
+      moves: [{ g: "m1", to: [30,40] }, { g: "m2", to: [52,38] }] },
+    { text: "Miltiq va to'p o'qi hujumni qaytaradi — otliq katta talafot ko'radi.", cam: [44,38,1.6], dur: 6,
+      losses: { m1: 0.45, m2: 0.45 } },
+    { text: "Ayyub bey boshchiligidagi umumiy hujum ham muvaffaqiyatsiz tugaydi.", cam: [40,38,1.5], dur: 5,
+      moves: [{ g: "m1", to: [24,36] }, { g: "m2", to: [44,36] }], losses: { m1: 0.25, m2: 0.3 } },
+    { text: "Bon bo'linmasi ustun bo'lib hujum qilib, Imbaba qishlog'ini egallaydi.", cam: [72,62,1.6], dur: 6,
+      moves: [{ g: "f5", to: [76,66] }, { g: "f4", to: [64,62] }, { g: "fa", to: [66,50] }], losses: { mg: 0.4, mt: 0.3 }, arrows: true },
+    { text: "Qochganlarning ko'pi Nilda cho'kadi. Yarador Murod bey Yuqori Misrga chekinadi.", cam: [70,66,1.4], dur: 6,
+      losses: { mg: 0.12, ml: 0.35, m1: 0.2, m2: 0.25, mt: 0 } }
+  ],
+  result: "Fransiya g'alaba qozondi (~300 talafot); mamluklar taxminan 10 ming talafot ko'rdi. 24-iyulda Qohira egallandi.",
+  note: "Manbalarda qo'shin soni farq qiladi: fransuzlar ~20–25 ming, mamluk-usmonli qo'shin 21–54 ming (animatsiyada o'rta variant olindi). To'plar soni shartli (belgi sifatida).",
+  sources: ["https://en.wikipedia.org/wiki/Battle_of_the_Pyramids", "https://napoleonguide.com/battle_pyramids.htm"]
+};
+DEMO.note = "Manbalarda qo'shin soni farq qiladi; raqamlar taxminiy, fillar soni shartli. XV asr boshida to'p va miltiq jangning hal qiluvchi quroli emas edi — asosiy qurol kamon, qilich va nayza. Darslikka solishtiring.";
+const LIB = { anqara: DEMO, ehromlar: PYR };
+
+function cleanJson(raw){
+  let x = String(raw || '').replace(/[“”„‟]/g, '"').replace(/[‘’‚‛]/g, "'").replace(/ /g, ' ').replace(/[​-‍﻿]/g, '');
+  x = x.replace(/```(?:json|javascript|js)?/gi, '');
+  const i = x.indexOf('{'), j = x.lastIndexOf('}');
+  if(i < 0) throw new Error('JSON topilmadi: matnda "{" belgisi yo\'q. AI javobi o\'rniga uning savoli yoki xatosini joylab yubormadingizmi?');
+  if(j < i) throw new Error('Javob to\'liq emas (oxiri kesilgan). AI javobini oxirigacha nusxalang yoki AI\'ga "davom et" deb yozing.');
+  x = x.slice(i, j + 1);
+  x = x.replace(/^\s*\/\/.*$/gm, '').replace(/\/\*[\s\S]*?\*\//g, '');
+  x = x.replace(/\[(\d+)\]/g, '');                         // [1] kabi havola raqamlarini olib tashlash
+  x = x.replace(/\bTrue\b/g, 'true').replace(/\bFalse\b/g, 'false').replace(/\bNone\b|\bundefined\b|\bNaN\b/g, 'null');
+  x = x.replace(/:\s*(\d{1,3}(?:[,  ]\d{3})+)(\s*[,}\]])/g, (m, n, e) => ': ' + n.replace(/\D/g, '') + e);   // 30,000 -> 30000
+  x = x.replace(/([{,]\s*)([A-Za-z_][A-Za-z0-9_]*)\s*:/g, '$1"$2":');   // qo'shtirnoqsiz kalitlar
+  x = x.replace(/,(\s*[}\]])/g, '$1');                      // oxirgi vergul
+  return x;
+}
+function parseLoose(raw){
+  const x = cleanJson(raw);
+  try{ return JSON.parse(x); }
+  catch(e1){
+    let msgTxt = e1.message, m = /position (\d+)/.exec(e1.message);
+    if(m){ const p = +m[1]; const lines = x.slice(0, p).split('\n'); msgTxt = (lines.length) + '-qator: ..."' + x.slice(Math.max(0, p - 40), p).replace(/\n/g, ' ') + ' ⟵ SHU YERDA XATO ⟶ ' + x.slice(p, p + 25).replace(/\n/g, ' ') + '"'; }
+    throw new Error('JSON tuzilishi buzuq. ' + msgTxt + '\nBu AI xatosi: unga "JSON\'ni to\'g\'rilab, faqat JSON qilib qayta yoz" deb yozing.');
   }
-})();
+}
+const KIND_ALIAS = { infantry: 'piyoda', foot: 'piyoda', cavalry: 'otliq', horse: 'otliq', horsemen: 'otliq', archers: 'kamonchi', archer: 'kamonchi', musketeers: 'miltiqchi', musketeer: 'miltiqchi', riflemen: 'miltiqchi', artillery: 'top', cannon: 'top', cannons: 'top', guns: 'top', elephants: 'fil', elephant: 'fil', "to'p": 'top', "to'plar": 'top', fillar: 'fil', otliqlar: 'otliq', piyodalar: 'piyoda', kamonchilar: 'kamonchi', miltiqchilar: 'miltiqchi' };
+const ALIASES = { sides: ['sides', 'armies', 'forces', 'tomonlar', 'qoshinlar', "qo'shinlar"], stages: ['stages', 'phases', 'steps', 'bosqichlar', 'bosqich'], groups: ['groups', 'units', 'guruhlar', 'armies'] };
+function pick(o, names){ for(const n of names) if(o && o[n] != null) return o[n]; return undefined; }
+function normalizeScenario(sc, warns){
+  if(!sc || typeof sc !== 'object') throw new Error('Ssenariy obyekt emas.');
+  const keys = Object.keys(sc).join(', ');
+  const sides = pick(sc, ALIASES.sides), stages = pick(sc, ALIASES.stages);
+  if(!Array.isArray(sides)) throw new Error('"sides" (tomonlar) ro\'yxati topilmadi. Topilgan kalitlar: ' + keys);
+  if(!Array.isArray(stages) || !stages.length) throw new Error('"stages" (bosqichlar) ro\'yxati topilmadi yoki bo\'sh. Topilgan kalitlar: ' + keys);
+  if(sides.length < 2) throw new Error('Kamida 2 ta tomon kerak, topilgani: ' + sides.length);
+  if(sides.length > 2) warns.push('2 tomondan ortiq berilgan — faqat birinchi ikkitasi olindi.');
+  const out = { title: String(sc.title || 'JANG'), year: sc.year || '', topic: sc.topic || '', terrain: sc.terrain || '', features: Array.isArray(sc.features) ? sc.features : [], result: sc.result || '', note: sc.note || '', sources: Array.isArray(sc.sources) ? sc.sources : [] };
+  const ids = {}; const colors = ['#C62828', '#2E9E4F'];
+  out.sides = sides.slice(0, 2).map((sd, si) => {
+    const gr = pick(sd, ALIASES.groups);
+    if(!Array.isArray(gr) || !gr.length){ warns.push((si + 1) + '-tomonda guruhlar yo\'q — bitta umumiy guruh qo\'shildi.'); }
+    const groups = (Array.isArray(gr) && gr.length ? gr : [{ name: sd.name || 'Qo\'shin', count: sd.count || sd.troops || 10000, kind: 'piyoda', commander: true }]).map((g, gi) => {
+      let kind = String(g.kind || g.type || 'piyoda').toLowerCase().trim(); kind = KIND_ALIAS[kind] || kind;
+      if(!['piyoda', 'otliq', 'kamonchi', 'miltiqchi', 'top', 'fil'].includes(kind)){ warns.push('"' + (g.name || g.id) + '": noma\'lum tur "' + kind + '" — piyoda deb olindi.'); kind = 'piyoda'; }
+      const num = v => { const n = parseFloat(String(v).replace(/[^\d.]/g, '')); return isFinite(n) ? n : NaN; };
+      let id = String(g.id || (si ? 'b' : 'a') + (gi + 1)); if(ids[id]) id += '_' + gi; ids[id] = 1;
+      let x = num(g.x), y = num(g.y);
+      if(isNaN(x) || isNaN(y)){ x = 12 + (gi % 4) * 25; y = si ? 22 + Math.floor(gi / 4) * 10 : 78 - Math.floor(gi / 4) * 10; warns.push('"' + (g.name || id) + '": joyi (x,y) berilmagan — avtomatik qo\'yildi.'); }
+      return Object.assign({}, g, { id, kind, count: num(g.count) || (kind === 'top' || kind === 'fil' ? 6 : 1000), x: Math.max(0, Math.min(100, x)), y: Math.max(0, Math.min(100, y)) });
+    });
+    if(!groups.some(g => g.commander) && groups.length) groups[0].commander = true;
+    return { name: sd.name || ('Tomon ' + (si + 1)), color: /^#[0-9a-f]{3,8}$/i.test(sd.color || '') ? sd.color : colors[si], commander: sd.commander || sd.leader || sd.general || '', groups };
+  });
+  out.stages = stages.map((st, i) => {
+    const o = { text: st.text || st.title || st.description || ('Bosqich ' + (i + 1)), dur: +st.dur || +st.duration || 5, arrows: st.arrows };
+    const cam = Array.isArray(st.cam) ? st.cam.map(Number) : null; o.cam = cam && cam.length >= 2 && cam.every(isFinite) ? [cam[0], cam[1], cam[2] || 1] : [50, 50, 1];
+    o.moves = (Array.isArray(st.moves) ? st.moves : []).map(m => { const to = Array.isArray(m.to) ? m.to : (m.x != null ? [m.x, m.y] : null); return { g: m.g || m.group || m.id, to: to && to.map(Number) }; }).filter(m => { const ok = ids[m.g] && m.to && m.to.length >= 2 && m.to.every(isFinite); if(!ok) warns.push((i + 1) + '-bosqich: harakat o\'tkazib yuborildi (guruh "' + m.g + '" topilmadi yoki joyi noto\'g\'ri).'); return ok; });
+    if(st.losses && typeof st.losses === 'object'){ o.losses = {}; Object.keys(st.losses).forEach(k => { let v = parseFloat(st.losses[k]); if(!ids[k] || !isFinite(v)){ warns.push((i + 1) + '-bosqich: yo\'qotish "' + k + '" o\'tkazib yuborildi.'); return; } if(v > 1) v = v / 100; o.losses[k] = Math.max(0, Math.min(1, v)); }); }
+    if(Array.isArray(st.defect)) o.defect = st.defect.filter(d => ids[d.g] && (d.to === 0 || d.to === 1));
+    return o;
+  });
+  return out;
+}
+
+const $ = id => document.getElementById(id);
+const cv = $('cv'), ctx = cv.getContext('2d');
+let S = null;            // yuklangan ssenariy
+let model = null;        // hisoblangan model
+let bgImg = null, portraits = [null, null];
+let t = 0, playing = false, lastTs = 0, recorder = null, topicOverride = '';
+
+function msg(t, err){ const m = $('msg'); m.textContent = t || ''; m.className = 'msg' + (err ? ' err' : ''); }
+function ease(x){ return x < 0.5 ? 2*x*x : 1 - Math.pow(-2*x + 2, 2) / 2; }
+function lerp(a, b, k){ return a + (b - a) * k; }
+function mulberry(a){ return function(){ a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+
+// ---------- Ssenariyni modelga aylantirish ----------
+const SYM = { top: 1, fil: 1 };   // soni — to'p/fil dona (belgi sifatida)
+const KIND_ASPECT = { miltiqchi: 4, top: 3, otliq: 3.2, piyoda: 2.2, kamonchi: 3, fil: 2, default: 2.4 };
+function buildModel(sc){
+  if(!sc || !Array.isArray(sc.sides) || sc.sides.length < 2) throw new Error('"sides" da kamida 2 ta tomon bo\'lishi kerak.');
+  if(!Array.isArray(sc.stages) || !sc.stages.length) throw new Error('"stages" (bosqichlar) bo\'sh.');
+  const groups = {}; const order = [];
+  let total = 0;
+  sc.sides.forEach((sd, si) => (sd.groups || []).forEach(g => { if(!SYM[g.kind]) total += +g.count || 0; }));
+  const per = Math.max(1, total / 520);   // bitta nuqta = per jangchi
+  sc.sides.forEach((sd, si) => (sd.groups || []).forEach((g, gi) => {
+    const id = g.id || (si + '_' + gi);
+    const sym = !!SYM[g.kind]; const n = sym ? Math.min(14, Math.max(3, +g.count || 4)) : Math.max(6, Math.round((+g.count || 100) / per)); const sp = sym ? 2.8 : 1.25;
+    const rnd = mulberry(1000 * si + gi + 7);
+    const asp = KIND_ASPECT[g.kind] || KIND_ASPECT.default;
+    const cols = Math.max(2, Math.round(Math.sqrt(n * asp)));
+    const dots = [];
+    for(let i = 0; i < n; i++){
+      const c = i % cols, r = Math.floor(i / cols), rows = Math.ceil(n / cols);
+      dots.push({ ox: (c - (cols - 1) / 2) * sp + (rnd() - .5) * .5, oy: (r - (rows - 1) / 2) * sp + (rnd() - .5) * .5, rn: rnd(), ph: rnd() * 6.28 });
+    }
+    const topOy = Math.min(...dots.map(q => q.oy)); groups[id] = { top: topOy, id, name: g.name || id, weapon: g.weapon || '', kind: g.kind || 'piyoda', count: +g.count || 0, side0: si, commander: !!g.commander, dots };
+    order.push(id);
+  }));
+  // bosqichlar bo'yicha holatlar (boshlanish/tugash)
+  let cur = {};
+  order.forEach(id => { const g = sc.sides.flatMap((s, si) => (s.groups || []).map((x, gi) => ({ x, si, gi }))).find(o => (o.x.id || (o.si + '_' + o.gi)) === id).x; cur[id] = { x: +g.x, y: +g.y, alive: 1, side: groups[id].side0 }; });
+  const stages = []; let acc = 4;           // 4 s — kirish
+  const intro = { t0: 0, t1: 4 };
+  (sc.stages).forEach((st, i) => {
+    const from = JSON.parse(JSON.stringify(cur)), to = JSON.parse(JSON.stringify(cur));
+    (st.moves || []).forEach(m => { if(to[m.g]) { to[m.g].x = m.to[0]; to[m.g].y = m.to[1]; } });
+    (st.defect || []).forEach(d => { if(to[d.g]) to[d.g].side = d.to; });
+    if(st.losses) Object.keys(st.losses).forEach(k => { if(to[k]) to[k].alive = Math.max(0, Math.min(1, st.losses[k])); });
+    const dur = Math.max(2, +st.dur || 5);
+    stages.push({ t0: acc, t1: acc + dur, from, to, text: st.text || '', cam: st.cam || [50, 50, 1], arrows: st.arrows !== false && !!(st.moves && st.moves.length), moves: st.moves || [] });
+    acc += dur; cur = to;
+  });
+  const outro = { t0: acc, t1: acc + 5 };
+  return { groups, order, stages, intro, outro, total: outro.t1, sc };
+}
+
+// ---------- Chizish ----------
+function worldView(cam){
+  const W = cv.width, H = cv.height;
+  const base = Math.min(W, H) / 100;
+  const z = cam[2] || 1;
+  return { s: base * z, ox: W / 2 - cam[0] * base * z, oy: H / 2 - cam[1] * base * z };
+}
+const FX = { boom: false, volley: false, clash: false, hoof: false };
+let texCache = {};
+function terrainPattern(col){
+  const key = col.join();
+  if(texCache[key]) return texCache[key];
+  const c = document.createElement('canvas'); c.width = c.height = 512; const x = c.getContext('2d'); const rn = mulberry(5);
+  for(let i = 0; i < 1800; i++){ const px = rn() * 512, py = rn() * 512, rr = 1 + rn() * 3; x.fillStyle = rn() > .5 ? 'rgba(255,245,210,' + (.05 + rn() * .08) + ')' : 'rgba(60,40,10,' + (.05 + rn() * .09) + ')'; for(const dx of [-512, 0, 512]) for(const dy of [-512, 0, 512]){ x.beginPath(); x.arc(px + dx, py + dy, rr, 0, 6.28); x.fill(); } }
+  for(let i = 0; i < 40; i++){ const px = rn() * 512, py = rn() * 512, rr = 30 + rn() * 70; const g = x.createRadialGradient(px, py, 0, px, py, rr); const light = rn() > .5; g.addColorStop(0, light ? 'rgba(255,240,190,.10)' : 'rgba(50,35,10,.10)'); g.addColorStop(1, 'rgba(0,0,0,0)'); x.fillStyle = g; for(const dx of [-512, 0, 512]) for(const dy of [-512, 0, 512]){ x.save(); x.translate(dx, dy); x.fillRect(px - rr, py - rr, rr * 2, rr * 2); x.restore(); } }
+  return texCache[key] = ctx.createPattern(c, 'repeat');
+}
+function drawTerrain(v){
+  const W = cv.width, H = cv.height;
+  if(bgImg){
+    const r = Math.max(W / bgImg.width, H / bgImg.height);
+    ctx.save(); ctx.translate(W / 2, H / 2); ctx.scale(1, 1);
+    ctx.drawImage(bgImg, -bgImg.width * r / 2, -bgImg.height * r / 2, bgImg.width * r, bgImg.height * r);
+    ctx.restore();
+    ctx.fillStyle = 'rgba(20,14,6,.35)'; ctx.fillRect(0, 0, W, H);
+  } else {
+    const terr = (model.sc.terrain || '').toLowerCase();
+    const col = /cho'l|sahro/.test(terr) ? ['#c9a86a', '#a8844a'] : /o'rmon/.test(terr) ? ['#6b7a45', '#46552c'] : /tog/.test(terr) ? ['#a89a6b', '#7c704a'] : ['#b5a15e', '#8c7a3f'];
+    const g = ctx.createRadialGradient(W / 2, H / 2, 40, W / 2, H / 2, Math.max(W, H) * .75);
+    g.addColorStop(0, col[0]); g.addColorStop(1, col[1]);
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    try{ const pt = terrainPattern(col); pt.setTransform(new DOMMatrix().translate(v.ox, v.oy).scale(v.s / 5)); ctx.fillStyle = pt; ctx.fillRect(0, 0, W, H); }catch(e){}
+  }
+  // xususiyatlar: daryo, tog', o'rmon
+  (model.sc.features || []).forEach(f => {
+    if(f.type === 'river' && f.pts){
+      ctx.save(); ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+      [['#e8dcc0', 2.6], ['#6f9fc2', 1.7]].forEach(([c, w]) => {
+        ctx.strokeStyle = c; ctx.lineWidth = w * v.s; ctx.beginPath();
+        f.pts.forEach((p, i) => { const x = p[0] * v.s + v.ox, y = p[1] * v.s + v.oy; i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); });
+        ctx.stroke();
+      });
+      if(f.name){ const p = f.pts[Math.floor(f.pts.length / 2)]; ctx.fillStyle = 'rgba(30,50,80,.8)'; ctx.font = 'italic ' + (2.2 * v.s) + 'px Georgia'; ctx.fillText(f.name, p[0] * v.s + v.ox - 8 * v.s, p[1] * v.s + v.oy - 3 * v.s); }
+      ctx.restore();
+    } else if(f.type === 'mountain'){
+      const x = f.x * v.s + v.ox, y = f.y * v.s + v.oy, r = (f.r || 8) * v.s;
+      ctx.fillStyle = 'rgba(0,0,0,.18)'; ctx.beginPath(); ctx.ellipse(x + r * .15, y + r * .55, r * 1.1, r * .22, 0, 0, 6.28); ctx.fill();
+      ctx.fillStyle = '#5b5240'; ctx.beginPath(); ctx.moveTo(x - r, y + r * .5); ctx.lineTo(x - r * .1, y - r * .7); ctx.lineTo(x + r * .35, y - r * .2); ctx.lineTo(x + r * .6, y - r * .5); ctx.lineTo(x + r, y + r * .5); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = 'rgba(255,255,255,.65)'; ctx.beginPath(); ctx.moveTo(x - r * .3, y - r * .45); ctx.lineTo(x - r * .1, y - r * .7); ctx.lineTo(x + r * .1, y - r * .4); ctx.closePath(); ctx.fill();
+    } else if(f.type === 'hill'){
+      const x = f.x * v.s + v.ox, y = f.y * v.s + v.oy, r = (f.r || 12) * v.s;
+      const g2 = ctx.createRadialGradient(x - r * .25, y - r * .3, r * .1, x, y, r);
+      g2.addColorStop(0, 'rgba(255,240,190,.20)'); g2.addColorStop(.6, 'rgba(120,95,50,.06)'); g2.addColorStop(1, 'rgba(40,25,5,.10)');
+      ctx.fillStyle = g2; ctx.beginPath(); ctx.ellipse(x, y, r, r * .7, 0, 0, 6.28); ctx.fill();
+    } else if(f.type === 'place'){
+      const x = f.x * v.s + v.ox, y = f.y * v.s + v.oy, u = v.s * 1.6;
+      ctx.save(); ctx.fillStyle = '#efe6cc'; ctx.strokeStyle = '#4a3b1c'; ctx.lineWidth = Math.max(1.5, u * .15);
+      if(f.kind === 'fort'){ ctx.fillRect(x - u, y - u * .8, u * 2, u * 1.6); ctx.strokeRect(x - u, y - u * .8, u * 2, u * 1.6); for(let i = -1; i <= 1; i++) ctx.fillRect(x + i * u * .75 - u * .22, y - u * 1.1, u * .44, u * .35); }
+      else if(f.kind === 'village'){ ctx.beginPath(); ctx.moveTo(x - u * .9, y + u * .6); ctx.lineTo(x - u * .9, y - u * .2); ctx.lineTo(x, y - u * 1.1); ctx.lineTo(x + u * .9, y - u * .2); ctx.lineTo(x + u * .9, y + u * .6); ctx.closePath(); ctx.fill(); ctx.stroke(); }
+      else { ctx.fillRect(x - u * 1.1, y - u * .6, u * 2.2, u * 1.2); ctx.strokeRect(x - u * 1.1, y - u * .6, u * 2.2, u * 1.2); ctx.beginPath(); ctx.moveTo(x - u * .5, y - u * .6); ctx.lineTo(x - u * .5, y - u * 1.4); ctx.lineTo(x, y - u * 1.0); ctx.lineTo(x + u * .5, y - u * 1.5); ctx.lineTo(x + u * .5, y - u * .6); ctx.fill(); ctx.stroke(); }
+      if(f.name){ ctx.font = '700 ' + Math.max(11, v.s * 2) + 'px Georgia,serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'top'; ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(255,245,220,.9)'; ctx.fillStyle = '#3a2c10'; ctx.strokeText(f.name, x, y + u * .9); ctx.fillText(f.name, x, y + u * .9); }
+      ctx.restore();
+    } else if(f.type === 'forest'){
+      const rn = mulberry(11); const x = f.x * v.s + v.ox, y = f.y * v.s + v.oy, r = (f.r || 10) * v.s;
+      for(let i = 0; i < 40; i++){ const a = rn() * 6.28, d = Math.sqrt(rn()) * r; ctx.fillStyle = i % 2 ? '#3d5a2a' : '#4f6e35'; ctx.beginPath(); ctx.arc(x + Math.cos(a) * d, y + Math.sin(a) * d * .7, v.s * 1.1, 0, 6.28); ctx.fill(); }
+    }
+  });
+  // vignetka
+  const vg = ctx.createRadialGradient(W / 2, H / 2, Math.min(W, H) * .35, W / 2, H / 2, Math.max(W, H) * .7);
+  vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, 'rgba(25,15,5,.55)');
+  ctx.fillStyle = vg; ctx.fillRect(0, 0, W, H);
+}
+function drawDot(kind, x, y, r, col, ang){
+  ang = ang == null ? -Math.PI / 2 : ang;
+  ctx.fillStyle = col;
+  if(kind === 'otliq'){ ctx.beginPath(); ctx.moveTo(x, y - r * 1.3); ctx.lineTo(x + r * 1.1, y); ctx.lineTo(x, y + r * 1.3); ctx.lineTo(x - r * 1.1, y); ctx.closePath(); ctx.fill(); }
+  else if(kind === 'top'){
+    ctx.save(); ctx.translate(x, y); ctx.rotate(ang + Math.PI / 2);
+    ctx.fillStyle = '#2a2a2a'; ctx.fillRect(-r * .45, -r * 3, r * .9, r * 3.2);
+    ctx.fillStyle = col; ctx.beginPath(); ctx.arc(0, 0, r * 1.6, 0, 6.28); ctx.fill();
+    ctx.strokeStyle = '#111'; ctx.lineWidth = Math.max(1, r * .3); ctx.stroke(); ctx.restore();
+  }
+  else if(kind === 'fil'){
+    ctx.fillStyle = '#8b8378'; ctx.beginPath(); ctx.ellipse(x, y, r * 2.6, r * 1.8, 0, 0, 6.28); ctx.fill();
+    ctx.fillStyle = col; ctx.beginPath(); ctx.arc(x, y - r * .2, r * 1.0, 0, 6.28); ctx.fill();
+    ctx.strokeStyle = '#6e675d'; ctx.lineWidth = r * .7; ctx.beginPath(); ctx.moveTo(x + Math.cos(ang) * r * 2.4, y + Math.sin(ang) * r * 1.6); ctx.lineTo(x + Math.cos(ang) * r * 4, y + Math.sin(ang) * r * 3); ctx.stroke();
+  }
+  else {
+    ctx.beginPath(); ctx.arc(x, y, r, 0, 6.28); ctx.fill();
+    if(kind === 'kamonchi'){ ctx.strokeStyle = 'rgba(255,255,255,.7)'; ctx.lineWidth = Math.max(1, r * .35); ctx.stroke(); }
+    if(kind === 'miltiqchi'){ ctx.strokeStyle = '#1b1b1b'; ctx.lineWidth = Math.max(1, r * .4); ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + Math.cos(ang) * r * 2.6, y + Math.sin(ang) * r * 2.6); ctx.stroke(); }
+  }
+}
+function star(x, y, R){ ctx.fillStyle = '#FFC93C'; ctx.strokeStyle = '#6b4b00'; ctx.lineWidth = Math.max(1, R * .12); ctx.beginPath(); for(let i = 0; i < 10; i++){ const a = -Math.PI / 2 + i * Math.PI / 5, r = i % 2 ? R * .45 : R; ctx.lineTo(x + Math.cos(a) * r, y + Math.sin(a) * r); } ctx.closePath(); ctx.fill(); ctx.stroke(); }
+function pill(text, x, y, size, opts){
+  opts = opts || {};
+  ctx.font = '700 ' + size + 'px "Archivo Black",Impact,"Arial Narrow",Arial,sans-serif';
+  const w = ctx.measureText(text).width + size * 1.1, h = size * 1.6;
+  ctx.fillStyle = opts.bg || 'rgba(240,240,240,.92)';
+  ctx.beginPath(); ctx.roundRect(x - w / 2, y - h / 2, w, h, size * .35); ctx.fill();
+  ctx.fillStyle = opts.fg || '#22262e'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(text, x, y + 1);
+}
+function wrap(text, maxW){ const words = String(text).split(' '); const lines = []; let line = ''; words.forEach(w => { const test = line ? line + ' ' + w : w; if(ctx.measureText(test).width > maxW && line){ lines.push(line); line = w; } else line = test; }); if(line) lines.push(line); return lines; }
+function portrait(i, x, y, r, side){
+  ctx.save(); ctx.beginPath(); ctx.arc(x, y, r, 0, 6.28); ctx.closePath(); ctx.clip();
+  const im = portraits[i];
+  if(im){ const k = Math.max(2 * r / im.width, 2 * r / im.height); ctx.drawImage(im, x - im.width * k / 2, y - im.height * k / 2, im.width * k, im.height * k); }
+  else { ctx.fillStyle = side.color; ctx.fillRect(x - r, y - r, 2 * r, 2 * r); ctx.fillStyle = 'rgba(255,255,255,.9)'; ctx.font = '700 ' + r * .9 + 'px Arial'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText((side.commander || side.name || '?').trim()[0].toUpperCase(), x, y + 2); }
+  ctx.restore();
+  ctx.lineWidth = r * .12; ctx.strokeStyle = side.color; ctx.beginPath(); ctx.arc(x, y, r, 0, 6.28); ctx.stroke();
+}
+function stateAt(tm){
+  // joriy bosqich va kamera
+  const sts = model.stages;
+  let k = sts.findIndex(s => tm >= s.t0 && tm < s.t1);
+  if(k < 0) k = tm < sts[0].t0 ? -1 : sts.length;
+  return k;
+}
+function nearestEnemy(id, gn){
+  const st = gn[id]; let best = null, bd = 1e9;
+  model.order.forEach(o => { const s2 = gn[o]; if(!s2 || s2.side === st.side || s2.alive < .05) return; const d = Math.hypot(s2.x - st.x, s2.y - st.y); if(d < bd){ bd = d; best = s2; } });
+  return best ? { st: best, d: bd } : null;
+}
+// to'p va miltiq o'qlari: o'q, olov, tutun
+function fireFX(tm, v, gn, k, r){
+  if(k < 0 || k >= model.stages.length) return;
+  model.order.forEach(id => {
+    const g = model.groups[id]; if(g.kind !== 'top' && g.kind !== 'miltiqchi') return;
+    const st = gn[id]; if(st.alive < .05) return;
+    const ne = nearestEnemy(id, gn); if(!ne) return;
+    const gun = g.kind === 'top', range = gun ? 60 : 30; if(ne.d > range) return;
+    if(gun) FX.boom = true; else FX.volley = true;
+    const cyc = gun ? 3.4 : 2.4, ang = Math.atan2(ne.st.y - st.y, ne.st.x - st.x);
+    g.dots.forEach(d => {
+      if(d.rn >= st.alive || (!gun && d.rn > .3)) return;
+      const ph = (((tm + d.ph * .8) % cyc) + cyc) % cyc;
+      const bx = (st.x + d.ox) * v.s + v.ox, by = (st.y + d.oy) * v.s + v.oy;
+      const tx = (ne.st.x + (d.ox * .8)) * v.s + v.ox, ty = (ne.st.y + (d.oy * .8)) * v.s + v.oy;
+      const mx = bx + Math.cos(ang) * r * (gun ? 3.2 : 2.8), my = by + Math.sin(ang) * r * (gun ? 3.2 : 2.8);
+      if(ph < .14){ ctx.fillStyle = 'rgba(255,214,90,.95)'; ctx.beginPath(); ctx.arc(mx, my, r * (gun ? 2.6 : 1.6), 0, 6.28); ctx.fill(); ctx.fillStyle = 'rgba(255,255,255,.9)'; ctx.beginPath(); ctx.arc(mx, my, r * (gun ? 1.2 : .7), 0, 6.28); ctx.fill(); }
+      if(ph < 1.6){ const q = ph / 1.6; ctx.fillStyle = 'rgba(225,225,225,' + (.45 * (1 - q)) + ')'; ctx.beginPath(); ctx.arc(mx + Math.cos(ang) * q * r * 2, my + Math.sin(ang) * q * r * 2 - q * r * 2, r * (1.3 + q * (gun ? 3.2 : 1.8)), 0, 6.28); ctx.fill(); }
+      if(gun){
+        if(ph < .75){ const q = ph / .75; const px = lerp(mx, tx, q), py = lerp(my, ty, q) - Math.sin(Math.PI * q) * v.s * 5;
+          ctx.fillStyle = 'rgba(255,255,255,.35)'; ctx.beginPath(); ctx.arc(lerp(mx, tx, Math.max(0, q - .08)), lerp(my, ty, Math.max(0, q - .08)) - Math.sin(Math.PI * Math.max(0, q - .08)) * v.s * 5, r * .8, 0, 6.28); ctx.fill();
+          ctx.fillStyle = '#151515'; ctx.beginPath(); ctx.arc(px, py, r * .9, 0, 6.28); ctx.fill(); }
+        else if(ph < 1.05){ const q = (ph - .75) / .3; ctx.fillStyle = 'rgba(255,140,40,' + (.8 * (1 - q)) + ')'; ctx.beginPath(); ctx.arc(tx, ty, r * (1.5 + q * 3), 0, 6.28); ctx.fill(); ctx.fillStyle = 'rgba(70,60,50,' + (.5 * (1 - q)) + ')'; ctx.beginPath(); ctx.arc(tx, ty - q * r * 2, r * (2 + q * 3), 0, 6.28); ctx.fill(); }
+      }
+    });
+  });
+}
+function render(tm){
+  if(!model) return;
+  FX.boom = FX.volley = FX.clash = FX.hoof = false;
+  const W = cv.width, H = cv.height, sts = model.stages, sc = model.sc;
+  let k = stateAt(tm);
+  let cam, groupsNow = {};
+  const first = sts[0], last = sts[sts.length - 1];
+  if(k === -1){ cam = [50, 50, 0.75]; model.order.forEach(id => groupsNow[id] = first.from[id]); }
+  else if(k === sts.length){ cam = last.cam; model.order.forEach(id => groupsNow[id] = last.to[id]); }
+  else {
+    const s = sts[k], p = Math.min(1, (tm - s.t0) / (s.t1 - s.t0)), e = ease(Math.min(1, p * 1.25));
+    const prevCam = k ? sts[k - 1].cam : [50, 50, 0.75];
+    const ce = ease(Math.min(1, p * 1.5));
+    cam = [lerp(prevCam[0], s.cam[0], ce), lerp(prevCam[1], s.cam[1], ce), lerp(prevCam[2] || 1, s.cam[2] || 1, ce) * (1 + .05 * p)];
+    if(Object.keys(s.to).some(id => s.to[id].alive < s.from[id].alive - .1) && p > .25 && p < .9){ const am = .35 * Math.sin(Math.PI * (p - .25) / .65); cam[0] += Math.sin(tm * 37) * am; cam[1] += Math.cos(tm * 29) * am; }
+    model.order.forEach(id => {
+      const a = s.from[id], b = s.to[id];
+      groupsNow[id] = { x: lerp(a.x, b.x, e), y: lerp(a.y, b.y, e), alive: lerp(a.alive, b.alive, ease(Math.max(0, (p - .3) / .7))), side: p > .5 ? b.side : a.side, prog: p };
+    });
+  }
+  const v = worldView(cam);
+  ctx.clearRect(0, 0, W, H);
+  drawTerrain(v);
+  // strelkalar
+  if(k >= 0 && k < sts.length && sts[k].arrows){
+    const s = sts[k], p = (tm - s.t0) / (s.t1 - s.t0);
+    if(p < .75) s.moves.forEach(m => {
+      const a = s.from[m.g]; if(!a) return;
+      const col = sc.sides[a.side].color;
+      const x1 = a.x * v.s + v.ox, y1 = a.y * v.s + v.oy, x2 = m.to[0] * v.s + v.ox, y2 = m.to[1] * v.s + v.oy;
+      ctx.save(); ctx.strokeStyle = 'rgba(255,255,255,.85)'; ctx.lineWidth = v.s * .6; ctx.setLineDash([v.s * 1.5, v.s * 1.2]); ctx.lineDashOffset = -tm * 20;
+      ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke(); ctx.setLineDash([]);
+      const ang = Math.atan2(y2 - y1, x2 - x1); ctx.fillStyle = 'rgba(255,255,255,.9)'; ctx.beginPath(); ctx.moveTo(x2, y2); ctx.lineTo(x2 - Math.cos(ang - .4) * v.s * 2.4, y2 - Math.sin(ang - .4) * v.s * 2.4); ctx.lineTo(x2 - Math.cos(ang + .4) * v.s * 2.4, y2 - Math.sin(ang + .4) * v.s * 2.4); ctx.closePath(); ctx.fill(); ctx.restore();
+    });
+  }
+  // qo'shin nuqtalari
+  const r = Math.max(1.5, v.s * .5);
+  model.order.forEach(id => {
+    const g = model.groups[id], st = groupsNow[id];
+    const col = sc.sides[st.side].color;
+    const moving = k >= 0 && k < sts.length && sts[k].to[id] && (sts[k].to[id].x !== sts[k].from[id].x || sts[k].to[id].y !== sts[k].from[id].y);
+    const fighting = st.alive < 0.99 && k >= 0 && k < sts.length && sts[k].to[id].alive < sts[k].from[id].alive;
+    const ne = (g.kind === 'top' || g.kind === 'miltiqchi' || g.kind === 'fil') ? nearestEnemy(id, groupsNow) : null;
+    const face = ne ? Math.atan2(ne.st.y - st.y, ne.st.x - st.x) : (st.side === 0 ? -Math.PI / 2 : Math.PI / 2);
+    if(fighting) FX.clash = true;
+    if(moving && g.kind === 'otliq') FX.hoof = true;
+    if(moving && !SYM[g.kind]){
+      const tgt = sts[k].to[id], ma = Math.atan2(tgt.y - sts[k].from[id].y, tgt.x - sts[k].from[id].x);
+      g.dots.forEach(d => { if(d.rn > (g.kind === 'otliq' ? .5 : .2) || d.rn >= st.alive) return; const q = ((tm * .8 + d.ph) % 1); ctx.fillStyle = 'rgba(214,196,150,' + (.22 * (1 - q)) + ')'; ctx.beginPath(); ctx.arc((st.x + d.ox) * v.s + v.ox - Math.cos(ma) * q * v.s * 3, (st.y + d.oy) * v.s + v.oy - Math.sin(ma) * q * v.s * 3, r * (1.2 + q * 2.4), 0, 6.28); ctx.fill(); });
+    }
+    g.dots.forEach(d => {
+      if(d.rn >= st.alive) return;
+      let jx = 0, jy = 0;
+      if(fighting){ jx = Math.sin(tm * 9 + d.ph) * .7; jy = Math.cos(tm * 8 + d.ph) * .7; }
+      else if(moving){ jy = Math.sin(tm * 6 + d.ph) * .25; }
+      drawDot(g.kind, (st.x + d.ox + jx) * v.s + v.ox, (st.y + d.oy + jy) * v.s + v.oy, r, col, face);
+    });
+    if(g.commander && st.alive > .05) star((st.x) * v.s + v.ox, (st.y) * v.s + v.oy, v.s * 1.9);
+  });
+  fireFX(tm, v, groupsNow, k, r);
+  // yozuvlar
+  drawOverlay(tm, k, groupsNow, v);
+}
+function drawOverlay(tm, k, gn, v){
+  const W = cv.width, H = cv.height, sc = model.sc, u = W / 540;
+  const topic = topicOverride || sc.topic || '';
+  if(topic) pill(topic, W / 2, 62 * u, 24 * u);
+  const sts = model.stages;
+  if(tm < model.intro.t1){
+    const a = tm < 3.4 ? 1 : Math.max(0, 1 - (tm - 3.4) / .6);
+    ctx.save(); ctx.globalAlpha = Math.min(1, tm / .6) * a;
+    pill(sc.sides[0].commander + '  VS  ' + sc.sides[1].commander, W / 2, 128 * u, 22 * u, { bg: 'rgba(30,30,30,.85)', fg: '#fff' });
+    portrait(0, W * .27, H * .34, 70 * u, sc.sides[0]); portrait(1, W * .73, H * .34, 70 * u, sc.sides[1]);
+    ctx.font = '700 ' + 40 * u + 'px "Archivo Black",Impact,Arial'; ctx.fillStyle = '#fff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('VS', W / 2, H * .34);
+    pill(sc.sides[0].name, W * .27, H * .34 + 100 * u, 18 * u, { bg: sc.sides[0].color, fg: '#fff' }); pill(sc.sides[1].name, W * .73, H * .34 + 100 * u, 18 * u, { bg: sc.sides[1].color, fg: '#fff' });
+    { const tt = sc.title || ''; let fs = 30 * u; ctx.font = '700 ' + fs + 'px "Archivo Black",Impact,Arial'; while(ctx.measureText(tt).width > W - 70 * u && fs > 12 * u) { fs -= 2 * u; ctx.font = '700 ' + fs + 'px "Archivo Black",Impact,Arial'; }
+      pill(tt, W / 2, H * .62, fs, { bg: 'rgba(240,240,240,.95)' });
+      if(sc.year) pill(sc.year, W / 2, H * .62 + fs * 2.1, 20 * u, { bg: 'rgba(30,30,30,.85)', fg: '#fff' }); }
+    ctx.restore();
+    return;
+  }
+  // doimiy: jang nomi
+  pill(sc.title || '', W / 2, H - 70 * u, 26 * u);
+  // kichik portretlar + sonlar
+  [0, 1].forEach(i => {
+    const side = sc.sides[i];
+    let n = 0; model.order.forEach(id => { const g = model.groups[id]; const st = gn[id]; if(st && st.side === i && !SYM[g.kind]) n += g.count * st.alive; });
+    const x = i ? W - 56 * u : 56 * u, y = 118 * u;
+    portrait(i, x, y, 30 * u, side);
+    ctx.font = '700 ' + 18 * u + 'px Arial'; ctx.fillStyle = '#fff'; ctx.strokeStyle = 'rgba(0,0,0,.7)'; ctx.lineWidth = 3 * u; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    const label = n >= 1000 ? '~' + Math.round(n / 1000) + ' ming' : '~' + Math.round(n / 10) * 10;
+    ctx.strokeText(label, x, y + 46 * u); ctx.fillText(label, x, y + 46 * u);
+  });
+  // guruh yorliqlari va talafot yozuvi
+  {
+    const s0 = (k >= 0 && k < sts.length) ? sts[k] : null, p0 = s0 ? Math.min(1, (tm - s0.t0) / (s0.t1 - s0.t0)) : 0;
+    ctx.save(); ctx.textAlign = 'center'; ctx.textBaseline = 'bottom'; ctx.font = '700 ' + 11.5 * u + 'px Arial';
+    model.order.forEach(id => {
+      const g = model.groups[id], st = gn[id]; if(!st || st.alive < .2) return;
+      const sx = st.x * v.s + v.ox, sy = (st.y + g.top) * v.s + v.oy - 9 * u;
+      if(sx < -50 || sx > W + 50 || sy < 140 * u || sy > H - 60 * u) return;
+      const label = (g.name || id).replace(/\s*\(.*\)\s*/, '').slice(0, 26);
+      const w = ctx.measureText(label).width;
+      ctx.fillStyle = 'rgba(15,12,8,.6)'; ctx.beginPath(); ctx.roundRect(sx - w / 2 - 6 * u, sy - 15 * u, w + 12 * u, 17 * u, 5 * u); ctx.fill();
+      ctx.fillStyle = sc.sides[st.side].color; ctx.fillRect(sx - w / 2 - 6 * u, sy - 15 * u, 3 * u, 17 * u);
+      ctx.fillStyle = '#fff'; ctx.fillText(label, sx + 1.5 * u, sy);
+      if(s0 && s0.from[id] && s0.to[id]){
+        const dl = s0.from[id].alive - s0.to[id].alive;
+        if(dl >= .15 && p0 > .45){
+          const a = Math.min(1, (p0 - .45) / .12) * (p0 > .9 ? (1 - p0) / .1 : 1);
+          ctx.globalAlpha = Math.max(0, a); ctx.font = '800 ' + 16 * u + 'px Arial'; ctx.strokeStyle = 'rgba(0,0,0,.8)'; ctx.lineWidth = 4 * u; ctx.fillStyle = '#ff6b5e';
+          const ty = sy - 20 * u - (p0 - .45) * 22 * u; ctx.strokeText('−' + Math.round(dl * 100) + '%', sx, ty); ctx.fillText('−' + Math.round(dl * 100) + '%', sx, ty);
+          ctx.globalAlpha = 1; ctx.font = '700 ' + 11.5 * u + 'px Arial';
+        }
+      }
+    });
+    ctx.restore();
+  }
+  // kuch chizig'i (ikki tomon) va bosqich hisoblagichi
+  {
+    const tot = [0, 0], now = [0, 0];
+    model.order.forEach(id => { const g = model.groups[id]; if(SYM[g.kind]) return; const st = gn[id]; tot[g.side0] += g.count; if(st) now[st.side] += g.count * st.alive; });
+    const M = Math.max(tot[0], tot[1], 1), bx = 104 * u, bw = W - 208 * u, by = 114 * u, bh = 13 * u, half = bw / 2 - 4 * u;
+    ctx.fillStyle = 'rgba(15,12,8,.55)'; ctx.beginPath(); ctx.roundRect(bx - 3 * u, by - 3 * u, bw + 6 * u, bh + 6 * u, 8 * u); ctx.fill();
+    ctx.fillStyle = sc.sides[0].color; ctx.fillRect(bx, by, Math.max(0, now[0] / M * half), bh);
+    ctx.fillStyle = sc.sides[1].color; const w1 = Math.max(0, now[1] / M * half); ctx.fillRect(bx + bw - w1, by, w1, bh);
+    ctx.fillStyle = 'rgba(255,255,255,.7)'; ctx.fillRect(W / 2 - u, by - 2 * u, 2 * u, bh + 4 * u);
+    ctx.font = '700 ' + 12.5 * u + 'px Arial'; ctx.textAlign = 'center'; ctx.textBaseline = 'bottom'; ctx.fillStyle = '#fff'; ctx.strokeStyle = 'rgba(0,0,0,.7)'; ctx.lineWidth = 3 * u;
+    const ct = k >= 0 && k < sts.length ? 'Bosqich ' + (k + 1) + ' / ' + sts.length : (k === sts.length ? 'Natija' : '');
+    if(ct){ ctx.strokeText(ct, W / 2, by - 6 * u); ctx.fillText(ct, W / 2, by - 6 * u); }
+    // vaqt chizig'i
+    const ty = H - 6 * u; ctx.fillStyle = 'rgba(255,255,255,.18)'; ctx.fillRect(0, ty, W, 6 * u);
+    ctx.fillStyle = '#E8A33D'; ctx.fillRect(0, ty, W * Math.min(1, tm / model.total), 6 * u);
+    ctx.fillStyle = 'rgba(0,0,0,.6)'; sts.forEach(st2 => ctx.fillRect(W * st2.t0 / model.total - u / 2, ty, u, 6 * u));
+  }
+  // belgilar (legend): qurol turlari
+  {
+    const KN = { piyoda: 'Piyoda', otliq: 'Otliq', kamonchi: 'Kamonchi', miltiqchi: 'Miltiqchi', top: "To'p", fil: 'Fil' };
+    const ent = {};
+    model.order.forEach(id => { const g = model.groups[id]; (ent[g.kind] = ent[g.kind] || new Set()); if(g.weapon) g.weapon.split(/\s*,\s*/).forEach(w => ent[g.kind].add(w)); });
+    const kinds = Object.keys(ent);
+    ctx.save(); ctx.font = '600 ' + 12.5 * u + 'px Arial'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+    const lines = kinds.map(kd => KN[kd] + (ent[kd].size ? ': ' + Array.from(ent[kd]).join(', ') : ''));
+    const lw = Math.min(W * .62, Math.max(...lines.map(l => ctx.measureText(l).width)) + 38 * u), lh = 22 * u, y0 = 188 * u;
+    ctx.fillStyle = 'rgba(15,12,8,.62)'; ctx.beginPath(); ctx.roundRect(10 * u, y0 - 10 * u, lw, lines.length * lh + 14 * u, 8 * u); ctx.fill();
+    lines.forEach((ln, i) => { drawDot(kinds[i], 26 * u, y0 + i * lh + 6 * u, 4.5 * u, '#d9d2c0', -Math.PI / 2); ctx.fillStyle = '#fff'; ctx.fillText(ln, 42 * u, y0 + i * lh + 6 * u, lw - 34 * u); });
+    ctx.restore();
+  }
+  // bosqich matni
+  let text = '';
+  if(k >= 0 && k < sts.length) text = sts[k].text;
+  else if(k === sts.length) text = sc.result || '';
+  if(text){
+    const s = k >= 0 && k < sts.length ? sts[k] : model.outro;
+    const p = Math.min(1, (tm - s.t0) / .5);
+    ctx.save(); ctx.globalAlpha = p; ctx.font = '600 ' + 21 * u + 'px Inter,Arial';
+    const lines = wrap(text, W - 80 * u), lh = 28 * u, h = lines.length * lh + 22 * u, y0 = H - 140 * u - h;
+    ctx.fillStyle = 'rgba(15,12,8,.78)'; ctx.beginPath(); ctx.roundRect(24 * u, y0, W - 48 * u, h, 14 * u); ctx.fill();
+    ctx.fillStyle = '#fff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    lines.forEach((ln, i) => ctx.fillText(ln, W / 2, y0 + 11 * u + lh / 2 + i * lh));
+    ctx.restore();
+  }
+}
+
+// ---------- Boshqaruv ----------
+function loadScenario(text){
+  try{
+    const warns = [];
+    const sc = normalizeScenario(parseLoose(text), warns);
+    model = buildModel(sc); S = sc; t = 0; playing = false; $('playBtn').textContent = '▶ Boshlash';
+    if(sc.topic && !topicOverride) $('topic').placeholder = sc.topic;
+    showSrc(sc); render(0); msg('Yuklandi: ' + sc.title + ' · ' + Math.round(model.total) + ' soniya' + (warns.length ? ' (' + warns.length + ' ta ogohlantirish)' : ''));
+    const eb = $('scnErr'); eb.style.display = warns.length ? 'block' : 'none'; eb.className = 'msg'; eb.style.color = '#f0d58a'; eb.textContent = warns.length ? 'Diqqat (video baribir tayyor):\n• ' + warns.slice(0, 8).join('\n• ') : '';
+    return true;
+  }catch(e){ msg('Ssenariyda xato — pastga qarang.', true); const eb = $('scnErr'); eb.style.display = 'block'; eb.className = 'msg err'; eb.style.color = ''; eb.textContent = '❌ ' + e.message; return false; }
+}
+function showSrc(sc){
+  const box = $('srcBox'); const has = sc.note || (sc.sources && sc.sources.length);
+  box.style.display = has ? 'block' : 'none'; if(!has) return;
+  $('srcNote').textContent = sc.note || '';
+  $('srcList').innerHTML = (sc.sources || []).map(u => /^https?:\/\//.test(u) ? '<div><a style="color:#E8A33D" target="_blank" rel="noopener" href="' + u.replace(/"/g, '') + '">' + u.replace(/^https?:\/\//, '').slice(0, 70) + '</a></div>' : '<div>' + String(u).replace(/[<>&]/g, '') + '</div>').join('');
+}
+
+// ---------- Ovoz (brauzerning o'zida sintez qilinadi, fayl kerak emas) ----------
+const Aud = { ac: null, acc: { beat: 0, boom: 0, volley: 0, clash: 0, hoof: 0 }, inten: .3, beat: 0 };
+function audInit(){
+  if(Aud.ac){ try{ Aud.ac.resume(); }catch(e){} return; }
+  const AC = window.AudioContext || window.webkitAudioContext; if(!AC) return;
+  const ac = Aud.ac = new AC();
+  Aud.master = ac.createGain(); Aud.master.gain.value = .8;
+  Aud.dest = ac.createMediaStreamDestination();
+  Aud.master.connect(ac.destination); Aud.master.connect(Aud.dest);
+  const o1 = ac.createOscillator(), o2 = ac.createOscillator(), o3 = ac.createOscillator(), g = ac.createGain(), f = ac.createBiquadFilter(), lfo = ac.createOscillator(), lg = ac.createGain();
+  o1.type = o2.type = 'sawtooth'; o3.type = 'sine'; o1.frequency.value = 55; o2.frequency.value = 55 * 1.4983; o3.frequency.value = 110 * 1.1892;
+  f.type = 'lowpass'; f.frequency.value = 260; g.gain.value = .05; lfo.frequency.value = .12; lg.gain.value = 90; lfo.connect(lg); lg.connect(f.frequency);
+  o1.connect(f); o2.connect(f); o3.connect(f); f.connect(g); g.connect(Aud.master); [o1, o2, o3, lfo].forEach(o => o.start());
+  Aud.droneG = g; Aud.droneF = f;
+  const nb = ac.createBuffer(1, ac.sampleRate, ac.sampleRate), ch = nb.getChannelData(0); for(let i = 0; i < ch.length; i++) ch[i] = Math.random() * 2 - 1; Aud.nb = nb;
+}
+function noiseBurst(dur, freq, q, vol, type){
+  const ac = Aud.ac; if(!ac) return; const src = ac.createBufferSource(); src.buffer = Aud.nb;
+  const f = ac.createBiquadFilter(); f.type = type || 'lowpass'; f.frequency.value = freq; f.Q.value = q || 1;
+  const g = ac.createGain(), t0 = ac.currentTime; g.gain.setValueAtTime(vol, t0); g.gain.exponentialRampToValueAtTime(.001, t0 + dur);
+  src.connect(f); f.connect(g); g.connect(Aud.master); src.start(t0, Math.random() * .5); src.stop(t0 + dur + .05);
+}
+function tone(f0, f1, dur, vol, type){
+  const ac = Aud.ac; if(!ac) return; const o = ac.createOscillator(), g = ac.createGain(), t0 = ac.currentTime;
+  o.type = type || 'sine'; o.frequency.setValueAtTime(f0, t0); o.frequency.exponentialRampToValueAtTime(Math.max(20, f1), t0 + dur);
+  g.gain.setValueAtTime(vol, t0); g.gain.exponentialRampToValueAtTime(.001, t0 + dur); o.connect(g); g.connect(Aud.master); o.start(t0); o.stop(t0 + dur + .05);
+}
+const SFX = {
+  drum(a){ tone(130, 45, .28, .55 * a, 'sine'); noiseBurst(.08, 400, 1, .12 * a); },
+  boom(){ noiseBurst(.7, 320, 1, .85); tone(95, 32, .6, .8, 'sine'); },
+  volley(){ for(let i = 0; i < 5; i++) setTimeout(() => noiseBurst(.09, 2400 + Math.random() * 1200, 1.2, .22, 'bandpass'), i * 45 + Math.random() * 40); },
+  clash(){ tone(1500 + Math.random() * 900, 900, .13, .10, 'square'); noiseBurst(.07, 4500, 1, .12, 'highpass'); },
+  hoof(){ noiseBurst(.08, 180, 2, .28); setTimeout(() => noiseBurst(.07, 160, 2, .2), 90); }
+};
+function audTick(dt){
+  if(!Aud.ac || !$('sndOn').checked){ if(Aud.master) Aud.master.gain.value = 0; return; }
+  Aud.master.gain.value = .8;
+  const k = model ? stateAt(t) : -1, st = model && k >= 0 && k < model.stages.length ? model.stages[k] : null;
+  const fight = st && Object.keys(st.to).some(id => st.to[id].alive < st.from[id].alive - .1);
+  const target = fight ? .95 : (st ? .5 : .25);
+  Aud.inten += (target - Aud.inten) * Math.min(1, dt * 1.2);
+  Aud.droneF.frequency.value = 200 + 500 * Aud.inten; Aud.droneG.gain.value = .035 + .04 * Aud.inten;
+  const A = Aud.acc; Object.keys(A).forEach(x => A[x] -= dt);
+  if(A.beat <= 0){ A.beat = .66 - .26 * Aud.inten; Aud.beat = (Aud.beat + 1) % 4; SFX.drum(Aud.beat === 0 ? 1 : .55); }
+  if(FX.boom && A.boom <= 0){ A.boom = .9 + Math.random() * 1.3; SFX.boom(); }
+  if(FX.volley && A.volley <= 0){ A.volley = 1.2 + Math.random() * 1.2; SFX.volley(); }
+  if(FX.clash && A.clash <= 0){ A.clash = .16 + Math.random() * .25; SFX.clash(); }
+  if(FX.hoof && A.hoof <= 0){ A.hoof = .2; SFX.hoof(); }
+}
+function audPause(on){ if(Aud.ac){ try{ on ? Aud.ac.suspend() : Aud.ac.resume(); }catch(e){} } }
+
+function frame(ts){
+  if(!playing){ return; }
+  const dt = Math.min(.1, (ts - lastTs) / 1000); lastTs = ts;
+  t += dt;
+  if(t >= model.total){ t = model.total; playing = false; $('playBtn').textContent = '▶ Qayta'; if(recorder) stopRec(); }
+  render(t); audTick(dt); $('seek').value = Math.round(t / model.total * 1000);
+  if(!playing) audPause(true);
+  if(playing) requestAnimationFrame(frame);
+}
+function play(){ if(!model) return; if(t >= model.total) t = 0; playing = true; if($('sndOn').checked){ audInit(); audPause(false); } lastTs = performance.now(); $('playBtn').textContent = '⏸ Pauza'; requestAnimationFrame(frame); }
+$('playBtn').onclick = () => { if(playing){ playing = false; $('playBtn').textContent = '▶ Davom'; audPause(true); } else play(); };
+$('stopBtn').onclick = () => { playing = false; audPause(true); t = 0; $('playBtn').textContent = '▶ Boshlash'; if(model) render(0); $('seek').value = 0; if(recorder) stopRec(); };
+$('seek').oninput = e => { if(!model) return; playing = false; $('playBtn').textContent = '▶ Davom'; t = e.target.value / 1000 * model.total; render(t); };
+$('loadBtn').onclick = () => loadScenario($('scn').value);
+$('lib').onchange = () => { $('scn').value = JSON.stringify(LIB[$('lib').value], null, 1); loadScenario($('scn').value); };
+let pasteH = null; $('scn').addEventListener('paste', () => { clearTimeout(pasteH); pasteH = setTimeout(() => loadScenario($('scn').value), 150); });
+$('topic').oninput = e => { topicOverride = e.target.value.trim(); if(model) render(t); };
+$('fmt').onchange = e => { if(e.target.value === 'h'){ cv.width = 960; cv.height = 540; } else { cv.width = 540; cv.height = 960; } if(model) render(t); };
+
+function readImg(inp, cb){ inp.onchange = () => { const f = inp.files[0]; if(!f) return; const im = new Image(); im.onload = () => { cb(im); if(model) render(t); }; im.src = URL.createObjectURL(f); }; }
+readImg($('bgFile'), im => bgImg = im); readImg($('p0File'), im => portraits[0] = im); readImg($('p1File'), im => portraits[1] = im);
+
+// ---------- Videoga yozish ----------
+function stopRec(){ try{ recorder.stop(); }catch(e){} }
+$('recBtn').onclick = () => {
+  if(!model) return msg('Avval ssenariyni yuklang.', true);
+  if(!cv.captureStream || typeof MediaRecorder === 'undefined') return msg('Brauzer videoga yozishni qo\'llamaydi. Chrome yoki Edge\'da oching.', true);
+  const types = ['video/mp4;codecs=avc1,mp4a.40.2', 'video/mp4;codecs=avc1', 'video/mp4', 'video/webm;codecs=vp9', 'video/webm'];
+  const mt = types.find(x => MediaRecorder.isTypeSupported(x)) || '';
+  if($('sndOn').checked) audInit();
+  const vs = cv.captureStream(30); if(Aud.dest && $('sndOn').checked) Aud.dest.stream.getAudioTracks().forEach(tr => vs.addTrack(tr));
+  const chunks = []; recorder = new MediaRecorder(vs, mt ? { mimeType: mt, videoBitsPerSecond: 4e6 } : { videoBitsPerSecond: 4e6 });
+  recorder.ondataavailable = e => { if(e.data.size) chunks.push(e.data); };
+  recorder.onstop = () => {
+    const type = recorder.mimeType || 'video/webm'; recorder = null;
+    const blob = new Blob(chunks, { type }); const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = (S.title || 'jang').replace(/[^\wЀ-ӿ' -]+/g, '_') + (type.includes('mp4') ? '.mp4' : '.webm');
+    document.body.appendChild(a); a.click(); a.remove(); msg('Video saqlandi (' + (blob.size / 1e6).toFixed(1) + ' MB, ' + (type.includes('mp4') ? 'mp4' : 'webm') + ').');
+  };
+  t = 0; recorder.start(); play(); msg('⏺ Yozilmoqda... tugaguncha sahifani yopmang (' + Math.round(model.total) + ' soniya).');
+};
+
+// ---------- Tayyor namuna va AI so'rovi ----------
+function formVals(){
+  const g = id => $(id).value.trim();
+  const num = (v, d) => { const n = parseInt(String(v).replace(/\D/g, ''), 10); return n > 0 ? n : d; };
+  return { name: g('pBattle'), year: g('pYear'), terr: g('pTerr'), s0: g('pS0') || '1-tomon', s1: g('pS1') || '2-tomon',
+    c0: g('pC0') || 'Sarkarda 1', c1: g('pC1') || 'Sarkarda 2', n0: num(g('pN0'), 30000), n1: num(g('pN1'), 30000), win: +$('pWin').value };
+}
+function makeSkeleton(f){
+  const mk = (n, i, ids) => {
+    const top = i === 1, Y = y => top ? 100 - y : y;
+    const sh = [['Markaz', 'piyoda', .4, 46, 80, true], ["O'ng qanot", 'otliq', .25, 76, 78], ['Chap qanot', 'otliq', .25, 16, 78], ['Zaxira (kamonchilar)', 'kamonchi', .1, 46, 92]];
+    return sh.map((r, k) => ({ id: ids[k], name: r[0], kind: r[1], count: Math.round(n * r[2] / 100) * 100, x: r[3], y: top ? 100 - r[4] : r[4], commander: !!r[5] }));
+  };
+  const A = ['a1', 'a2', 'a3', 'a4'], B = ['b1', 'b2', 'b3', 'b4'];
+  const terr = f.terr.toLowerCase(); const features = [];
+  if(/daryo/.test(terr)) features.push({ type: 'river', name: 'Daryo', pts: [[0, 55], [25, 49], [45, 54], [65, 47], [85, 52], [100, 46]] });
+  if(/tog/.test(terr)) features.push({ type: 'mountain', x: 84, y: 14, r: 12 }, { type: 'mountain', x: 14, y: 12, r: 10 }, { type: 'mountain', x: 88, y: 88, r: 10 });
+  if(/o'rmon/.test(terr)) features.push({ type: 'forest', x: 15, y: 50, r: 12 }, { type: 'forest', x: 85, y: 50, r: 12 });
+  const W = f.win, L = 1 - W, wi = W ? B : A, li = L ? B : A, ws = W ? f.s1 : f.s0, ls = L ? f.s1 : f.s0;
+  const stages = [
+    { text: f.s0 + ' va ' + f.s1 + ' qo\'shinlari jang maydonida saf tortadi.', cam: [50, 52, 0.85], dur: 5 },
+    { text: 'Qo\'shinlar bir-biriga yaqinlashadi.', cam: [50, 52, 1], dur: 5, moves: [{ g: 'a1', to: [46, 64] }, { g: 'a4', to: [46, 76] }, { g: 'b1', to: [46, 36] }, { g: 'b4', to: [46, 24] }] },
+    { text: 'Ikki tomon otliqlari qanotlarda hujumga o\'tadi.', cam: [50, 50, 1.1], dur: 6, moves: [{ g: 'a2', to: [76, 56] }, { g: 'a3', to: [16, 56] }, { g: 'b2', to: [76, 44] }, { g: 'b3', to: [16, 44] }] },
+    { text: 'Markazda shiddatli to\'qnashuv boshlanadi.', cam: [46, 50, 1.5], dur: 6, moves: [{ g: 'a1', to: [46, 55] }, { g: 'b1', to: [46, 45] }], losses: { a1: .7, b1: .7 } },
+    { text: ws + ' qanotlardan aylanib o\'tib, qurshov hosil qiladi.', cam: [46, 48, 1.4], dur: 7,
+      moves: wi.slice(1, 3).map((id, k) => ({ g: id, to: [k ? 30 : 62, 46] })), losses: Object.assign({}, ...li.map(id => ({ [id]: .25 })), ...wi.map(id => ({ [id]: .75 }))) },
+    { text: ls + ' safi buzilib, qo\'shin tor-mor qilinadi.', cam: [46, 48, 1.6], dur: 5, losses: Object.assign({}, ...li.map(id => ({ [id]: .03 })), ...wi.map(id => ({ [id]: .7 }))) }
+  ];
+  return { title: (f.name || 'JANG').toUpperCase(), year: f.year, topic: '', terrain: f.terr, features,
+    sides: [{ name: f.s0, color: '#C62828', commander: f.c0, groups: mk(f.n0, 0, A) }, { name: f.s1, color: '#2E9E4F', commander: f.c1, groups: mk(f.n1, 1, B) }],
+    stages, result: ws + ' g\'alaba qozondi, ' + ls + ' qo\'shini mag\'lub bo\'ldi.' };
+}
+$('skBtn').onclick = () => {
+  const f = formVals(); if(!f.name){ $('pMsg').textContent = 'Jang nomini kiriting.'; return; }
+  $('scn').value = JSON.stringify(makeSkeleton(f), null, 1);
+  if(loadScenario($('scn').value)) $('pMsg').textContent = '✓ Namuna tayyor va yuklandi. Tarixiy aniqlik uchun «AI uchun so\'rov»dan foydalaning.';
+};
+$('pBtn').onclick = () => {
+  const f = formVals(); if(!f.name){ $('pMsg').textContent = 'Jang nomini kiriting.'; return; }
+  const given = $('pS0').value.trim() && $('pS1').value.trim();
+  const sk = given ? JSON.stringify(makeSkeleton(f)) : '';
+  const p = `Sen tarixchi va xarita rejissyorisan. Vazifa: "${f.name}" jangini xaritada animatsiya qilish uchun ssenariy tuz.
+
+AVVAL internetda ishonchli manbalardan (ensiklopediyalar, akademik tarix kitoblari, muzey/arxiv saytlari, Wikipedia + uning manbalari) quyidagilarni top: jang sanasi va joyi, tomonlar, sarkardalar, har tomonning jangchilar soni (turlari bo'yicha: piyoda/otliq/kamonchi/fil), jang joyining relyefi (daryo, tog', o'rmon, qishloq), jangning haqiqiy bosqichlari va natijasi (talafotlar). Manbalarda raqamlar farq qilsa — oraliqni "note" ga yoz, animatsiyada o'rtachasini ol. Internet qidiruvi imkonsiz bo'lsa, buni "note" ga ochiq yoz va eng ishonchli ma'lumotni ber.
+${given ? "\nFoydalanuvchi bergan ma'lumot: 1-tomon — " + f.s0 + " (" + f.c0 + ", ~" + f.n0 + "); 2-tomon — " + f.s1 + " (" + f.c1 + ", ~" + f.n1 + "); joy: " + f.terr + ".\n" : ''}
+KEYIN javobni FAQAT bitta JSON obyekt qilib ber (kod bloki ichida bo'lishi mumkin, boshqa matn yozma). Javob to'liq bo'lsin, kesilmasin.
+
+JSON:
+{
+ "title":"JANG NOMI (katta harf, qisqa)","year":"sana","topic":"MAVZU (katta harf)","terrain":"tekislik|daryo|tog'|cho'l|o'rmon",
+ "features":[{"type":"river","name":"..","pts":[[x,y],...]},{"type":"mountain","x":..,"y":..,"r":..},{"type":"forest","x":..,"y":..,"r":..},{"type":"hill","x":..,"y":..,"r":..},{"type":"place","kind":"city|village|fort","name":"Joy nomi","x":..,"y":..}],
+ "sides":[
+  {"name":"1-tomon","color":"#C62828","commander":"Sarkarda ismi","groups":[{"id":"a1","name":"Markaz","kind":"piyoda","weapon":"nayza, qilich","count":30000,"x":46,"y":80,"commander":true}]},
+  {"name":"2-tomon","color":"#2E9E4F","commander":"Sarkarda ismi","groups":[{"id":"b1","name":"Markaz","kind":"piyoda","count":25000,"x":46,"y":30,"commander":true}]}
+ ],
+ "stages":[{"text":"o'zbekcha, ≤90 belgi","cam":[50,55,1],"dur":5,"moves":[{"g":"a1","to":[46,60]}],"losses":{"b1":0.5},"defect":[{"g":"b3","to":0}],"arrows":true}],
+ "result":"Natija (bir gap, talafotlar bilan)",
+ "note":"Manbalarda sonlar qanday farq qilishi",
+ "sources":["https://manba1","https://manba2"]
+}
+
+QOIDALAR:
+- Koordinatalar 0..100: x — g'arbdan sharqqa, y — shimoldan janubga (y=0 tepada). Tomonlar xaritaning qarama-qarshi chetlarida, haqiqiy geografiyaga mos (daryo qaysi tomonda bo'lsa, shunga qo'y).
+- "kind": piyoda | otliq | kamonchi | miltiqchi | top | fil. Jang zamoniga mos qurol tanla: qadimda/o'rta asrda kamon, qilich, nayza, fil; to'p va miltiq faqat ular haqiqatan ishlatilgan davrda (XIV asrdan to'p, XVI asrdan miltiqli piyoda). Har guruhga "weapon" yoz (masalan "kamon, qilich"). "top" va "fil" guruhlarida "count" — dona (to'p/fil soni, ko'p bo'lsa 14 gacha), boshqalarida — jangchilar soni. Har tomonda 3–7 guruh, har tomonda bitta "commander":true. Piyoda/otliq/kamonchi/miltiqchi sonlari yig'indisi tomon umumiy soniga teng.
+- "stages": 6–8 ta, tarixiy ketma-ketlikda (joylashuv → yaqinlashish → hujum → hal qiluvchi lahza: xiyonat/pistirma/qurshov → natija). "moves" — faqat harakatlanayotgan guruhlar. "losses" — guruhning QOLGAN ulushi 0..1 (0 = yo'q bo'ldi). "defect" — guruh tomon almashtirsa (to: 0 yoki 1). "cam":[markazX,markazY,zoom 0.8–2].
+- "sources" — haqiqatan foydalangan sahifalar havolasi. Matnlar o'zbek (lotin), maktab o'quvchisiga tushunarli. Aniq bilmagan narsangni to'qima.${sk ? "\n\nBOSHLANG'ICH QORALAMA (kerak bo'lsa tuzat):\n" + sk : ''}`;
+  navigator.clipboard.writeText(p).then(() => { $('pMsg').textContent = '✓ So\'rov nusxalandi. AI\'ga joylang, javobini yuqoridagi maydonga qo\'ying.'; }).catch(() => { $('scn').value = p; $('pMsg').textContent = 'Nusxalab bo\'lmadi — so\'rov yuqoridagi maydonga qo\'yildi, uni nusxalang.'; });
+};
+
+$('scn').value = JSON.stringify(DEMO, null, 1); loadScenario($('scn').value);
 </script>
+<script src="theme.js"></script>
 </body>
 </html>
