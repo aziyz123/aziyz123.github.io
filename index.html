@@ -74,7 +74,22 @@
   @media (max-width:880px){ .bento{ grid-template-columns:repeat(2,minmax(0,1fr)); grid-auto-rows:158px; } .big{ grid-column:span 2; } .big h3{ font-size:28px; } }
   @media (max-width:520px){ .wrap{ padding:0 16px; } .tile{ border-radius:22px; padding:16px; } .tile h3{ font-size:18px; } .c2{ grid-column:span 2; } .tile .ltr{ font-size:28px; } }
   @media (prefers-reduced-motion:reduce){ .tile{ opacity:1; transform:none; transition:none; } }
+  /* ILOVA REJIMI (o'rnatilgan ilova / APK): telefon ko'rinishi */
+  .appnav{display:none}
+  html.app .pills,html.app .facts,html.app .foot,html.app [data-install]{display:none !important}
+  html.app .topbar{padding-top:max(14px,env(safe-area-inset-top))}
+  html.app .wrap{padding-bottom:110px}
+  html.app .bento{grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:132px;gap:12px}
+  html.app .big{grid-column:span 2;grid-row:span 1}
+  html.app .big p{display:none}
+  html.app .big h3{font-size:24px}
+  html.app h1{font-size:38px}
+  html.app .appnav{display:flex;position:fixed;left:14px;right:14px;bottom:max(14px,env(safe-area-inset-bottom));z-index:50;background:rgba(20,33,58,.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-radius:28px;padding:10px 6px;justify-content:space-around;box-shadow:0 14px 30px rgba(20,33,58,.35)}
+  html.app .appnav a{flex:1;text-align:center;color:#C3CCDD;text-decoration:none;font-size:11px;line-height:1.5;font-weight:500}
+  html.app .appnav a b{display:block;font-size:16px;font-weight:400}
+  html.app .appnav a.on{color:#E6CF98;font-weight:600}
 </style>
+<script>try{var ua=navigator.userAgent;if(matchMedia('(display-mode: standalone)').matches||navigator.standalone||/; wv\)/.test(ua)||window.Android)document.documentElement.classList.add('app')}catch(e){}</script>
 </head>
 <body>
 <div class="wrap">
@@ -176,5 +191,6 @@
   }
 </script>
 
+<nav class="appnav" aria-label="Ilova"><a class="on" href="#tools"><b>●</b>Vositalar</a><a href="fayl-uzatish.html"><b>○</b>Fayllar</a><a href="dars-jadvali.html"><b>○</b>Jadval</a><a href="https://t.me/byaziyz" target="_blank" rel="noopener"><b>○</b>Telegram</a></nav>
 </body>
 </html>
