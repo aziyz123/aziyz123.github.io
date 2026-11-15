@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Jang Xaritasi</title>
-<meta name="description" content="Tarixiy jangni xaritada animatsiya qilish">
+<meta name="description" content="Tarixiy jangni xaritada animatsiya qilish: qo'shinlar, sarkardalar, joy va taktika. Videoga yozib olinadi.">
 <style>
   :root{ --bg:#14161C; --card:#1D2029; --paper:#F3EFE4; --gold:#E8A33D; --line:rgba(255,255,255,.12); }
   *{ box-sizing:border-box; }
@@ -63,6 +63,7 @@
         <div class="tl-wrap"><div class="tl-steps" id="tlSteps"></div></div>
         <div class="msg" id="msg"></div>
       </div>
+      <div class="card" id="srcBox" style="display:none;"><h2>📚 Ma'lumot manbalari</h2><div class="hint" id="srcNote"></div><div id="srcList" class="hint"></div></div>
     </div>
     <div>
       <div class="card">
@@ -86,6 +87,20 @@
         <input type="text" id="pBattle" placeholder="Masalan: Napoleon Misrda jangi">
         <div class="row"><button id="pBtn">📋 AI so'rovini nusxalash</button></div>
         <div class="msg" id="pMsg"></div>
+        <details style="margin-top:12px;"><summary style="cursor:pointer;font-size:13px;color:var(--gold)">Qo'lda sozlash</summary>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <div><label for="pYear">Yili</label><input type="text" id="pYear"></div>
+          <div><label for="pTerr">Joy</label><select id="pTerr"><option>tekislik</option><option>daryo</option><option>tog'</option><option>cho'l</option><option>o'rmon</option></select></div>
+          <div><label for="pS0">1-tomon</label><input type="text" id="pS0"></div>
+          <div><label for="pS1">2-tomon</label><input type="text" id="pS1"></div>
+          <div><label for="pC0">1-sarkarda</label><input type="text" id="pC0"></div>
+          <div><label for="pC1">2-sarkarda</label><input type="text" id="pC1"></div>
+          <div><label for="pN0">1-soni</label><input type="text" id="pN0"></div>
+          <div><label for="pN1">2-soni</label><input type="text" id="pN1"></div>
+        </div>
+        <label for="pWin">G'olib</label>
+        <select id="pWin"><option value="0">1-tomon</option><option value="1">2-tomon</option></select>
+        <div class="row"><button id="skBtn" class="alt">⚡ Namuna yasash</button></div></details>
       </div>
       <div class="card">
         <h2>3 · Rasmlar</h2>
@@ -97,11 +112,9 @@
     </div>
   </div>
 </div>
-<script>
-// PLACEHOLDER - full logic will be restored in next commit. For now open console for errors.
-console.error('Jang logikasi yuklanmoqda... Agar ko\'rinmasa, sahifani yangilang.');
-document.getElementById('msg').textContent = 'Logika yuklanmoqda... Bir daqiqa kuting yoki sahifani yangilang.';
-</script>
+<script src="jang-logic-a.js?v=6"></script>
+<script src="jang-logic-b.js?v=6"></script>
+<script src="jang-logic-c.js?v=6"></script>
 <script src="theme.js"></script>
 </body>
 </html>
