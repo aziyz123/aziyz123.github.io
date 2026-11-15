@@ -1,0 +1,37 @@
+/* Umumiy dizayn: "Navy klub" — fildirak, to'q ko'k, guruch (old money, iOS uslubi) */
+:root{
+  --stage:#F3F0E8; --stage-2:#FBF9F3; --stage-3:#E7E3D9;
+  --bg:#F3F0E8; --card:#FBF9F3;
+  --paper:#14213A; --paper-dim:rgba(20,33,58,.64);
+  --gold:#8A6A2A; --gold-2:#B8903E;
+  --line:rgba(20,33,58,.12);
+  --danger:#B3362E; --ok:#2F7A52;
+  --t1:#B8903E; --t2:#2E4A78; --t3:#8C3B52; --t4:#4F7A5C;
+  --navy:#1F3354; --ink:#14213A;
+}
+html{ color-scheme:light; }
+body{ background:#F3F0E8 !important; color:#14213A; font-family:'Inter',system-ui,sans-serif !important; -webkit-font-smoothing:antialiased; }
+h1,h2,h3,.brand,.logo{ font-family:'Newsreader',Georgia,serif; letter-spacing:-.005em; }
+h1{ font-weight:600; } h2,h3{ font-weight:600; }
+a{ color:#7A5A1E; }
+::selection{ background:#B8903E; color:#14213A; }
+.card, .panel, .box{ background:#FBF9F3 !important; border:1px solid rgba(20,33,58,.12) !important; border-radius:20px !important; box-shadow:0 8px 22px rgba(20,33,58,.06); }
+input[type=text],input[type=number],input[type=password],input[type=search],input:not([type]),textarea,select{
+  background:#fff !important; color:#14213A !important; border:1px solid rgba(20,33,58,.18) !important; border-radius:12px; }
+input::placeholder,textarea::placeholder{ color:rgba(20,33,58,.42) !important; }
+input:focus,textarea:focus,select:focus{ outline:2px solid rgba(184,144,62,.55); outline-offset:1px; }
+button.primary,.primary{ background:linear-gradient(150deg,#E3C77E,#B8903E) !important; color:#14213A !important; border:0 !important; font-weight:700; border-radius:14px; box-shadow:0 6px 14px rgba(184,144,62,.28); }
+button.primary:hover,.primary:hover{ filter:brightness(1.04); }
+button.secondary,button.alt,.secondary,.alt{ background:#E7E3D9 !important; color:#14213A !important; border:1px solid rgba(20,33,58,.14) !important; border-radius:14px; }
+button:disabled{ opacity:.5; }
+code,pre{ background:#E7E3D9; color:#14213A; border-radius:8px; }
+details > summary{ color:#7A5A1E; }
+/* Telegram kanal belgisi (hamma sahifada) */
+.tg-foot{ display:flex; justify-content:center; padding:26px 16px 34px; }
+.tg-foot a{ display:inline-flex; align-items:center; gap:8px; background:#1F3354; color:#E3C77E !important; text-decoration:none; font-size:13px; font-weight:600; padding:10px 18px; border-radius:999px; box-shadow:0 8px 18px rgba(20,33,58,.2); }
+.tg-foot a:hover{ filter:brightness(1.12); }
+
+.p-status.violated{ color:#9A2B25 !important; background:rgba(179,54,46,.14) !important; }
+.p-status.finished{ color:#1F6A45 !important; background:rgba(47,122,82,.16) !important; }
+.p-status.waiting{ color:#7A5A1E !important; }
+.p-status.in_progress{ color:#2E4A78 !important; background:rgba(46,74,120,.13) !important; }

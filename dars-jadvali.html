@@ -15,7 +15,7 @@
     --paper:#F3EFE4; --gold:#A9813F; --gold-2:#C9A45C;
     --danger:#D64545; --ok:#4A9A6A;
     --t1:#E8A33D; --t2:#2E8B8B; --t3:#B23A6B; --t4:#6B8F5C;
-    --line: rgba(255,255,255,0.1);
+    --line: rgba(20,33,58,0.1);
   }
   *{box-sizing:border-box;}
   body{
@@ -45,21 +45,21 @@
 
   .card{
     background: linear-gradient(155deg, var(--stage-2) 0%, var(--stage) 100%);
-    border: 1px solid rgba(255,255,255,0.07);
+    border: 1px solid rgba(20,33,58,0.07);
     border-radius: 14px; padding: 24px 26px; margin-top: 22px;
-    box-shadow: 0 1px 0 rgba(255,255,255,0.04) inset, 0 18px 40px -12px rgba(0,0,0,0.5);
+    box-shadow: 0 1px 0 rgba(20,33,58,0.04) inset, 0 18px 40px -12px rgba(0,0,0,0.5);
   }
   .card h2{ font-family:'Archivo', sans-serif; font-size: 13px; font-weight:700; color: var(--gold-2); margin:0 0 14px 0; }
   label{ display:block; font-size:13px; font-weight:600; margin-bottom:6px; margin-top:14px; }
   label:first-of-type{ margin-top:0; }
   textarea, input[type=text], input[type=date], select{
     width:100%; font-family:'Inter', sans-serif; font-size:14px; padding: 12px 14px;
-    border: 1px solid rgba(255,255,255,0.1); border-radius:8px;
+    border: 1px solid rgba(20,33,58,0.1); border-radius:8px;
     background: rgba(0,0,0,0.25); color: var(--paper);
   }
   textarea{ min-height: 90px; }
   textarea:focus, input:focus, select:focus{ outline:none; border-color: var(--gold); }
-  .hint{ font-size:11px; color: rgba(243,239,228,0.45); margin-top:6px; line-height:1.5; }
+  .hint{ font-size:11px; color: rgba(20,33,58,0.45); margin-top:6px; line-height:1.5; }
   .row{ display:flex; gap:14px; flex-wrap:wrap; }
   .row > div{ flex:1; min-width:150px; }
 
@@ -79,7 +79,7 @@
   .qr-row{ display:flex; gap: 18px; align-items:center; flex-wrap:wrap; margin-top: 14px; }
   #qrcodeBox{ background:#fff; padding: 8px; border-radius: 8px; display:inline-block; line-height:0; }
   .class-code{ font-family:'Archivo Black', sans-serif; font-size: 22px; color: var(--gold-2); }
-  .class-url{ font-family:'IBM Plex Mono', monospace; font-size: 11px; color: rgba(243,239,228,0.5); word-break: break-all; margin-top:4px; }
+  .class-url{ font-family:'IBM Plex Mono', monospace; font-size: 11px; color: rgba(20,33,58,0.5); word-break: break-all; margin-top:4px; }
 
   .period-item{
     background: var(--stage-2); border-radius:10px; padding: 16px 18px; margin-bottom: 12px;
@@ -87,17 +87,17 @@
   }
   .period-num{ font-family:'IBM Plex Mono', monospace; font-size: 11px; color: var(--gold-2); font-weight:700; }
   .period-subject{ font-family:'Archivo', sans-serif; font-weight:700; font-size: 17px; margin-top:4px; }
-  .period-topic{ font-size: 14px; color: rgba(243,239,228,0.75); margin-top:4px; font-style:italic; }
-  .period-info{ font-size: 13px; color: rgba(243,239,228,0.6); margin-top:8px; line-height:1.5; white-space:pre-wrap; }
+  .period-topic{ font-size: 14px; color: rgba(20,33,58,0.75); margin-top:4px; font-style:italic; }
+  .period-info{ font-size: 13px; color: rgba(20,33,58,0.6); margin-top:8px; line-height:1.5; white-space:pre-wrap; }
   .period-link{ display:inline-block; margin-top:10px; font-size:12px; color: var(--gold-2); text-decoration:none; border:1px solid var(--gold); padding:6px 12px; border-radius:6px; }
   .period-link:hover{ background: var(--gold); color: var(--stage); }
   .period-remove{ float:right; border:none; background:transparent; color: var(--danger); font-size:11px; cursor:pointer; font-family:'IBM Plex Mono', monospace; }
-  .empty-note{ font-size:13px; color: rgba(243,239,228,0.4); font-style:italic; padding: 10px 0; }
+  .empty-note{ font-size:13px; color: rgba(20,33,58,0.4); font-style:italic; padding: 10px 0; }
 
   .date-strip{ display:flex; gap:8px; overflow-x:auto; padding-bottom:6px; margin-top:14px; }
   .date-chip{
     flex-shrink:0; padding: 10px 14px; border-radius:8px; background: var(--stage-2);
-    border: 1px solid rgba(255,255,255,0.1); font-family:'IBM Plex Mono', monospace; font-size:12px;
+    border: 1px solid rgba(20,33,58,0.1); font-family:'IBM Plex Mono', monospace; font-size:12px;
     cursor:pointer; text-align:center; min-width:64px;
   }
   .date-chip.active{ background: var(--gold); color: var(--stage); border-color: var(--gold); font-weight:700; }
@@ -108,12 +108,14 @@
   .auto-row .auto-remove{ border:none; background:transparent; color: var(--danger); cursor:pointer; font-size:16px; flex:0 0 auto; }
 
   .app-footer{
-    margin-top: 34px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.08);
-    font-family:'IBM Plex Mono', monospace; font-size: 11px; color: rgba(243,239,228,0.4);
+    margin-top: 34px; padding-top: 20px; border-top: 1px solid rgba(20,33,58,0.08);
+    font-family:'IBM Plex Mono', monospace; font-size: 11px; color: rgba(20,33,58,0.4);
     display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px;
   }
   .app-footer a{ color: var(--gold-2); text-decoration:none; }
 </style>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="theme.css">
 </head>
 <body>
 
@@ -478,5 +480,6 @@ function runStudentView(code){
   loadPeriods(currentDate);
 }
 </script>
+<script src="theme.js"></script>
 </body>
 </html>

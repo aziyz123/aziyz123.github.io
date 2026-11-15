@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#0F1116">
+<meta name="theme-color" content="#F3F0E8">
 <title>Fayl Uzatish — Telefondan Kompyuterga | O'quv Vositalari</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Archivo+Black&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -32,32 +32,32 @@
   @keyframes cubeSpin{ from{ transform: rotateX(0deg) rotateY(0deg); } to{ transform: rotateX(360deg) rotateY(360deg); } }
   h1{ font-family:'Archivo', sans-serif; font-weight:800; font-size: 26px; margin:0; }
   .sub{ font-family:'IBM Plex Mono', monospace; font-size: 12px; color: var(--gold-2); margin-top:8px; }
-  .card{ background: linear-gradient(155deg, var(--stage-2) 0%, var(--stage) 100%); border: 1px solid rgba(255,255,255,0.07); border-radius: 14px; padding: 26px; margin-top: 24px; box-shadow: 0 1px 0 rgba(255,255,255,0.04) inset, 0 18px 40px -12px rgba(0,0,0,0.5); }
+  .card{ background: linear-gradient(155deg, var(--stage-2) 0%, var(--stage) 100%); border: 1px solid rgba(20,33,58,0.07); border-radius: 14px; padding: 26px; margin-top: 24px; box-shadow: 0 1px 0 rgba(20,33,58,0.04) inset, 0 18px 40px -12px rgba(0,0,0,0.5); }
   .card h2{ font-family:'Archivo', sans-serif; font-size: 14px; font-weight:700; color: var(--gold-2); margin:0 0 16px 0; }
   button.primary{ width:100%; padding:16px; border:none; border-radius:10px; background: linear-gradient(135deg, var(--gold-2), var(--gold)); color: var(--stage); font-family:'Archivo', sans-serif; font-weight:800; font-size:15px; cursor:pointer; box-shadow: 0 14px 30px -8px rgba(169,129,63,0.5); }
   button.secondary{ width:100%; padding:14px; border:1px solid rgba(201,164,92,0.4); border-radius:10px; background: transparent; color: var(--gold-2); font-family:'Archivo', sans-serif; font-weight:700; font-size:14px; cursor:pointer; margin-top:10px; }
-  button.ghost{ width:100%; padding:14px; border:1px dashed rgba(255,255,255,0.2); border-radius:10px; background: rgba(0,0,0,0.2); color: var(--paper); font-family:'Archivo', sans-serif; font-weight:600; font-size:14px; cursor:pointer; margin-top:10px; }
+  button.ghost{ width:100%; padding:14px; border:1px dashed rgba(20,33,58,0.2); border-radius:10px; background: rgba(0,0,0,0.2); color: var(--paper); font-family:'Archivo', sans-serif; font-weight:600; font-size:14px; cursor:pointer; margin-top:10px; }
   .btn-row{ display:flex; flex-direction:column; gap:10px; margin-top:14px; }
   .qr-row{ display:flex; gap: 20px; align-items:center; flex-wrap:wrap; margin-top: 18px; }
   #qrcodeBox{ background:#fff; padding: 10px; border-radius: 8px; display:inline-block; line-height:0; }
   .room-code{ font-family:'Archivo Black', sans-serif; font-size: 26px; color: var(--gold-2); }
-  .status-line{ font-family:'IBM Plex Mono', monospace; font-size: 13px; color: rgba(243,239,228,0.55); margin-top: 14px; }
+  .status-line{ font-family:'IBM Plex Mono', monospace; font-size: 13px; color: rgba(20,33,58,0.55); margin-top: 14px; }
   .status-line.ok{ color: var(--ok); } .status-line.err{ color: #ff9d9d; }
-  input[type=file]{ width:100%; padding: 14px; border: 2px dashed rgba(255,255,255,0.2); border-radius:10px; background: rgba(0,0,0,0.25); color: var(--paper); font-family:'Inter',sans-serif; font-size:13px; }
-  .hint{ font-size:12px; color: rgba(243,239,228,0.45); margin-top:10px; line-height:1.5; }
-  .progress-bar-bg{ height:8px; border-radius:4px; background: rgba(255,255,255,0.1); margin-top:16px; overflow:hidden; display:none; }
+  input[type=file]{ width:100%; padding: 14px; border: 2px dashed rgba(20,33,58,0.2); border-radius:10px; background: rgba(0,0,0,0.25); color: var(--paper); font-family:'Inter',sans-serif; font-size:13px; }
+  .hint{ font-size:12px; color: rgba(20,33,58,0.45); margin-top:10px; line-height:1.5; }
+  .progress-bar-bg{ height:8px; border-radius:4px; background: rgba(20,33,58,0.1); margin-top:16px; overflow:hidden; display:none; }
   .progress-bar-bg.active{ display:block; }
   .progress-bar-fill{ height:100%; width:0%; background: linear-gradient(90deg, var(--gold), var(--gold-2)); transition: width 0.15s ease; }
   .file-result{ display:none; margin-top: 16px; padding: 16px; background: rgba(74,154,106,0.12); border:1px solid var(--ok); border-radius:8px; }
   .file-result.active{ display:block; }
   .file-name{ font-weight:700; font-size:14px; word-break: break-all; }
-  .file-meta{ font-family:'IBM Plex Mono', monospace; font-size:11px; color: rgba(243,239,228,0.5); margin-top:4px; }
+  .file-meta{ font-family:'IBM Plex Mono', monospace; font-size:11px; color: rgba(20,33,58,0.5); margin-top:4px; }
   .file-type-badge{ display:inline-block; margin-top:8px; padding:4px 10px; border-radius:20px; font-size:11px; font-weight:600; background: rgba(201,164,92,0.2); color: var(--gold-2); }
-  .app-footer{ margin-top: 40px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.08); font-family:'IBM Plex Mono', monospace; font-size: 11px; color: rgba(243,239,228,0.4); display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px; }
+  .app-footer{ margin-top: 40px; padding-top: 20px; border-top: 1px solid rgba(20,33,58,0.08); font-family:'IBM Plex Mono', monospace; font-size: 11px; color: rgba(20,33,58,0.4); display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px; }
   .app-footer a{ color: var(--gold-2); text-decoration:none; }
-  .steps{ font-size:12px; color:rgba(243,239,228,0.45); margin-top:12px; line-height:1.6; } .steps b{ color: var(--gold-2); }
-  .divider{ display:flex; align-items:center; gap:12px; margin: 20px 0 8px; font-size:11px; color: rgba(243,239,228,0.35); font-family:'IBM Plex Mono', monospace; }
-  .divider::before, .divider::after{ content:''; flex:1; height:1px; background: rgba(255,255,255,0.08); }
+  .steps{ font-size:12px; color:rgba(20,33,58,0.45); margin-top:12px; line-height:1.6; } .steps b{ color: var(--gold-2); }
+  .divider{ display:flex; align-items:center; gap:12px; margin: 20px 0 8px; font-size:11px; color: rgba(20,33,58,0.35); font-family:'IBM Plex Mono', monospace; }
+  .divider::before, .divider::after{ content:''; flex:1; height:1px; background: rgba(20,33,58,0.08); }
   #scannerBox{ display:none; margin-top:16px; border-radius:12px; overflow:hidden; background:#000; } #scannerBox.active{ display:block; } #qr-reader{ width:100%; }
   .viewer-overlay{ display:none; position:fixed; inset:0; z-index:1000; background:#0a0a0c; flex-direction:column; } .viewer-overlay.active{ display:flex; }
   .viewer-toolbar{
@@ -69,7 +69,7 @@
   }
   .viewer-toolbar .title{ font-size:13px; font-weight:600; max-width:35%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; text-shadow:0 1px 3px rgba(0,0,0,0.8); pointer-events:none; }
   .viewer-toolbar button{
-    background:rgba(0,0,0,0.35); border:1px solid rgba(255,255,255,0.25);
+    background:rgba(0,0,0,0.35); border:1px solid rgba(20,33,58,0.25);
     color:#fff; padding:8px 14px; border-radius:8px; font-size:13px; cursor:pointer;
     backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
     pointer-events:auto; transition:background 0.15s;
@@ -79,7 +79,7 @@
   .viewer-body{ flex:1; display:flex; align-items:center; justify-content:center; overflow:auto; padding:0; background:#111; min-height:0; }
   .viewer-body img{ max-width:100%; max-height:100%; object-fit:contain; border-radius:4px; }
   .viewer-body iframe{ width:100%; height:100%; border:none; background:#fff; }
-  .viewer-hint{ text-align:center; color:rgba(255,255,255,0.5); font-size:13px; padding:20px; }
+  .viewer-hint{ text-align:center; color:rgba(20,33,58,0.5); font-size:13px; padding:20px; }
   #pptxCanvas{
     display:none;
     background:#111;
@@ -88,12 +88,14 @@
     max-height:100vh;
   }
   .mode-tabs{ display:flex; gap:8px; margin-top:24px; }
-  .mode-tab{ flex:1; padding:12px; text-align:center; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); font-family:'Archivo', sans-serif; font-weight:700; font-size:13px; color: rgba(243,239,228,0.6); cursor:pointer; }
+  .mode-tab{ flex:1; padding:12px; text-align:center; border-radius:10px; border:1px solid rgba(20,33,58,0.1); background: rgba(0,0,0,0.2); font-family:'Archivo', sans-serif; font-weight:700; font-size:13px; color: rgba(20,33,58,0.6); cursor:pointer; }
   .mode-tab.active{ background: linear-gradient(135deg, rgba(201,164,92,0.25), rgba(169,129,63,0.15)); border-color: rgba(201,164,92,0.5); color: var(--gold-2); }
-  .stash-row{ display:flex; justify-content:space-between; align-items:center; gap:10px; padding:10px 0; border-top:1px dashed rgba(255,255,255,0.12); font-size:13px; }
+  .stash-row{ display:flex; justify-content:space-between; align-items:center; gap:10px; padding:10px 0; border-top:1px dashed rgba(20,33,58,0.12); font-size:13px; }
   .stash-name{ word-break:break-all; min-width:0; }
   button.stash-btn{ flex:0 0 auto; width:auto; padding:8px 12px; margin-top:0; font-size:12px; }
 </style>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="theme.css">
 </head>
 <body>
 <div id="homeScreen" class="wrap">
@@ -140,7 +142,7 @@
       <div class="status-line" id="scanStatus"></div>
       <div class="divider">yoki</div>
       <p class="hint" style="margin-top:0;">Xona kodini qo'lda kiriting:</p>
-      <input type="text" id="manualCode" placeholder="Masalan: 4832" maxlength="6" style="width:100%; padding:14px; border-radius:10px; border:1px solid rgba(255,255,255,0.15); background:rgba(0,0,0,0.3); color:var(--paper); font-size:18px; letter-spacing:4px; text-align:center; font-family:'Archivo',sans-serif; margin-top:8px;">
+      <input type="text" id="manualCode" placeholder="Masalan: 4832" maxlength="6" style="width:100%; padding:14px; border-radius:10px; border:1px solid rgba(20,33,58,0.15); background:rgba(0,0,0,0.3); color:var(--paper); font-size:18px; letter-spacing:4px; text-align:center; font-family:'Archivo',sans-serif; margin-top:8px;">
       <button class="ghost" id="manualJoinBtn" style="margin-top:12px;">Xonaga kirish</button>
     </div>
   </div>
@@ -152,8 +154,8 @@
       <details style="margin-top:14px;">
         <summary style="cursor:pointer;color:var(--gold-2);font-weight:700;font-size:14px;">🎮 Bilim Kechasi savollarini ham qo'shish</summary>
         <div id="qpHost"></div>
-        <input type="text" id="stashQuizName" placeholder="Nomi (masalan: Temur yurishlari)" style="width:100%;margin-top:10px;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.15);background:rgba(0,0,0,0.3);color:var(--paper);font-size:14px;">
-        <textarea id="stashQuizText" placeholder="Savollarni Bilim Kechasidagi formatda yozing:&#10;&#10;1. O'zbekiston poytaxti qaysi shahar?&#10;A) Samarqand&#10;B) Buxoro&#10;C) Toshkent&#10;D) Andijon&#10;Javob: C&#10;&#10;2. Amir Temur qachon tug'ilgan?&#10;Javob: 1336-yilda" style="width:100%;height:170px;margin-top:8px;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.15);background:rgba(0,0,0,0.3);color:var(--paper);font-size:13px;font-family:'IBM Plex Mono',monospace;"></textarea>
+        <input type="text" id="stashQuizName" placeholder="Nomi (masalan: Temur yurishlari)" style="width:100%;margin-top:10px;padding:12px;border-radius:10px;border:1px solid rgba(20,33,58,0.15);background:rgba(0,0,0,0.3);color:var(--paper);font-size:14px;">
+        <textarea id="stashQuizText" placeholder="Savollarni Bilim Kechasidagi formatda yozing:&#10;&#10;1. O'zbekiston poytaxti qaysi shahar?&#10;A) Samarqand&#10;B) Buxoro&#10;C) Toshkent&#10;D) Andijon&#10;Javob: C&#10;&#10;2. Amir Temur qachon tug'ilgan?&#10;Javob: 1336-yilda" style="width:100%;height:170px;margin-top:8px;padding:12px;border-radius:10px;border:1px solid rgba(20,33,58,0.15);background:rgba(0,0,0,0.3);color:var(--paper);font-size:13px;font-family:'IBM Plex Mono',monospace;"></textarea>
         <button class="secondary" id="stashQuizSave">Savollarni xonaga saqlash</button>
         <div class="status-line" id="stashQuizStatus"></div>
       </details>
@@ -171,7 +173,7 @@
     </div>
     <div class="card">
       <h2>2 · Kod bilan olish (aqlli doskada)</h2>
-      <input type="text" id="stashCodeInput" inputmode="numeric" placeholder="6 xonali kod" maxlength="6" style="width:100%; padding:14px; border-radius:10px; border:1px solid rgba(255,255,255,0.15); background:rgba(0,0,0,0.3); color:var(--paper); font-size:20px; letter-spacing:5px; text-align:center; font-family:'Archivo',sans-serif;">
+      <input type="text" id="stashCodeInput" inputmode="numeric" placeholder="6 xonali kod" maxlength="6" style="width:100%; padding:14px; border-radius:10px; border:1px solid rgba(20,33,58,0.15); background:rgba(0,0,0,0.3); color:var(--paper); font-size:20px; letter-spacing:5px; text-align:center; font-family:'Archivo',sans-serif;">
       <button class="primary" id="stashOpenBtn" style="margin-top:12px;">Xonani ochish</button>
       <div class="status-line" id="stashGetStatus"></div>
       <div id="stashGetList" style="margin-top:12px;"></div>
@@ -239,5 +241,6 @@
 <script src="fayl-telegram.js?v=1"></script>
 <script src="quiz-prompt.js?v=1"></script>
 <script src="fayl-stash.js?v=6"></script>
+<script src="theme.js"></script>
 </body>
 </html>

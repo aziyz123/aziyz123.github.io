@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#0F1116">
-<meta name="msapplication-TileColor" content="#0F1116">
+<meta name="theme-color" content="#F3F0E8">
+<meta name="msapplication-TileColor" content="#F3F0E8">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="O'quv Vositalari">
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
 <link rel="manifest" href="/manifest.json">
@@ -28,354 +28,112 @@
 <meta name="twitter:title" content="O'quv Vositalari — Slayd, Test, Imtihon va Sinf O'yinlari">
 <meta name="twitter:description" content="O'qituvchilar va o'quvchilar uchun bepul onlayn vositalar — ro'yxatdan o'tish shart emas.">
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,500;0,600;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --stage:#0F1116; --stage-2:#171B24; --stage-3:#1D232F;
-    --paper:#F3EFE4; --paper-dim: rgba(243,239,228,0.55);
-    --gold:#A9813F; --gold-2:#D4AF6A;
-    --t1:#E8A33D; --t2:#2E8B8B; --t3:#B23A6B; --t4:#6B8F5C;
-    --line: rgba(243,239,228,0.10);
-  }
+  :root{ --ivory:#F3F0E8; --ivory-2:#E7E3D9; --ink:#14213A; --ink-2:#3C4A66; --navy:#1F3354; --blue:#2E4A78; --brass:#B8903E; --brass-l:#E3C77E; --line:rgba(20,33,58,.12); }
   *{ box-sizing:border-box; }
   html{ scroll-behavior:smooth; }
-  body{
-    margin:0; font-family:'Inter', sans-serif; color: var(--paper);
-    background: var(--stage); -webkit-font-smoothing:antialiased; overflow-x:hidden;
-  }
-  ::selection{ background: var(--gold); color: var(--stage); }
+  body{ margin:0; background:var(--ivory); color:var(--ink); font-family:'Inter',system-ui,sans-serif; -webkit-font-smoothing:antialiased; }
   a{ color:inherit; }
-
-  .grain{
-    position:fixed; inset:0; pointer-events:none; z-index:5; opacity:0.05; mix-blend-mode:overlay;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  }
-
-  .topbar{ position:fixed; top:0; left:0; right:0; z-index:40; display:flex; justify-content:space-between; align-items:center; padding: 22px 28px; }
-  .topbar .brand{ display:flex; align-items:center; gap:10px; font-family:'Archivo', sans-serif; font-weight:700; font-size:14px; }
-  .brand-mark{ width:26px; height:26px; border-radius:7px; background: linear-gradient(135deg, var(--gold-2), var(--t3)); flex-shrink:0; }
-  .topbar nav a{ font-family:'IBM Plex Mono', monospace; font-size:12px; color: var(--paper-dim); text-decoration:none; margin-left:22px; }
-  .topbar nav a:hover{ color: var(--paper); }
-
-  .hero{
-    min-height: 100svh; position:relative; overflow:hidden;
-    display:flex; align-items:center;
-    background:
-      radial-gradient(ellipse 900px 500px at 75% -10%, rgba(169,129,63,0.30) 0%, transparent 60%),
-      radial-gradient(ellipse 700px 500px at 0% 100%, rgba(46,139,139,0.20) 0%, transparent 55%),
-      radial-gradient(ellipse 600px 400px at 90% 90%, rgba(178,58,107,0.16) 0%, transparent 55%),
-      var(--stage);
-  }
-  .hero-inner{ max-width: 1180px; margin: 0 auto; padding: 90px 28px 40px; width:100%; position:relative; z-index:3; }
-  .kicker{ font-family:'IBM Plex Mono', monospace; font-size: 13px; color: var(--paper-dim); margin-bottom: 22px; }
-  .kicker b{ color: var(--gold-2); font-weight:600; }
-  .hero h1{
-    font-family:'Archivo', sans-serif; font-weight:800; letter-spacing:-0.025em;
-    font-size: clamp(40px, 6.8vw, 84px); line-height: 1.01; margin:0; max-width: 15ch;
-  }
-  .hero h1 em{
-    font-style:normal;
-    background: linear-gradient(100deg, var(--gold-2), var(--t1) 55%, var(--gold-2));
-    -webkit-background-clip:text; background-clip:text; color:transparent;
-  }
-  .hero p{ font-size: clamp(15px, 1.6vw, 18px); color: var(--paper-dim); max-width: 44ch; line-height:1.65; margin-top: 26px; }
-  .hero-cta{ display:flex; gap:16px; margin-top:36px; flex-wrap:wrap; align-items:center; }
-  .hero-cta a.btn{
-    display:inline-block; padding: 16px 30px; border-radius:999px;
-    background: var(--paper); color: var(--stage);
-    font-family:'Archivo', sans-serif; font-weight:700; font-size:14.5px; text-decoration:none;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    box-shadow: 0 16px 34px -12px rgba(212,175,106,0.35);
-  }
-  .hero-cta a.btn:hover{ transform: translateY(-2px); }
-
-  .float-stack{ position:absolute; inset:0; z-index:2; pointer-events:none; }
-  .fcard{
-    position:absolute; width: 220px; border-radius: 14px; padding: 14px;
-    background: rgba(255,255,255,0.04); backdrop-filter: blur(6px);
-    border: 1px solid rgba(255,255,255,0.10);
-    box-shadow: 0 30px 60px -20px rgba(0,0,0,0.6);
-    transition: transform 0.4s ease;
-  }
-  .fcard .fc-label{ font-family:'IBM Plex Mono', monospace; font-size:9.5px; color: var(--paper-dim); margin-bottom:8px; letter-spacing:0.03em; }
-
-  .fc1{ top: 8%; right: 6%; }
-  .fc2{ top: 46%; right: -2%; width:190px; }
-  .fc3{ bottom: 6%; right: 20%; width:200px; }
-
-  .mock-slide{ background:#EDE9DD; border-radius:8px; padding:12px; }
-  .mock-slide .bar{ height:6px; border-radius:3px; background:#C9A45C; width:60%; margin-bottom:8px; }
-  .mock-slide .ln{ height:5px; border-radius:3px; background:#00000022; margin-bottom:6px; overflow:hidden; position:relative; }
-  .mock-slide .ln::after{ content:''; position:absolute; inset:0; background:#00000038; transform-origin:left; animation: lnGrow 3.2s ease-in-out infinite; }
-  .mock-slide .ln:nth-child(3)::after{ width:90%; animation-delay:0s; } .mock-slide .ln:nth-child(4)::after{ width:75%; animation-delay:0.25s; } .mock-slide .ln:nth-child(5)::after{ width:82%; animation-delay:0.5s; }
-  @keyframes lnGrow{ 0%{ transform:scaleX(0); } 35%,70%{ transform:scaleX(1); } 100%{ transform:scaleX(1); } }
-
-  .mock-score{ display:flex; gap:6px; align-items:flex-end; height:70px; padding:6px; }
-  .mock-score div{ flex:1; border-radius:5px 5px 0 0; transform-origin:bottom; animation: barPulse 2.4s ease-in-out infinite; }
-  .mock-score .b1{ height:55%; background: var(--t1); animation-delay:0s; } .mock-score .b2{ height:88%; background: var(--gold-2); animation-delay:0.2s; } .mock-score .b3{ height:40%; background: var(--t2); animation-delay:0.4s; }
-  @keyframes barPulse{ 0%,100%{ transform:scaleY(1); } 50%{ transform:scaleY(1.14); } }
-
-  .mock-rank{ display:flex; flex-direction:column; gap:6px; }
-  .mock-rank .row{ display:flex; align-items:center; gap:8px; background:rgba(255,255,255,0.05); border-radius:6px; padding:6px 8px; }
-  .mock-rank .row.top{ background: rgba(212,175,106,0.22); animation: rowGlow 2.2s ease-in-out infinite; }
-  @keyframes rowGlow{ 0%,100%{ box-shadow: 0 0 0 rgba(212,175,106,0); } 50%{ box-shadow: 0 0 16px rgba(212,175,106,0.35); } }
-  .mock-rank .dot{ width:16px; height:16px; border-radius:50%; background: var(--gold-2); flex-shrink:0; font-size:9px; display:flex; align-items:center; justify-content:center; color:var(--stage); font-weight:700; font-family:'Archivo',sans-serif; }
-  .mock-rank .row:not(.top) .dot{ background: rgba(255,255,255,0.15); color: var(--paper-dim); }
-  .mock-rank .ln{ height:6px; border-radius:3px; background: rgba(255,255,255,0.18); flex:1; }
-
-  .transfer-mock{ display:flex; align-items:center; gap:10px; width:100%; }
-  .tm-phone{ width:18px; height:32px; border:2px solid var(--t1); border-radius:4px; flex-shrink:0; }
-  .tm-computer{ width:28px; height:20px; border:2px solid var(--t1); border-radius:3px; flex-shrink:0; position:relative; }
-  .tm-computer::after{ content:''; position:absolute; left:50%; bottom:-6px; width:14px; height:2px; background:var(--t1); transform:translateX(-50%); }
-  .tm-line{ flex:1; height:2px; background: rgba(232,163,61,0.22); position:relative; }
-  .tm-dot{ position:absolute; top:-3px; left:0; width:8px; height:8px; border-radius:50%; background: var(--t1); animation: dotMove 2.4s ease-in-out infinite; }
-  @keyframes dotMove{ 0%{ left:0%; opacity:0; } 12%{ opacity:1; } 88%{ opacity:1; } 100%{ left:calc(100% - 8px); opacity:0; } }
-
-  .cal-mock{ display:grid; grid-template-columns:repeat(7,1fr); gap:4px; width:100%; }
-  .cal-mock div{ height:12px; border-radius:3px; background:rgba(255,255,255,0.1); animation: calWave 3.5s ease-in-out infinite; }
-  .cal-mock div:nth-child(1){ animation-delay:0s; } .cal-mock div:nth-child(2){ animation-delay:0.15s; }
-  .cal-mock div:nth-child(3){ animation-delay:0.3s; } .cal-mock div:nth-child(4){ animation-delay:0.45s; }
-  .cal-mock div:nth-child(5){ animation-delay:0.6s; } .cal-mock div:nth-child(6){ animation-delay:0.75s; }
-  .cal-mock div:nth-child(7){ animation-delay:0.9s; }
-  @keyframes calWave{ 0%,80%,100%{ background:rgba(255,255,255,0.1); } 40%{ background:var(--gold-2); } }
-
-  @media (max-width: 980px){ .float-stack{ display:none; } }
-
-  .scroll-cue{
-    position:absolute; bottom: 26px; left: 28px; z-index:3;
-    font-family:'IBM Plex Mono', monospace; font-size: 11px; color: rgba(243,239,228,0.35);
-    display:flex; align-items:center; gap:10px;
-  }
-  .scroll-cue .line{ width:26px; height:1px; background: rgba(243,239,228,0.35); }
-
-  .stats{
-    max-width:1180px; margin:0 auto; padding: 0 28px 70px;
-    display:grid; grid-template-columns: repeat(4,1fr); gap:20px; position:relative; z-index:3;
-  }
-  .stat b{ display:block; font-family:'Archivo', sans-serif; font-weight:800; font-size: clamp(30px,4vw,46px); color: var(--paper); }
-  .stat span{ font-family:'IBM Plex Mono', monospace; font-size:12px; color: var(--paper-dim); }
-  @media (max-width:700px){ .stats{ grid-template-columns: repeat(2,1fr); } }
-
-  .tools-section{ max-width: 1180px; margin:0 auto; padding: 40px 28px 100px; position:relative; z-index:2; }
-  .section-head{ display:flex; justify-content:space-between; align-items:flex-end; gap:20px; margin-bottom: 40px; flex-wrap:wrap; }
-  .section-head h2{ font-family:'Archivo', sans-serif; font-weight:700; font-size: clamp(24px,3vw,32px); margin:0; }
-  .section-head p{ color: var(--paper-dim); font-size:14px; max-width:38ch; margin:0; }
-
-  .bento{ display:grid; grid-template-columns: repeat(6, 1fr); grid-auto-rows: minmax(120px, auto); gap: 16px; }
-  .tile{
-    position:relative; border-radius: 18px;
-    text-decoration:none; color: var(--paper);
-    background: var(--stage-2); border: 1px solid var(--line);
-    display:flex; flex-direction:column; overflow:hidden;
-    opacity:0; transform: translateY(18px);
-    transition: transform 0.55s cubic-bezier(.2,.7,.2,1), opacity 0.55s ease, border-color 0.25s ease;
-  }
-  .tile.in-view{ opacity:1; transform: translateY(0); }
-  .tile:hover{ border-color: rgba(243,239,228,0.28); }
-  .tile:hover .preview{ transform: scale(1.03); }
-  .tile::after{
-    content:''; position:absolute; inset:0; pointer-events:none; opacity:0; transition:opacity 0.3s ease; z-index:1;
-    background: radial-gradient(280px circle at var(--mx,50%) var(--my,50%), rgba(255,255,255,0.07), transparent 65%);
-  }
-  .tile:hover::after{ opacity:1; }
-  .tile .preview{ height: 118px; padding:16px; display:flex; align-items:center; background: var(--stage-3); transition: transform 0.4s ease; position:relative; z-index:2; }
-  .tile .body{ padding: 22px 24px 26px; flex:1; display:flex; flex-direction:column; position:relative; z-index:2; }
-  .tile h3{ font-family:'Archivo', sans-serif; font-weight:700; font-size: 19px; margin:0 0 8px; }
-  .tile p{ font-size: 13.5px; color: var(--paper-dim); line-height:1.55; margin:0; max-width: 40ch; }
-  .tile .arrow{ margin-top:auto; padding-top:14px; font-family:'IBM Plex Mono', monospace; font-size:11px; color: var(--gold-2); }
-
-  .tile.featured{ grid-column: span 3; grid-row: span 2; }
-  .tile.featured .preview{ height:180px; }
-  .tile.featured h3{ font-size: 24px; }
-  .tile.wide{ grid-column: span 3; grid-row: span 1; flex-direction:row; }
-  .tile.wide .preview{ width:150px; height:auto; flex-shrink:0; }
-  .tile.small{ grid-column: span 2; grid-row: span 1; }
-
-  @media (max-width: 900px){
-    .bento{ grid-template-columns: repeat(2, 1fr); }
-    .tile.featured, .tile.small{ grid-column: span 2; grid-row: span 1; }
-    .tile.wide{ grid-column: span 2; flex-direction:column; }
-    .tile.wide .preview{ width:auto; height:118px; }
-  }
-
-  .site-footer{
-    max-width:1180px; margin:0 auto; padding: 40px 28px 60px;
-    border-top: 1px solid var(--line);
-    display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px;
-  }
-  .site-footer .brand2{ font-family:'Archivo', sans-serif; font-weight:700; font-size:14px; }
-  .site-footer .meta{ font-family:'IBM Plex Mono', monospace; font-size:12px; color: var(--paper-dim); text-align:right; }
-  .site-footer a{ color: var(--gold-2); text-decoration:none; }
-  .site-footer a:hover{ text-decoration:underline; }
+  .wrap{ max-width:1120px; margin:0 auto; padding:0 20px; }
+  .topbar{ display:flex; align-items:center; justify-content:space-between; padding:22px 0; gap:12px; flex-wrap:wrap; }
+  .brand{ display:flex; align-items:center; gap:12px; font-family:'Newsreader',serif; font-weight:600; font-size:23px; }
+  .brand-mark{ width:38px; height:38px; border-radius:12px; background:linear-gradient(150deg,var(--navy),#0C1528); color:var(--brass-l); display:flex; align-items:center; justify-content:center; font-size:17px; font-weight:600; box-shadow:0 6px 14px rgba(20,33,58,.25); }
+  .pills{ display:flex; gap:6px; background:var(--ivory-2); border-radius:999px; padding:4px; font-size:13px; font-weight:500; }
+  .pills a, .pills button{ text-decoration:none; color:var(--ink-2); padding:8px 16px; border-radius:999px; border:0; background:none; font:inherit; cursor:pointer; white-space:nowrap; }
+  .pills a.on{ background:var(--ink); color:var(--ivory); }
+  .pills a:hover, .pills button:hover{ color:var(--ink); background:rgba(20,33,58,.07); }
+  .pills a.on:hover{ background:var(--ink); color:var(--ivory); }
+  .eyebrow{ font-size:11px; letter-spacing:.2em; font-weight:600; color:#8A6A2A; text-transform:uppercase; }
+  h1{ font-family:'Newsreader',serif; font-weight:600; font-size:clamp(40px,6.2vw,68px); line-height:1.04; margin:6px 0 0; letter-spacing:-.01em; }
+  .sub{ font-family:'Newsreader',serif; font-style:italic; font-size:clamp(18px,2.4vw,24px); color:var(--ink-2); margin:8px 0 0; }
+  .facts{ display:flex; gap:8px; flex-wrap:wrap; margin:22px 0 26px; }
+  .fact{ font-size:12.5px; font-weight:500; padding:7px 14px; border-radius:999px; background:#fff; border:1px solid var(--line); color:var(--ink-2); }
+  .bento{ display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); grid-auto-rows:168px; gap:14px; }
+  .tile{ position:relative; overflow:hidden; border-radius:26px; padding:20px; text-decoration:none; display:flex; flex-direction:column; justify-content:space-between; box-shadow:0 10px 24px rgba(20,33,58,.10), inset 0 0 0 1px rgba(255,255,255,.14); transition:transform .25s ease, box-shadow .25s ease; opacity:0; transform:translateY(14px); }
+  .tile.in-view{ opacity:1; transform:none; }
+  .tile.in-view:hover{ transform:translateY(-4px); box-shadow:0 18px 34px rgba(20,33,58,.18), inset 0 0 0 1px rgba(255,255,255,.2); }
+  .tile .ltr{ font-family:'Newsreader',serif; font-size:34px; font-weight:600; line-height:1; opacity:.92; }
+  .tile h3{ font-family:'Newsreader',serif; font-size:21px; font-weight:600; margin:0; line-height:1.15; }
+  .tile p{ font-size:12.5px; line-height:1.5; margin:6px 0 0; opacity:.88; }
+  .tile .go{ position:absolute; right:18px; top:18px; width:30px; height:30px; border-radius:50%; background:rgba(255,255,255,.16); display:flex; align-items:center; justify-content:center; font-size:15px; }
+  .t-navy{ background:radial-gradient(120% 100% at 100% 0%, #2B4572 0%, #14213A 60%, #0C1528 100%); color:#F3F0E8; }
+  .t-blue{ background:linear-gradient(150deg,#365489,#2E4A78 60%,#243B63); color:#F3F0E8; }
+  .t-brass{ background:linear-gradient(150deg,#E3C77E,#B8903E); color:#14213A; }
+  .t-light{ background:#FBF9F3; color:var(--ink); box-shadow:0 10px 24px rgba(20,33,58,.07), inset 0 0 0 1px var(--line); }
+  .t-light .go{ background:rgba(20,33,58,.07); }
+  .t-sand{ background:var(--ivory-2); color:var(--ink); box-shadow:inset 0 0 0 1px var(--line); }
+  .t-topo{ background:repeating-radial-gradient(circle at 82% 18%, #6A5420 0 2px, #5A451A 2px 15px); color:#F6EBCB; }
+  .c2{ grid-column:span 2; } .r2{ grid-row:span 2; }
+  .big h3{ font-size:34px; } .big p{ font-size:14.5px; max-width:34ch; }
+  .ring{ position:absolute; border-radius:50%; border:1px solid rgba(227,199,126,.45); pointer-events:none; }
+  .tg{ display:inline-flex; align-items:center; gap:8px; margin-top:10px; background:var(--navy); color:var(--brass-l); font-size:13px; font-weight:600; padding:9px 16px; border-radius:999px; align-self:flex-start; }
+  .foot{ display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; padding:34px 0 40px; margin-top:34px; border-top:1px solid var(--line); font-size:13px; color:var(--ink-2); }
+  .foot a{ color:#7A5A1E; font-weight:600; text-decoration:none; } .foot a:hover{ text-decoration:underline; }
+  .foot .b{ font-family:'Newsreader',serif; font-size:18px; color:var(--ink); font-weight:600; }
+  @media (max-width:880px){ .bento{ grid-template-columns:repeat(2,minmax(0,1fr)); grid-auto-rows:158px; } .big{ grid-column:span 2; } .big h3{ font-size:28px; } }
+  @media (max-width:520px){ .wrap{ padding:0 16px; } .tile{ border-radius:22px; padding:16px; } .tile h3{ font-size:18px; } .c2{ grid-column:span 2; } .tile .ltr{ font-size:28px; } }
+  @media (prefers-reduced-motion:reduce){ .tile{ opacity:1; transform:none; transition:none; } }
 </style>
 </head>
 <body>
-<div class="grain"></div>
+<div class="wrap">
+  <div class="topbar">
+    <div class="brand"><div class="brand-mark">OV</div>O'quv Vositalari</div>
+    <nav class="pills" aria-label="Asosiy">
+      <a class="on" href="#tools">Vositalar</a>
+      <a href="https://t.me/byaziyz" target="_blank" rel="noopener">Telegram</a>
+      <button data-install type="button">Ilova</button>
+    </nav>
+  </div>
 
-<div class="topbar">
-  <div class="brand"><div class="brand-mark"></div>O'quv Vositalari</div>
-  <nav>
-    <a href="#tools">Vositalar</a>
-    <a href="https://t.me/byaziyz" target="_blank" rel="noopener">Telegram</a>
-  </nav>
+  <header style="padding:18px 0 0;">
+    <div class="eyebrow" id="today">O'QITUVCHI UCHUN</div>
+    <h1>Xush kelibsiz</h1>
+    <p class="sub">Bugun dars uchun nima kerak?</p>
+    <div class="facts"><span class="fact">8 ta vosita</span><span class="fact">Doim bepul</span><span class="fact">O'rnatish shart emas</span><span class="fact">QR bilan bir bosishda</span></div>
+  </header>
+
+  <section id="tools" aria-label="Vositalar">
+    <div class="bento">
+      <a class="tile t-navy big c2 r2" href="slayd-yaratuvchi.html">
+        <div class="ring" style="right:-70px;top:-70px;width:260px;height:260px"></div><div class="ring" style="right:-30px;top:-30px;width:180px;height:180px"></div>
+        <div class="ltr" style="color:#E3C77E">S</div>
+        <div><h3>Slayd yaratuvchi</h3><p>Matn, PDF yoki Word — bir necha soniyada tayyor PowerPoint taqdimoti. Orqa fon, teglar, aqlli doskaga yuborish.</p></div>
+        <div class="go">↗</div>
+      </a>
+      <a class="tile t-blue" href="sinf-musobaqasi.html"><div class="ltr">B</div><div><h3>Bilim kechasi</h3><p>Jamoa musobaqasi, jonli reyting</p></div><div class="go">↗</div></a>
+      <a class="tile t-sand" href="imtihon.html"><div class="ltr">I</div><div><h3>Imtihon</h3><p>Nazoratli onlayn test</p></div><div class="go">↗</div></a>
+      <a class="tile t-navy" href="fayl-uzatish.html"><div class="ltr" style="color:#E3C77E">F</div><div><h3>Fayl uzatish</h3><p>Kod orqali, 24 soatlik xona</p></div><div class="go">↗</div></a>
+      <a class="tile t-light" href="dars-jadvali.html"><div class="ltr" style="color:#8A6A2A">D</div><div><h3>Dars jadvali</h3><p>Mavzular sanalarga taqsimlanadi</p></div><div class="go">↗</div></a>
+      <a class="tile t-topo c2" href="jang-xaritasi.html"><div class="ltr" style="color:#E3C77E">J</div><div><h3>Jang xaritasi</h3><p>Tarixiy janglar animatsiyasi: qo'shinlar, to'p, miltiq, sarkardalar. Videoga yozib olinadi.</p></div><div class="go">↗</div></a>
+      <a class="tile t-light" href="yurishlar-xaritasi.html"><div class="ltr" style="color:#8A6A2A">Y</div><div><h3>Yurishlar xaritasi</h3><p>Sarkarda yurishlari yil bo'yicha</p></div><div class="go">↗</div></a>
+      <a class="tile t-blue" href="aqlli-takrorlash.html"><div class="ltr">A</div><div><h3>Aqlli takrorlash</h3><p>Xatolar bo'yicha mashq</p></div><div class="go">↗</div></a>
+      <a class="tile t-brass c2" href="https://t.me/byaziyz" target="_blank" rel="noopener">
+        <div class="ring" style="right:-40px;bottom:-60px;width:200px;height:200px;border-color:rgba(20,33,58,.25)"></div>
+        <div class="ltr" style="font-size:0;height:0"></div>
+        <div><h3>Telegram kanal: @byaziyz</h3><p>Yangi vositalar, yangilanishlar va yo'riqnomalar shu kanalda.</p><span class="tg">Kanalga o'tish →</span></div>
+      </a>
+      <a class="tile t-light c2" href="#" data-install><div class="ltr" style="color:#8A6A2A">↓</div><div><h3>Ilova va yorliq o'rnatish</h3><p>Aqlli doska, kompyuter yoki telefon uchun: Android ilova (APK), Windows yorlig'i va brauzer ilovasi.</p></div><div class="go">↗</div></a>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <div class="b">O'quv Vositalari</div>
+    <div>Yaratdi: <a href="https://t.me/byaziyz" target="_blank" rel="noopener">@byaziyz</a> · Telegram kanal · 2026</div>
+  </footer>
 </div>
 
-<section class="hero">
-  <div class="float-stack">
-    <div class="fcard fc1" data-rot="6">
-      <div class="fc-label">SLAYD YARATUVCHI</div>
-      <div class="mock-slide"><div class="bar"></div><div class="ln"></div><div class="ln"></div><div class="ln"></div><div class="ln"></div></div>
-    </div>
-    <div class="fcard fc2" data-rot="-4">
-      <div class="fc-label">BILIM KECHASI · JAMOA BALLI</div>
-      <div class="mock-score"><div class="b1"></div><div class="b2"></div><div class="b3"></div></div>
-    </div>
-    <div class="fcard fc3" data-rot="3">
-      <div class="fc-label">IMTIHON · REYTING</div>
-      <div class="mock-rank">
-        <div class="row top"><div class="dot">1</div><div class="ln"></div></div>
-        <div class="row"><div class="dot">2</div><div class="ln"></div></div>
-        <div class="row"><div class="dot">3</div><div class="ln"></div></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="hero-inner">
-    <div class="kicker"><b>@byaziyz</b> tomonidan yaratilgan</div>
-    <h1>Darsni <em>jonlantiradigan</em> beshta vosita.</h1>
-    <p>Slayd, musobaqa, imtihon, fayl almashish va dars rejasi — barchasi bepul, internet orqali, hech qanday o'rnatishsiz. Proyektorda oching, QR ko'rsating, boshlang.</p>
-    <div class="hero-cta">
-      <a class="btn" href="#tools">Vositalarni ko'rish</a>
-      <a class="btn" href="#" id="openInstall" style="background:transparent;color:var(--gold-2);border:1px solid var(--gold-2);">📲 Ilova / yorliq o'rnatish</a>
-    </div>
-  </div>
-  <div class="scroll-cue"><span class="line"></span> Pastga tushing</div>
-</section>
-
-<div class="stats">
-  <div class="stat"><b>7</b><span>vosita</span></div>
-  <div class="stat"><b>0 so'm</b><span>doim bepul</span></div>
-  <div class="stat"><b>0</b><span>o'rnatish kerak</span></div>
-  <div class="stat"><b>QR</b><span>bir bosishda kirish</span></div>
-</div>
-
-<section class="tools-section" id="tools">
-  <div class="section-head">
-    <h2>Bir joyda — hamma narsa</h2>
-    <p>Har biri mustaqil ishlaydi, hech qanday hisob yaratish shart emas.</p>
-  </div>
-
-  <div class="bento" id="bento">
-    <a class="tile featured" href="slayd-yaratuvchi.html">
-      <div class="preview mock-slide" style="background:var(--stage-3);">
-        <div style="width:100%;">
-          <div class="bar" style="width:45%;"></div>
-          <div class="ln"></div><div class="ln"></div><div class="ln" style="width:70%;"></div>
-        </div>
-      </div>
-      <div class="body">
-        <h3>Slayd Yaratuvchi</h3>
-        <p>Manba matningizni (PDF, Word yoki oddiy matn) joylashtiring — bir necha soniyada tayyor, dizayni pishiq PowerPoint taqdimotini oling.</p>
-        <div class="arrow">Ochish →</div>
-      </div>
-    </a>
-
-    <a class="tile wide" href="sinf-musobaqasi.html">
-      <div class="preview"><div class="mock-score" style="height:80px;"><div class="b1"></div><div class="b2"></div><div class="b3"></div></div></div>
-      <div class="body">
-        <h3>Bilim Kechasi</h3>
-        <p>Jamoalar uchun raqamli doska musobaqasi — syurpriz kartalar, taymer, QR orqali savol qo'shish.</p>
-        <div class="arrow">Ochish →</div>
-      </div>
-    </a>
-
-    <a class="tile wide" href="imtihon.html">
-      <div class="preview"><div class="mock-rank" style="width:100%;"><div class="row top"><div class="dot">1</div><div class="ln"></div></div><div class="row"><div class="dot">2</div><div class="ln"></div></div></div></div>
-      <div class="body">
-        <h3>Imtihon</h3>
-        <p>Jonli onlayn test — javoblar yashirin, oyna almashtirsa yopiladi, oxirida reyting chiqadi.</p>
-        <div class="arrow">Ochish →</div>
-      </div>
-    </a>
-
-    <a class="tile wide" href="jang-xaritasi.html">
-      <div class="preview"><div style="font-size:54px;text-align:center;">⚔️</div></div>
-      <div class="body">
-        <h3>Jang xaritasi</h3>
-        <p>Tarixiy jangni xaritada animatsiya qiling: qo'shinlar, sarkardalar, joy va taktika — videoga yozib oling.</p>
-        <div class="arrow">Ochish →</div>
-      </div>
-    </a>
-
-    <a class="tile small" href="fayl-uzatish.html">
-      <div class="preview">
-        <div class="transfer-mock">
-          <div class="tm-phone"></div>
-          <div class="tm-line"><div class="tm-dot"></div></div>
-          <div class="tm-computer"></div>
-        </div>
-      </div>
-      <div class="body">
-        <h3>Fayl Uzatish</h3>
-        <p>Telefondagi faylni QR kod orqali bir zumda kompyuterga o'tkazing.</p>
-        <div class="arrow">Ochish →</div>
-      </div>
-    </a>
-
-    <a class="tile small" href="dars-jadvali.html">
-      <div class="preview">
-        <div class="cal-mock">
-          <div></div><div></div><div></div><div></div><div></div><div></div><div></div>
-        </div>
-      </div>
-      <div class="body">
-        <h3>Dars Jadvali</h3>
-        <p>Semestr mavzularini sanalarga avtomatik taqsimlaydi — o'quvchi kalendar orqali ko'radi.</p>
-        <div class="arrow">Ochish →</div>
-      </div>
-    </a>
-    <a class="tile small" href="yurishlar-xaritasi.html">
-      <div class="preview">
-        <svg viewBox="0 0 100 50" width="100%" height="50" fill="none">
-          <polygon points="20,35 35,15 55,20 60,38 30,45" fill="var(--gold-2)" fill-opacity="0.3" stroke="var(--gold-2)" stroke-width="1.5"/>
-          <circle cx="35" cy="15" r="2.5" fill="var(--t1)"/>
-          <circle cx="55" cy="20" r="2.5" fill="var(--t1)"/>
-          <circle cx="60" cy="38" r="2.5" fill="var(--t1)"/>
-        </svg>
-      </div>
-      <div class="body">
-        <h3>Yurishlar Xaritasi</h3>
-        <p>Sarkarda yurishlarini xaritada ko'rsating — hudud kengayishi, jang joylari, qo'shin sonlari yil bo'yicha.</p>
-        <div class="arrow">Ochish →</div>
-      </div>
-    </a>
-
-    <a class="tile small" href="aqlli-takrorlash.html">
-      <div class="preview" style="justify-content:center; gap:8px;">
-        <div style="width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:rgba(178,58,107,0.2);"><div class="dot" style="background:var(--t3); color:#fff;">🔴</div></div>
-        <div style="width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:rgba(232,163,61,0.2);"><div class="dot" style="background:var(--t1); color:#fff;">🟡</div></div>
-        <div style="width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:rgba(74,154,106,0.2);"><div class="dot" style="background:#4A9A6A; color:#fff;">🟢</div></div>
-      </div>
-      <div class="body">
-        <h3>Aqlli Takrorlash</h3>
-        <p>Xato qilgan savollaringizni tizim eslab qoladi va aynan ularni qayta-qayta mashq qildiradi — zaif joylaringiz mustahkamlanguncha.</p>
-        <div class="arrow">Ochish →</div>
-      </div>
-    </a>
-  </div>
-</section>
-
-<div id="installModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.72);align-items:center;justify-content:center;padding:16px;">
-  <div style="background:#1B2029;color:#F3EFE4;max-width:560px;width:100%;max-height:90vh;overflow:auto;border:1px solid rgba(201,164,92,.4);border-radius:14px;padding:24px;font-family:'Inter',sans-serif;">
+<div id="installModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(20,33,58,.55);align-items:center;justify-content:center;padding:16px;">
+  <div style="background:#F3F0E8;color:#14213A;max-width:560px;width:100%;max-height:90vh;overflow:auto;border:1px solid #CFC8B6;border-radius:22px;padding:24px;font-family:'Inter',sans-serif;">
     <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
       <b style="font-size:18px;">📲 Ilova / yorliq o'rnatish</b>
-      <button id="closeInstall" style="background:none;border:none;color:#F3EFE4;font-size:26px;cursor:pointer;line-height:1;">×</button>
+      <button id="closeInstall" style="background:none;border:none;color:#14213A;font-size:26px;cursor:pointer;line-height:1;">×</button>
     </div>
     <p style="font-size:13px;opacity:.7;margin:8px 0 16px;">Qurilmangizga qarab birini tanlang.</p>
-    <button id="doInstall" style="display:none;width:100%;padding:14px;margin-bottom:10px;border:none;border-radius:10px;background:#C9A45C;color:#12151C;font-weight:800;font-size:15px;cursor:pointer;">⚡ Brauzer orqali ilova qilib o'rnatish</button>
-    <button id="dlShortcut" style="width:100%;padding:14px;margin-bottom:10px;border:1px solid rgba(201,164,92,.5);border-radius:10px;background:transparent;color:#C9A45C;font-weight:700;font-size:14px;cursor:pointer;">🖥 Kompyuter / doska uchun yorliq (.url) yuklab olish</button>
-    <a href="https://github.com/aziyz123/aziyz123.github.io/releases/download/apk-latest/Oquv-Vositalari.apk" style="display:block;text-align:center;padding:14px;margin-bottom:16px;border:1px solid rgba(201,164,92,.5);border-radius:10px;color:#C9A45C;font-weight:700;font-size:14px;text-decoration:none;">🤖 Android uchun APK yuklab olish</a>
+    <button id="doInstall" style="display:none;width:100%;padding:14px;margin-bottom:10px;border:none;border-radius:10px;background:linear-gradient(150deg,#E3C77E,#B8903E);color:#14213A;font-weight:800;font-size:15px;cursor:pointer;">⚡ Brauzer orqali ilova qilib o'rnatish</button>
+    <button id="dlShortcut" style="width:100%;padding:14px;margin-bottom:10px;border:1px solid #B8903E;border-radius:10px;background:transparent;color:#7A5A1E;font-weight:700;font-size:14px;cursor:pointer;">🖥 Kompyuter / doska uchun yorliq (.url) yuklab olish</button>
+    <a href="https://github.com/aziyz123/aziyz123.github.io/releases/download/apk-latest/Oquv-Vositalari.apk" style="display:block;text-align:center;padding:14px;margin-bottom:16px;border:1px solid #B8903E;border-radius:10px;color:#C9A45C;font-weight:700;font-size:14px;text-decoration:none;">🤖 Android uchun APK yuklab olish</a>
     <div style="font-size:13px;line-height:1.6;opacity:.9;">
       <b>Yorliq (.url) qanday ishlatiladi:</b> yuklangan faylni <b>Ish stoli</b>ga ko'chiring. Ustiga ikki marta bossangiz, sayt brauzerda ochiladi.<br><br>
       <b>Chrome (Windows doskasi):</b> o'ng yuqoridagi <b>⋮</b> → «Quyish, saqlash va ulashish» → <b>«Sahifani ilova sifatida o'rnatish»</b> yoki «Yorliq yaratish» («Ochilsin: alohida oynada» belgilang).<br>
@@ -386,52 +144,12 @@
   </div>
 </div>
 
-<footer class="site-footer">
-  <div class="brand2">O'quv Vositalari</div>
-  <div class="meta">Yaratdi: <a href="https://t.me/byaziyz" target="_blank" rel="noopener">@byaziyz</a>　　2026</div>
-</footer>
-
 <script>
-  const io = new IntersectionObserver((entries) => {
-    entries.forEach((e, i) => {
-      if(e.isIntersecting){
-        setTimeout(() => e.target.classList.add('in-view'), i * 70);
-        io.unobserve(e.target);
-      }
-    });
-  }, { threshold: 0.15 });
-  document.querySelectorAll('.tile').forEach(t => io.observe(t));
-
-  if(window.matchMedia('(hover: hover)').matches){
-    document.querySelectorAll('.tile').forEach(tile => {
-      tile.addEventListener('mousemove', (e) => {
-        const r = tile.getBoundingClientRect();
-        const x = e.clientX - r.left, y = e.clientY - r.top;
-        tile.style.setProperty('--mx', x + 'px');
-        tile.style.setProperty('--my', y + 'px');
-        const rx = ((y - r.height/2) / r.height) * -5;
-        const ry = ((x - r.width/2) / r.width) * 5;
-        tile.style.transform = 'perspective(800px) rotateX(' + rx + 'deg) rotateY(' + ry + 'deg)';
-      });
-      tile.addEventListener('mouseleave', () => { tile.style.transform = ''; });
-    });
-  }
-
-  if(window.matchMedia('(hover: hover)').matches){
-    const hero = document.querySelector('.hero');
-    const cards = document.querySelectorAll('.fcard');
-    cards.forEach(c => { c.style.transform = 'rotate(' + c.dataset.rot + 'deg)'; });
-    hero.addEventListener('mousemove', (e) => {
-      const x = (e.clientX / window.innerWidth - 0.5);
-      const y = (e.clientY / window.innerHeight - 0.5);
-      cards.forEach((c, i) => {
-        const depth = (i + 1) * 8;
-        c.style.transform = 'rotate(' + c.dataset.rot + 'deg) translate(' + (x*depth) + 'px,' + (y*depth) + 'px)';
-      });
-    });
-  } else {
-    document.querySelectorAll('.fcard').forEach(c => { c.style.transform = 'rotate(' + c.dataset.rot + 'deg)'; });
-  }
+  (function(){
+    var io = new IntersectionObserver(function(es){ es.forEach(function(e, i){ if(e.isIntersecting){ setTimeout(function(){ e.target.classList.add('in-view'); }, i * 60); io.unobserve(e.target); } }); }, { threshold: .1 });
+    document.querySelectorAll('.tile').forEach(function(t){ io.observe(t); });
+    try{ var d = new Date(), M = ['YANVAR','FEVRAL','MART','APREL','MAY','IYUN','IYUL','AVGUST','SENTABR','OKTABR','NOYABR','DEKABR'], W = ['YAKSHANBA','DUSHANBA','SESHANBA','CHORSHANBA','PAYSHANBA','JUMA','SHANBA']; document.getElementById('today').textContent = W[d.getDay()] + ' · ' + d.getDate() + '-' + M[d.getMonth()]; }catch(e){}
+  })();
 </script>
 
 <script>
@@ -439,7 +157,7 @@
     var modal=document.getElementById('installModal'), dp=null;
     window.addEventListener('beforeinstallprompt', function(e){ e.preventDefault(); dp=e; document.getElementById('doInstall').style.display='block'; });
     window.addEventListener('appinstalled', function(){ dp=null; document.getElementById('doInstall').style.display='none'; });
-    document.getElementById('openInstall').addEventListener('click', function(e){ e.preventDefault(); modal.style.display='flex'; });
+    document.querySelectorAll('[data-install]').forEach(function(b){ b.addEventListener('click', function(e){ e.preventDefault(); modal.style.display='flex'; }); });
     document.getElementById('closeInstall').addEventListener('click', function(){ modal.style.display='none'; });
     modal.addEventListener('click', function(e){ if(e.target===modal) modal.style.display='none'; });
     document.getElementById('doInstall').addEventListener('click', function(){ if(dp){ dp.prompt(); dp.userChoice.finally(function(){ dp=null; document.getElementById('doInstall').style.display='none'; }); } });
