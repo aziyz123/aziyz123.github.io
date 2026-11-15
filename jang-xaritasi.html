@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Jang Xaritasi</title>
-<meta name="description" content="Tarixiy jangni xaritada animatsiya qilish.">
 <style>
   :root{ --bg:#14161C; --card:#1D2029; --paper:#F3EFE4; --gold:#E8A33D; --line:rgba(255,255,255,.12); }
   *{ box-sizing:border-box; }
@@ -42,7 +41,7 @@
 <div class="wrap">
   <a class="back" href="index.html">← Bosh sahifa</a>
   <h1>⚔️ Jang xaritasi</h1>
-  <div class="sub">Jang nomi va ma'lumotlar → xaritada qo'shinlar harakati → video.</div>
+  <div class="sub">Jang nomi → xaritada qo'shinlar harakati → video. Tarixiy ma'lumotni o'zingiz tekshiring.</div>
   <div class="grid">
     <div>
       <div class="stage"><canvas id="cv" width="540" height="960"></canvas></div>
@@ -89,8 +88,8 @@
           <div><label for="pS1">2-tomon</label><input type="text" id="pS1"></div>
           <div><label for="pC0">1-sarkarda</label><input type="text" id="pC0"></div>
           <div><label for="pC1">2-sarkarda</label><input type="text" id="pC1"></div>
-          <div><label for="pN0">1-tomon soni</label><input type="text" id="pN0"></div>
-          <div><label for="pN1">2-tomon soni</label><input type="text" id="pN1"></div>
+          <div><label for="pN0">1-soni</label><input type="text" id="pN0"></div>
+          <div><label for="pN1">2-soni</label><input type="text" id="pN1"></div>
         </div>
         <label for="pWin">G'olib</label>
         <select id="pWin"><option value="0">1-tomon</option><option value="1">2-tomon</option></select>
@@ -99,16 +98,21 @@
       <div class="card">
         <h2>3 · Rasmlar</h2>
         <label>Orqa fon</label><input type="file" id="bgFile" accept="image/*">
-        <label>1-sarkarda portreti</label><input type="file" id="p0File" accept="image/*">
-        <label>2-sarkarda portreti</label><input type="file" id="p1File" accept="image/*">
-        <label for="topic">Yuqoridagi yozuv</label><input type="text" id="topic">
+        <label>1-sarkarda</label><input type="file" id="p0File" accept="image/*">
+        <label>2-sarkarda</label><input type="file" id="p1File" accept="image/*">
+        <label for="topic">Mavzu yozuvi</label><input type="text" id="topic">
       </div>
     </div>
   </div>
 </div>
 <script src="jang-data.js?v=1"></script>
-<script src="jang-logic-a.js?v=1"></script>
-<script src="jang-logic-b.js?v=1"></script>
+<script src="jang-logic-p0.js?v=1"></script>
+<script src="jang-logic-p1.js?v=1"></script>
+<script src="jang-logic-p2.js?v=1"></script>
+<script src="jang-logic-p3.js?v=1"></script>
+<script src="jang-logic-p4.js?v=1"></script>
+<script src="jang-logic-p5.js?v=1"></script>
+<script src="jang-logic-loader.js?v=1"></script>
 <script src="jang-enhance.js?v=1"></script>
 <script src="theme.js"></script>
 </body>
