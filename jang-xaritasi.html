@@ -347,7 +347,28 @@ function drawTerrain(v){
     ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
     try{ const pt = terrainPattern(col); pt.setTransform(new DOMMatrix().translate(v.ox, v.oy).scale(v.s / 5)); ctx.fillStyle = pt; ctx.fillRect(0, 0, W, H); }catch(e){}
   }
+  if(!bgImg){
+    // o't-o'lan tutamlari (relyefga jon kiritadi)
+    const rt = mulberry(77), grass = /o'rmon|daryo|tekislik/.test((model.sc.terrain || '').toLowerCase());
+    ctx.save(); ctx.lineCap = 'round';
+    for(let i = 0; i < 420; i++){
+      const wx = rt() * 100, wy = rt() * 100, x = wx * v.s + v.ox, y = wy * v.s + v.oy, h = v.s * (.5 + rt() * .6);
+      if(x < -20 || x > W + 20 || y < -20 || y > H + 20) continue;
+      ctx.strokeStyle = grass ? 'rgba(70,90,35,' + (.22 + rt() * .2) + ')' : 'rgba(90,70,30,' + (.2 + rt() * .2) + ')'; ctx.lineWidth = Math.max(1, v.s * .12);
+      ctx.beginPath(); ctx.moveTo(x - h * .4, y); ctx.lineTo(x - h * .5, y - h); ctx.moveTo(x, y); ctx.lineTo(x + h * .05, y - h * 1.2); ctx.moveTo(x + h * .4, y); ctx.lineTo(x + h * .55, y - h * .9); ctx.stroke();
+    }
+    ctx.restore();
+  }
   // xususiyatlar: daryo, tog', o'rmon
+  (model.sc.features || []).forEach(f => {
+    if(f.type !== 'sea') return;
+    const lvl = (f.y != null ? f.y : 12) * v.s + v.oy; if(lvl < 0) return;
+    const sg = ctx.createLinearGradient(0, lvl - 30 * v.s, 0, lvl); sg.addColorStop(0, '#2f6a93'); sg.addColorStop(1, '#6fb0cf');
+    ctx.fillStyle = sg; ctx.fillRect(0, Math.min(0, lvl - 60 * v.s), W, lvl - Math.min(0, lvl - 60 * v.s));
+    ctx.strokeStyle = 'rgba(255,255,255,.75)'; ctx.lineWidth = Math.max(1.5, v.s * .35); ctx.beginPath();
+    for(let x = -10; x <= W + 10; x += 12) ctx.lineTo(x, lvl + Math.sin(x * .05 + performance.now() / 600) * v.s * .5); ctx.stroke();
+    if(f.name){ ctx.fillStyle = 'rgba(255,255,255,.85)'; ctx.font = 'italic ' + (2.4 * v.s) + 'px Georgia'; ctx.textAlign = 'center'; ctx.fillText(f.name, W / 2, lvl - 4 * v.s); ctx.textAlign = 'start'; }
+  });
   (model.sc.features || []).forEach(f => {
     if(f.type === 'river' && f.pts){
       ctx.save(); ctx.lineCap = 'round'; ctx.lineJoin = 'round';
@@ -361,7 +382,9 @@ function drawTerrain(v){
     } else if(f.type === 'mountain'){
       const x = f.x * v.s + v.ox, y = f.y * v.s + v.oy, r = (f.r || 8) * v.s;
       ctx.fillStyle = 'rgba(0,0,0,.18)'; ctx.beginPath(); ctx.ellipse(x + r * .15, y + r * .55, r * 1.1, r * .22, 0, 0, 6.28); ctx.fill();
+      ctx.fillStyle = '#6e634c'; ctx.beginPath(); ctx.moveTo(x - r * 1.3, y + r * .5); ctx.lineTo(x - r * .7, y - r * .1); ctx.lineTo(x - r * .4, y + r * .1); ctx.lineTo(x, y + r * .5); ctx.closePath(); ctx.fill();
       ctx.fillStyle = '#5b5240'; ctx.beginPath(); ctx.moveTo(x - r, y + r * .5); ctx.lineTo(x - r * .1, y - r * .7); ctx.lineTo(x + r * .35, y - r * .2); ctx.lineTo(x + r * .6, y - r * .5); ctx.lineTo(x + r, y + r * .5); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = 'rgba(30,22,8,.28)'; ctx.beginPath(); ctx.moveTo(x - r * .1, y - r * .7); ctx.lineTo(x + r * .35, y - r * .2); ctx.lineTo(x + r * .6, y - r * .5); ctx.lineTo(x + r, y + r * .5); ctx.lineTo(x + r * .1, y + r * .5); ctx.closePath(); ctx.fill();
       ctx.fillStyle = 'rgba(255,255,255,.65)'; ctx.beginPath(); ctx.moveTo(x - r * .3, y - r * .45); ctx.lineTo(x - r * .1, y - r * .7); ctx.lineTo(x + r * .1, y - r * .4); ctx.closePath(); ctx.fill();
     } else if(f.type === 'hill'){
       const x = f.x * v.s + v.ox, y = f.y * v.s + v.oy, r = (f.r || 12) * v.s;
@@ -385,6 +408,14 @@ function drawTerrain(v){
   const vg = ctx.createRadialGradient(W / 2, H / 2, Math.min(W, H) * .35, W / 2, H / 2, Math.max(W, H) * .7);
   vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, 'rgba(25,15,5,.55)');
   ctx.fillStyle = vg; ctx.fillRect(0, 0, W, H);
+  // ramka va kompas
+  ctx.save(); const m = Math.min(W, H) * .018; ctx.strokeStyle = 'rgba(243,217,138,.8)'; ctx.lineWidth = Math.max(1.5, m * .18); ctx.strokeRect(m, m, W - 2 * m, H - 2 * m);
+  ctx.strokeStyle = 'rgba(243,217,138,.4)'; ctx.strokeRect(m * 1.6, m * 1.6, W - 3.2 * m, H - 3.2 * m);
+  const cr = Math.min(W, H) * .05, cx = W - m * 2 - cr * 1.3, cy = H * .27;
+  ctx.translate(cx, cy); ctx.fillStyle = 'rgba(20,14,6,.55)'; ctx.beginPath(); ctx.arc(0, 0, cr * 1.15, 0, 6.28); ctx.fill(); ctx.strokeStyle = 'rgba(243,217,138,.85)'; ctx.lineWidth = Math.max(1, cr * .06); ctx.stroke();
+  ctx.fillStyle = '#F3D98A'; ctx.beginPath(); ctx.moveTo(0, -cr); ctx.lineTo(cr * .22, 0); ctx.lineTo(-cr * .22, 0); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = 'rgba(243,217,138,.45)'; ctx.beginPath(); ctx.moveTo(0, cr); ctx.lineTo(cr * .22, 0); ctx.lineTo(-cr * .22, 0); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = '#F3D98A'; ctx.font = '700 ' + cr * .5 + 'px Georgia'; ctx.textAlign = 'center'; ctx.fillText('SH', 0, -cr * 1.35); ctx.restore();
 }
 function drawDot(kind, x, y, r, col, ang){
   ang = ang == null ? -Math.PI / 2 : ang;
@@ -514,6 +545,12 @@ function render(tm){
       const tgt = sts[k].to[id], ma = Math.atan2(tgt.y - sts[k].from[id].y, tgt.x - sts[k].from[id].x);
       g.dots.forEach(d => { if(d.rn > (g.kind === 'otliq' ? .5 : .2) || d.rn >= st.alive) return; const q = ((tm * .8 + d.ph) % 1); ctx.fillStyle = 'rgba(214,196,150,' + (.22 * (1 - q)) + ')'; ctx.beginPath(); ctx.arc((st.x + d.ox) * v.s + v.ox - Math.cos(ma) * q * v.s * 3, (st.y + d.oy) * v.s + v.oy - Math.sin(ma) * q * v.s * 3, r * (1.2 + q * 2.4), 0, 6.28); ctx.fill(); });
     }
+    if(st.alive > .03){
+      const xs = g.dots.map(q => q.ox), ys = g.dots.map(q => q.oy), cx = st.x * v.s + v.ox, cy = st.y * v.s + v.oy;
+      const rx = (Math.max(...xs) - Math.min(...xs)) / 2 + 2, ry = (Math.max(...ys) - Math.min(...ys)) / 2 + 2;
+      ctx.save(); ctx.globalAlpha = .22 + .1 * st.alive; ctx.fillStyle = col; ctx.beginPath(); ctx.ellipse(cx, cy + v.s * .3, rx * v.s, ry * v.s * .9, 0, 0, 6.28); ctx.fill();
+      ctx.globalAlpha = .55; ctx.strokeStyle = col; ctx.lineWidth = Math.max(1, v.s * .15); ctx.setLineDash([v.s * .8, v.s * .6]); ctx.stroke(); ctx.restore();
+    }
     g.dots.forEach(d => {
       if(d.rn >= st.alive) return;
       let jx = 0, jy = 0;
@@ -521,6 +558,11 @@ function render(tm){
       else if(moving){ jy = Math.sin(tm * 6 + d.ph) * .25; }
       drawDot(g.kind, (st.x + d.ox + jx) * v.s + v.ox, (st.y + d.oy + jy) * v.s + v.oy, r, col, face);
     });
+    if(st.alive > .05 && !SYM[g.kind]){
+      const bx = st.x * v.s + v.ox, by = (st.y + g.top - 1.6) * v.s + v.oy, hh = v.s * 2.6, wv = Math.sin(tm * 4 + st.x) * v.s * .25;
+      ctx.save(); ctx.strokeStyle = '#3a2c10'; ctx.lineWidth = Math.max(1, v.s * .18); ctx.beginPath(); ctx.moveTo(bx, by); ctx.lineTo(bx, by - hh); ctx.stroke();
+      ctx.fillStyle = col; ctx.strokeStyle = '#F3D98A'; ctx.lineWidth = Math.max(1, v.s * .12); ctx.beginPath(); ctx.moveTo(bx, by - hh); ctx.quadraticCurveTo(bx + hh * .5, by - hh + wv, bx + hh * .9, by - hh * .8); ctx.lineTo(bx + hh * .8, by - hh * .5); ctx.quadraticCurveTo(bx + hh * .45, by - hh * .55 - wv, bx, by - hh * .45); ctx.closePath(); ctx.fill(); ctx.stroke(); ctx.restore();
+    }
     if(g.commander && st.alive > .05) star((st.x) * v.s + v.ox, (st.y) * v.s + v.oy, v.s * 1.9);
   });
   fireFX(tm, v, groupsNow, k, r);
