@@ -46,37 +46,31 @@ canvas{display:block;width:100%;height:100%}
 </head>
 <body>
 <canvas id="gl"></canvas>
-
 <div class="welcome" id="welcome">
   <div>
     <div style="font-size:11px;letter-spacing:.16em;color:var(--gold);margin-bottom:12px">YURILADIGAN VIRTUAL MUZEY · BETA</div>
     <h1>Ichida <em>yurib</em> ko‘ring</h1>
-    <p>Birinchi telefonda muzey ichida yurasiz. Ikkinchi telefonni joystik qilib ulashing. Eksponatlarga yaqinlashib, ma’lumotni oching.</p>
+    <p>Birinchi telefonda muzey ichida yurasiz. Ikkinchi telefonni joystik qilib ulashing.</p>
     <button class="btn" id="startBtn">Muzeyga kirish</button>
-    <div style="margin-top:14px;font-size:12px;color:var(--muted)">BETA · haqiqiy tarixiy suratlar bilan eksponatlar</div>
+    <div style="margin-top:14px;font-size:12px;color:var(--muted)">BETA · haqiqiy tarixiy suratlar</div>
   </div>
 </div>
-
 <div class="ui top" id="hud" style="display:none">
   <a class="pill" href="muzey.html">← Asosiy</a>
   <button class="pill" id="linkBtn" type="button">Ikkinchi telefon</button>
   <button class="pill" id="stickBtn" type="button">Joystik</button>
   <span class="tag">YURISH BETA</span>
 </div>
-
-<div class="hint" id="hint" style="display:none">Ekranni suring — qarash · pastki joystik yoki 2-telefon — yurish</div>
-
+<div class="hint" id="hint" style="display:none">Ekranni suring — qarash · pastki joystik — yurish</div>
 <div class="panel" id="info">
   <button class="x" id="closeInfo" type="button">×</button>
   <h3 id="infoTitle">—</h3>
   <p id="infoText">—</p>
   <div class="src" id="infoSrc"></div>
 </div>
-
 <div class="stick-wrap" id="stickWrap">
   <div class="stick-base" id="stickBase"><div class="stick-knob" id="stickKnob"></div></div>
 </div>
-
 <div class="ctrl" id="controller">
   <h2>Masofaviy joystik</h2>
   <div class="st" id="ctrlStatus">Ulanish...</div>
@@ -94,23 +88,25 @@ canvas{display:block;width:100%;height:100%}
     <button type="button" data-act="lookR">Qarash ▶</button>
   </div>
 </div>
-
 <div id="linkModal" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:30;display:grid;place-items:center;padding:16px">
   <div style="background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:18px;width:min(400px,100%);position:relative">
     <button class="x" id="closeLink" type="button">×</button>
     <h3 style="margin:0 0 8px">Ikkinchi telefon</h3>
-    <p style="color:var(--muted);font-size:13px;line-height:1.4">QR yoki havolani oching. O‘sha telefon joystik bo‘ladi.</p>
+    <p style="color:var(--muted);font-size:13px;line-height:1.4">QR yoki havolani oching.</p>
     <div id="qrcode" style="display:grid;place-items:center;margin:12px 0;min-height:150px"></div>
     <div style="text-align:center;margin-bottom:8px;font-size:13px">Xona: <strong id="roomCode">—</strong></div>
     <input id="shareUrl" readonly style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:#0b1220;color:var(--text);font-size:12px">
     <button class="btn" id="copyLink" type="button" style="margin-top:10px;width:100%">Nusxalash</button>
-    <p style="font-size:11px;color:var(--muted);margin-top:10px">Supabase sozlanmasa faqat shu telefonda joystik ishlaydi.</p>
   </div>
 </div>
-
 <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 <script src="muzey-beta-config.js"></script>
-<script src="muzey-walk.js?v=10"></script>
+<script src="exhibits/temur.js?v=3"></script>
+<script src="exhibits/registon.js?v=3"></script>
+<script src="exhibits/qala.js?v=3"></script>
+<script src="exhibits/book.js?v=3"></script>
+<script src="exhibits/tile.js?v=3"></script>
+<script src="muzey-walk.js?v=12"></script>
 </body>
 </html>
