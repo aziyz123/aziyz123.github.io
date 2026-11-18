@@ -10,7 +10,7 @@ window.MUZEY_BETA_CONFIG = {
   SUPABASE_URL: "",
   SUPABASE_ANON_KEY: "",
   // Haqiqiy 2:1 equirectangular 360° panorama manzili. Bo'sh qoldirilsa demo panorama ishlatiladi.
-  PANORAMA_URL: "assets/demo-panorama.svg",
+  PANORAMA_URL: "assets/demo-panorama.svg?v=2",
   // Ishlatish uchun bitta maxsus sinov xonasi nomi
   DEFAULT_HALL: "Registon — bosh zal"
 };
