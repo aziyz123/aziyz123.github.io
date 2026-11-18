@@ -87,14 +87,13 @@ function buildHall(){
     const rim = new THREE.Mesh(new THREE.BoxGeometry(1.65, 0.05, 0.58), goldMat);
     rim.position.y = 0.92; group.add(rim);
 
-    // Gold frame border only (thin rim around photo)
-    const frameOuter = new THREE.Mesh(new THREE.BoxGeometry(1.72, 2.02, 0.08), goldMat);
-    frameOuter.position.set(0, 2.15, 0); group.add(frameOuter);
+    const frameOuter = new THREE.Mesh(new THREE.BoxGeometry(1.72, 2.02, 0.06), goldMat);
+    frameOuter.position.set(0, 2.15, -0.02); group.add(frameOuter);
 
-    // PHOTO — BasicMaterial so it always shows bright, facing center
     const mat = new THREE.MeshBasicMaterial({ color: 0x888888, side: THREE.DoubleSide });
     const photo = new THREE.Mesh(new THREE.PlaneGeometry(1.55, 1.85), mat);
-    photo.position.set(0, 2.15, -0.06);
+    photo.position.set(0, 2.15, 0.09);
+    photo.rotation.y = Math.PI;
     group.add(photo);
 
     const url = (window.EXHIBIT_IMGS && window.EXHIBIT_IMGS[ex.theme]) || WIKI[ex.theme];
