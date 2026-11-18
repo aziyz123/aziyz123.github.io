@@ -7,11 +7,11 @@
   const room = params.get("room") || makeRoom();
   let channel = null, viewer = null, vrLeft = null, vrRight = null, currentHall = 0, gyroEnabled = false, vrEnabled = false;
   let halls = [
-    {id:"registon",name:"Registon — bosh zal",title:"Registon maydoni",text:"Samarqanddagi Registon ansambli Ulug‘bek, Sherdor va Tillakori madrasalaridan tashkil topgan. Ushbu beta zal panoramali namoyish uchun sinov makonidir.",source:"Manba tekshiruvi: UNESCO va O‘zbekiston madaniy merosi manbalari bilan boyitish rejalashtirilgan.",yaw:0},
-    {id:"temur",name:"Amir Temur zali",title:"Amir Temur davri",text:"Bu zalda Temuriylar davri me’morchiligi, davlat boshqaruvi, hunarmandchilik va ilm-faniga oid eksponatlar namoyish etiladi. Tarixiy buyumlar uchun alohida tasdiqlangan manbalar kiritiladi.",source:"BETA: hozircha demo panorama. Tarixiy eksponatlar keyingi bosqichda qo‘shiladi.",yaw:90},
-    {id:"ancient",name:"Qadimgi dunyo",title:"Qadimgi sivilizatsiyalar",text:"Qadimgi Misr, Mesopotamiya va antik dunyo yodgorliklari uchun mo‘ljallangan zal.",source:"BETA: kontent namunasi.",yaw:180},
-    {id:"islamic",name:"Islom sivilizatsiyasi",title:"Ilm-fan va qo‘lyozmalar",text:"Ilmiy meros, qo‘lyozmalar, astronomiya, matematika va tarixiy olimlar faoliyati yoritiladi.",source:"BETA: kontent namunasi.",yaw:270},
-    {id:"uzbek",name:"O‘zbekiston tarixi",title:"O‘zbekiston tarixiy merosi",text:"Arxeologik topilmalar, qadimiy shaharlar va moddiy madaniyat namunalari uchun zal.",source:"BETA: kontent namunasi.",yaw:0}
+    {id:"registon",name:"Tarixiy zal",title:"Tarixiy me’moriy makon",text:"Bu 360° ko‘rinishda tarixiy bino ichki makoni: gumbazlar, ustunlar, me’moriy bezaklar va eksponatlar. Aylantirib tomosha qiling — har tomonda yangi detal ochiladi.",source:"Panorama: Wikimedia Commons (CC BY-SA). Keyinroq Registon / qal’a / maydon 360° suratlari bilan almashtiriladi.",yaw:0},
+    {id:"temur",name:"Amir Temur zali",title:"Temuriylar davri",text:"Temuriylar me’morchiligi, davlat boshqaruvi, hunarmandchilik va ilm-fan. Eksponatlar keyingi bosqichda haqiqiy buyumlar suratlari bilan boyitiladi.",source:"BETA kontent · manbalar tekshiruvi rejalashtirilgan.",yaw:45},
+    {id:"qala",name:"Qal’a va mudofaa",title:"Qal’a me’morchiligi",text:"Qadimgi qal’alar, devorlar, darvozalar va mudofaa tizimlari haqida ma’lumotlar. 360° muhitda qal’a ichki hovlisi yoki zalini his qilish mumkin.",source:"BETA: hozirgi panorama umumiy tarixiy interyer sifatida ishlatilmoqda.",yaw:120},
+    {id:"maydon",name:"Tarixiy maydon",title:"Registon va shahar maydonlari",text:"Samarqand Registoni, Buxoro va Xiva maydonlari — madrasa, minora va maydon ansambllari. Keyingi versiyada alohida 360° maydon panoramalari qo‘shiladi.",source:"UNESCO merosi · kontent yangilanadi.",yaw:200},
+    {id:"uzbek",name:"O‘zbekiston merosi",title:"Milliy meros",text:"Arxeologiya, qo‘lyozmalar, hunarmandchilik va qadimiy shaharlar. Zal orasida o‘tib, eksponat tugmasini bosing.",source:"BETA namuna matn.",yaw:280}
   ];
 
   function makeRoom(){ return Math.random().toString(36).slice(2,8).toUpperCase(); }
@@ -25,7 +25,7 @@
   }
 
   function panoramaConfig(yaw){
-    const url = cfg.PANORAMA_URL || "assets/demo-panorama.svg";
+    const url = cfg.PANORAMA_URL || "assets/demo-panorama.svg?v=2";
     return {
       type: "equirectangular",
       panorama: url,
