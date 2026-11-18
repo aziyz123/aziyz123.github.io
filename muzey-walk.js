@@ -6,9 +6,6 @@ const params = new URLSearchParams(location.search);
 const mode = params.get("mode") || "museum";
 const room = params.get("room") || Math.random().toString(36).slice(2,8).toUpperCase();
 
-/* imgs in exhibit-data.js */
-
-
 const exhibits = [
   {id:"e1",title:"Amir Temur",text:"Temuriylar saltanati asoschisi (1336–1405).",src:"Amir Temur muzeyi",x:-5,z:-8,theme:"temur"},
   {id:"e2",title:"Registon",text:"Ulug‘bek, Sherdor va Tillakori madrasalari. UNESCO.",src:"Samarqand",x:5,z:-8,theme:"registon"},
@@ -16,6 +13,14 @@ const exhibits = [
   {id:"e4",title:"Miniatyura",text:"Temuriylar davri tarixiy miniatyuralari.",src:"Tarixiy meros",x:5,z:7,theme:"book"},
   {id:"e5",title:"Koshinkorlik",text:"Moviy koshin va naqqoshlik — Registon uslubi.",src:"Registon",x:0,z:-10,theme:"tile"}
 ];
+
+const WIKI = {
+  temur: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e2/Amir_Temur_shajarasi.jpg/640px-Amir_Temur_shajarasi.jpg",
+  registon: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Registan_01.jpg/640px-Registan_01.jpg",
+  qala: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Kalyan_Minaret.jpg/640px-Kalyan_Minaret.jpg",
+  book: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Amir_Timur_The_Mongol_Conquer_And_Emperor.jpg/640px-Amir_Timur_The_Mongol_Conquer_And_Emperor.jpg",
+  tile: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Decorated_walls_of_Registan_Square_in_Samarkand%2C_Uzbekistan_-_01.jpg/640px-Decorated_walls_of_Registan_Square_in_Samarkand%2C_Uzbekistan_-_01.jpg"
+};
 
 let renderer, scene, camera, clock;
 let yaw = 0, pitch = 0;
@@ -37,20 +42,14 @@ function toast(msg){
 function makeMat(color, rough=0.85, metal=0.05){
   return new THREE.MeshStandardMaterial({color, roughness:rough, metalness:metal});
 }
-function loadTex(dataUrl, onDone){
-  new THREE.TextureLoader().load(dataUrl, function(tex){
-    tex.colorSpace = THREE.SRGBColorSpace;
-    onDone(tex);
-  });
-}
 function buildHall(){
   scene = new THREE.Scene();
   scene.background = new THREE.Color(0x0a1018);
   scene.fog = new THREE.Fog(0x0a1018, 16, 40);
-  scene.add(new THREE.HemisphereLight(0xc0d0e8, 0x2a2218, 0.65));
-  const dir = new THREE.DirectionalLight(0xffe6b0, 1.0);
+  scene.add(new THREE.HemisphereLight(0xc0d0e8, 0x2a2218, 0.7));
+  const dir = new THREE.DirectionalLight(0xffe6b0, 1.1);
   dir.position.set(4, 10, 6); scene.add(dir);
-  const pl = new THREE.PointLight(0xe3c77e, 0.55, 28); pl.position.set(0, 4.5, 0); scene.add(pl);
+  scene.add(new THREE.PointLight(0xe3c77e, 0.6, 28).translateY(4.5));
 
   const floor = new THREE.Mesh(new THREE.PlaneGeometry(26,26), makeMat(0x2c241c, 0.9));
   floor.rotation.x = -Math.PI/2; scene.add(floor);
@@ -88,20 +87,27 @@ function buildHall(){
     const rim = new THREE.Mesh(new THREE.BoxGeometry(1.65, 0.05, 0.58), goldMat);
     rim.position.y = 0.92; group.add(rim);
 
-    const frame = new THREE.Mesh(new THREE.BoxGeometry(1.7, 2.0, 0.1), goldMat);
-    frame.position.set(0, 2.15, 0); group.add(frame);
+    // Gold frame border only (thin rim around photo)
+    const frameOuter = new THREE.Mesh(new THREE.BoxGeometry(1.72, 2.02, 0.08), goldMat);
+    frameOuter.position.set(0, 2.15, 0); group.add(frameOuter);
 
-    const mat = new THREE.MeshStandardMaterial({ color: 0xaaaaaa, roughness: 0.55, metalness: 0.0, side: THREE.DoubleSide });
-    const photo = new THREE.Mesh(new THREE.PlaneGeometry(1.5, 1.8), mat);
+    // PHOTO — BasicMaterial so it always shows bright, facing center
+    const mat = new THREE.MeshBasicMaterial({ color: 0x888888, side: THREE.DoubleSide });
+    const photo = new THREE.Mesh(new THREE.PlaneGeometry(1.55, 1.85), mat);
     photo.position.set(0, 2.15, -0.06);
     group.add(photo);
 
-    const dataUrl = window.EXHIBIT_IMGS && window.EXHIBIT_IMGS[ex.theme];
-    if (dataUrl) {
-      loadTex(dataUrl, function(tex){
+    const url = (window.EXHIBIT_IMGS && window.EXHIBIT_IMGS[ex.theme]) || WIKI[ex.theme];
+    if (url) {
+      const loader = new THREE.TextureLoader();
+      loader.setCrossOrigin("anonymous");
+      loader.load(url, function(tex){
+        tex.colorSpace = THREE.SRGBColorSpace;
         mat.map = tex;
         mat.color.setHex(0xffffff);
         mat.needsUpdate = true;
+      }, undefined, function(err){
+        console.warn("texture fail", ex.theme, err);
       });
     }
 
