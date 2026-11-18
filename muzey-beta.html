@@ -1,104 +1,116 @@
 <!doctype html>
 <html lang="uz">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#101a2b">
-  <title>Virtual muzey — BETA</title>
-  <link rel="stylesheet" href="muzey-beta.css">
-  <link rel="preconnect" href="https://cdn.jsdelivr.net">
-  <script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css">
-  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#0b1220">
+<title>Virtual muzey — Yurish BETA</title>
+<style>
+:root{--bg:#0b1220;--panel:#101a2b;--gold:#e3c77e;--gold2:#b8903e;--text:#f3f0e8;--muted:rgba(243,240,232,.7);--line:rgba(227,199,126,.3)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif;overflow:hidden;touch-action:none;user-select:none}
+canvas{display:block;width:100%;height:100%}
+#gl{position:fixed;inset:0}
+.ui{position:fixed;z-index:5;pointer-events:none}
+.ui *{pointer-events:auto}
+.top{left:0;right:0;top:0;padding:max(10px,env(safe-area-inset-top)) 12px 0;display:flex;gap:8px;align-items:center}
+.pill{background:rgba(16,26,43,.88);backdrop-filter:blur(10px);border:1px solid var(--line);color:var(--text);border-radius:999px;padding:10px 14px;font:600 13px/1 Inter,system-ui,sans-serif;text-decoration:none;cursor:pointer}
+.pill.on{background:linear-gradient(135deg,#e8d39a,#b8903e);color:#1a1208;border-color:transparent}
+.tag{margin-left:auto;font:600 12px Inter,sans-serif;opacity:.85;padding:8px 12px;border-radius:999px;border:1px solid var(--line);background:rgba(16,26,43,.8)}
+.hint{position:fixed;left:50%;bottom:max(18px,env(safe-area-inset-bottom));transform:translateX(-50%);background:rgba(16,26,43,.9);border:1px solid var(--line);padding:10px 14px;border-radius:999px;font-size:12px;color:var(--muted);z-index:6;max-width:92vw;text-align:center}
+.panel{position:fixed;right:12px;bottom:max(70px,env(safe-area-inset-bottom));width:min(320px,calc(100vw - 24px));background:rgba(16,26,43,.95);border:1px solid var(--line);border-radius:16px;padding:14px;z-index:8;display:none}
+.panel.open{display:block}
+.panel h3{margin:0 0 8px;font-size:16px;color:var(--gold)}
+.panel p{margin:0;font-size:13px;line-height:1.45;color:var(--muted)}
+.panel .src{margin-top:8px;font-size:11px;opacity:.7}
+.x{position:absolute;top:8px;right:10px;border:0;background:transparent;color:var(--text);font-size:20px;cursor:pointer}
+.stick-wrap{position:fixed;left:18px;bottom:max(24px,env(safe-area-inset-bottom));width:120px;height:120px;z-index:7;display:none}
+.stick-base{width:120px;height:120px;border-radius:50%;background:rgba(16,26,43,.55);border:1px solid var(--line);position:relative}
+.stick-knob{width:48px;height:48px;border-radius:50%;background:linear-gradient(145deg,#e3c77e,#b8903e);position:absolute;left:36px;top:36px;box-shadow:0 4px 12px rgba(0,0,0,.35)}
+.ctrl{min-height:100vh;display:none;flex-direction:column;padding:max(14px,env(safe-area-inset-top)) 16px max(20px,env(safe-area-inset-bottom));background:radial-gradient(ellipse at top,rgba(28,161,161,.12),transparent 50%),var(--bg)}
+.ctrl.on{display:flex}
+.ctrl h2{margin:0 0 6px;font-size:18px}
+.ctrl .st{font-size:12px;color:var(--muted);margin-bottom:18px}
+.pad{flex:1;display:grid;place-items:center;gap:14px;max-width:300px;margin:0 auto;width:100%}
+.pad button{appearance:none;border:1px solid var(--line);background:rgba(16,26,43,.92);color:var(--text);border-radius:18px;min-width:72px;min-height:72px;font-size:24px;font-weight:700;cursor:pointer}
+.pad .mid{display:flex;gap:48px}
+.actions{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:16px}
+.actions button{appearance:none;border:1px solid var(--line);background:rgba(16,26,43,.9);color:var(--text);border-radius:999px;padding:12px 16px;font-size:13px;font-weight:600;cursor:pointer}
+.welcome{position:fixed;inset:0;z-index:20;display:grid;place-items:center;background:radial-gradient(ellipse at 50% 20%,rgba(28,161,161,.15),transparent 50%),var(--bg);padding:24px;text-align:center}
+.welcome h1{font-size:clamp(26px,6vw,40px);margin:0 0 12px}
+.welcome h1 em{font-style:normal;color:var(--gold)}
+.welcome p{max-width:420px;margin:0 auto 20px;color:var(--muted);line-height:1.5;font-size:14px}
+.btn{appearance:none;border:0;cursor:pointer;background:linear-gradient(135deg,#e8d39a,#b8903e);color:#1a1208;font-weight:800;font-size:15px;padding:14px 22px;border-radius:999px}
+.hidden{display:none!important}
+</style>
 </head>
 <body>
-  <main id="museumMode" class="app">
-    <header class="topbar">
-      <a class="brand" href="muzey.html">← Asosiy muzey</a>
-      <div class="brand-center"><span class="brand-mark">T</span><span>TARIX <small>VIRTUAL MUSEUM</small></span></div>
-      <span class="beta-tag">BETA</span>
-    </header>
+<canvas id="gl"></canvas>
 
-    <section class="welcome" id="welcome">
-      <div class="eyebrow">IMMERSIVE HISTORY EXPERIENCE</div>
-      <h1>Tarixga <em>sayohat</em> boshlanadi</h1>
-      <p>Telefoningizni aylantiring yoki ekranni suring. 360° tarixiy makonni tomosha qiling, eksponatlarni tanlang va ikkinchi telefonni boshqaruv pultiga aylantiring.</p>
-      <button class="primary" id="startBtn">Muzeyga kirish <span>→</span></button>
-      <div class="welcome-note">BETA sinov versiyasi · Mobil qurilmalar uchun</div>
-    </section>
+<div class="welcome" id="welcome">
+  <div>
+    <div style="font-size:11px;letter-spacing:.16em;color:var(--gold);margin-bottom:12px">YURILADIGAN VIRTUAL MUZEY · BETA</div>
+    <h1>Ichida <em>yurib</em> ko‘ring</h1>
+    <p>Birinchi telefonda muzey ichida yurasiz. Ikkinchi telefonni joystik qilib ulashing. Eksponatlarga yaqinlashib, ma’lumotni oching.</p>
+    <button class="btn" id="startBtn">Muzeyga kirish</button>
+    <div style="margin-top:14px;font-size:12px;color:var(--muted)">BETA · sun’iy zal + namuna eksponatlar</div>
+  </div>
+</div>
 
-    <section class="museum-shell hidden" id="museumShell">
-      <div class="scene-wrap">
-        <div id="panoramaNormal" aria-label="360 darajali muzey panoramasi"></div>
-        <div id="panoramaVR" class="hidden" aria-label="VR stereo panorama"><div id="panoramaLeft"></div><div id="panoramaRight"></div></div>
-        <div class="scene-vignette"></div>
-        <div class="hud">
-          <div class="hud-left">
-            <button type="button" id="hallPrev" class="icon-btn" aria-label="Oldingi zal">‹</button>
-            <div class="hall-info">
-              <div class="hall-label" id="hallLabel">Registon — bosh zal</div>
-              <div class="hall-sub" id="hallSub">360° panorama</div>
-            </div>
-            <button type="button" id="hallNext" class="icon-btn" aria-label="Keyingi zal">›</button>
-          </div>
-          <div class="hud-right">
-            <button type="button" id="gyroBtn" class="chip">Giroskop</button>
-            <button type="button" id="vrBtn" class="chip">VR</button>
-            <button type="button" id="linkBtn" class="chip accent">Ikkinchi telefon</button>
-            <button type="button" id="infoBtn" class="chip">Eksponat</button>
-          </div>
-        </div>
-      </div>
+<div class="ui top" id="hud" style="display:none">
+  <a class="pill" href="muzey.html">← Asosiy</a>
+  <button class="pill" id="linkBtn" type="button">Ikkinchi telefon</button>
+  <button class="pill" id="stickBtn" type="button">Joystik</button>
+  <span class="tag">YURISH BETA</span>
+</div>
 
-      <aside class="exhibit" id="exhibitPanel">
-        <button type="button" class="close-x" id="closeExhibit" aria-label="Yopish">×</button>
-        <div class="eyebrow">EKSPONAT</div>
-        <h2 id="exhibitTitle">—</h2>
-        <p id="exhibitText">—</p>
-        <div class="source" id="exhibitSource">—</div>
-      </aside>
+<div class="hint" id="hint" style="display:none">Ekranni suring — qarash · pastki joystik yoki 2-telefon — yurish</div>
 
-      <div class="link-modal hidden" id="linkModal">
-        <div class="link-card">
-          <button type="button" class="close-x" id="closeLink" aria-label="Yopish">×</button>
-          <h3>Ikkinchi telefonni ulash</h3>
-          <p>QR kodni skanerlang yoki havolani oching. Ikkinchi telefon boshqaruv pultiga aylanadi.</p>
-          <div id="qrcode"></div>
-          <div class="room-code">Xona: <strong id="roomCode">—</strong></div>
-          <input type="text" id="shareUrl" readonly>
-          <div class="row">
-            <button type="button" id="copyLink" class="primary small">Nusxalash</button>
-            <button type="button" id="closeLink2" class="ghost small">Yopish</button>
-          </div>
-          <p class="note">Supabase sozlanmagan bo‘lsa masofaviy boshqaruv ishlamaydi. Sozlamalar: muzey-beta-config.js</p>
-        </div>
-      </div>
+<div class="panel" id="info">
+  <button class="x" id="closeInfo" type="button">×</button>
+  <h3 id="infoTitle">—</h3>
+  <p id="infoText">—</p>
+  <div class="src" id="infoSrc"></div>
+</div>
 
-      <div class="toast" id="toast"></div>
-    </section>
-  </main>
+<div class="stick-wrap" id="stickWrap">
+  <div class="stick-base" id="stickBase"><div class="stick-knob" id="stickKnob"></div></div>
+</div>
 
-  <main id="controllerPage" class="controller hidden">
-    <header class="ctrl-top">
-      <div>Boshqaruv pulti</div>
-      <div id="ctrlStatus">Ulanish...</div>
-    </header>
-    <div class="pad">
-      <button type="button" data-dir="up">▲</button>
-      <div class="mid">
-        <button type="button" data-dir="left">◀</button>
-        <button type="button" data-dir="right">▶</button>
-      </div>
-      <button type="button" data-dir="down">▼</button>
+<div class="ctrl" id="controller">
+  <h2>Masofaviy joystik</h2>
+  <div class="st" id="ctrlStatus">Ulanish...</div>
+  <div class="pad">
+    <button type="button" data-dir="f">▲</button>
+    <div class="mid">
+      <button type="button" data-dir="l">◀</button>
+      <button type="button" data-dir="r">▶</button>
     </div>
-    <div class="ctrl-actions">
-      <button type="button" data-action="hall-prev">← Zal</button>
-      <button type="button" data-action="info">Eksponat</button>
-      <button type="button" data-action="hall-next">Zal →</button>
-    </div>
-  </main>
+    <button type="button" data-dir="b">▼</button>
+  </div>
+  <div class="actions">
+    <button type="button" data-act="info">Eksponat</button>
+    <button type="button" data-act="lookL">Qarash ◀</button>
+    <button type="button" data-act="lookR">Qarash ▶</button>
+  </div>
+</div>
 
-  <script src="muzey-beta-config.js"></script>
-  <script src="muzey-beta.js"></script>
+<div id="linkModal" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:30;display:grid;place-items:center;padding:16px">
+  <div style="background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:18px;width:min(400px,100%);position:relative">
+    <button class="x" id="closeLink" type="button">×</button>
+    <h3 style="margin:0 0 8px">Ikkinchi telefon</h3>
+    <p style="color:var(--muted);font-size:13px;line-height:1.4">QR yoki havolani oching. O‘sha telefon joystik bo‘ladi.</p>
+    <div id="qrcode" style="display:grid;place-items:center;margin:12px 0;min-height:150px"></div>
+    <div style="text-align:center;margin-bottom:8px;font-size:13px">Xona: <strong id="roomCode">—</strong></div>
+    <input id="shareUrl" readonly style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:#0b1220;color:var(--text);font-size:12px">
+    <button class="btn" id="copyLink" type="button" style="margin-top:10px;width:100%">Nusxalash</button>
+    <p style="font-size:11px;color:var(--muted);margin-top:10px">Supabase sozlanmasa faqat shu telefonda joystik ishlaydi.</p>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<script src="muzey-beta-config.js"></script>
+<script src="muzey-walk.js"></script>
 </body>
 </html>
