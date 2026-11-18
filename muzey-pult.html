@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="uz"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#14213A">
+<title>Muzey pulti</title>
+<style>
+  *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body{ margin:0; height:100%; background:#0A1220; color:#F3F0E8; font-family:Inter,system-ui,sans-serif; overflow:hidden; touch-action:none; user-select:none; -webkit-user-select:none; overscroll-behavior:none; }
+  .wrap{ position:fixed; inset:0; padding:max(14px,env(safe-area-inset-top)) max(14px,env(safe-area-inset-right)) max(14px,env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left)); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; text-align:center; }
+  h1{ font:600 22px Georgia,serif; margin:0; } p{ margin:0; font-size:14px; color:#C9D1E0; max-width:420px; line-height:1.5; }
+  .pill{ background:linear-gradient(150deg,#E3C77E,#B8903E); color:#14213A; border:0; border-radius:999px; font:600 14px Inter,sans-serif; padding:13px 20px; min-height:44px; }
+  .pill.g{ background:rgba(20,33,58,.9); color:#F3F0E8; border:1px solid rgba(227,199,126,.4); }
+  canvas#qr{ width:min(70vw,300px); border-radius:12px; background:#fff; }
+  video{ width:min(90vw,360px); border-radius:12px; }
+  #ctl{ display:none; } body.on #ctl{ display:block; } body.on .setup{ display:none; }
+  #ctl{ position:fixed; inset:0; }
+  .stick{ position:absolute; bottom:max(28px,env(safe-area-inset-bottom)); width:min(38vw,190px); height:min(38vw,190px); max-height:46vh; max-width:46vh; border-radius:50%; background:rgba(20,33,58,.55); border:1px solid rgba(227,199,126,.35); touch-action:none; }
+  #sL{ left:max(24px,env(safe-area-inset-left)); } #sR{ right:max(24px,env(safe-area-inset-right)); }
+  .stick i{ position:absolute; left:50%; top:50%; width:36%; height:36%; margin:-18% 0 0 -18%; border-radius:50%; background:linear-gradient(150deg,#E3C77E,#B8903E); }
+  .lbl{ position:absolute; bottom:calc(min(38vw,190px) + 40px); font-size:12px; color:#9AA6BC; } #lL{ left:34px; } #lR{ right:34px; }
+  #spots{ position:absolute; top:max(12px,env(safe-area-inset-top)); left:0; right:0; display:flex; gap:8px; justify-content:center; flex-wrap:wrap; padding:0 12px; }
+  #st{ position:absolute; top:70px; left:0; right:0; font-size:12px; color:#9AA6BC; }
+</style></head>
+<body>
+<div class="wrap setup" id="setup">
+  <h1>🎮 Muzey pulti</h1>
+  <p id="msg">VR telefondagi «🎮 Pult» → «QR yaratish» ni bosing va shu yerda QR'ni skanerlang.</p>
+  <video id="vid" muted playsinline hidden></video>
+  <button class="pill" id="scan" type="button">📷 QR skanerlash</button>
+  <canvas id="qr" hidden></canvas>
+  <button class="pill g" id="aft" type="button" hidden>Tayyor — VR telefonga ko'rsatildi</button>
+</div>
+<div id="ctl">
+  <div id="spots"></div><div id="st"></div>
+  <div class="lbl" id="lL">YURISH</div><div class="stick" id="sL"><i></i></div>
+  <div class="lbl" id="lR">BURILISH</div><div class="stick" id="sR"><i></i></div>
+</div>
+<script src="lib/qrcode.js"></script>
+<script src="pultlink.js"></script>
+<script>
+(function(){
+  var $ = function(i){ return document.getElementById(i); }, ch = null, st = { x: 0, y: 0, r: 0 }, last = '';
+  function msg(t){ $('msg').textContent = t; }
+  function connect(code){
+    $('scan').hidden = true; $('vid').hidden = true; msg('Ulanmoqda…');
+    PultLink.join(code, function(c){ ch = c; document.body.classList.add('on'); $('st').textContent = 'Ulandi ✅'; try{ if(document.documentElement.requestFullscreen) document.documentElement.requestFullscreen(); }catch(_){} try{ navigator.wakeLock && navigator.wakeLock.request('screen').catch(function(){}); }catch(_){} }, function(d){
+      var m; try{ m = JSON.parse(d); }catch(_){ return; }
+      if(m.t === 'hi'){ var box = $('spots'); box.innerHTML = ''; m.s.forEach(function(n, i){ var b = document.createElement('button'); b.className = 'pill g'; b.textContent = n; b.onclick = function(){ send({ t: 'g', i: i }); }; box.appendChild(b); }); }
+    }, function(s){ if(s === 'disconnected' || s === 'failed' || s === 'closed'){ document.body.classList.remove('on'); $('scan').hidden = false; msg('Ulanish uzildi. Qayta skanerlang.'); } })
+    .then(function(l){
+      msg('Endi VR telefon kamerasini shu QR\'ga qarating:'); var cv = $('qr'); cv.hidden = false; PultLink.drawQR(cv, 'MZA1:' + l.code);
+    }).catch(function(e){ msg('Xato: ' + (e && e.message || e)); $('scan').hidden = false; });
+  }
+  function send(o){ if(ch && ch.readyState === 'open') try{ ch.send(JSON.stringify(o)); }catch(_){} }
+  var h = location.hash.match(/^#o=(.+)$/);
+  if(h){ $('scan').hidden = true; connect(decodeURIComponent(h[1])); }
+  $('scan').onclick = function(){ $('vid').hidden = false; msg('VR telefondagi QR\'ga kamerani qarating…'); PultLink.scan($('vid'), function(t){ var m = t.match(/#o=(.+)$/); connect(m ? decodeURIComponent(m[1]) : t); }, function(){ msg('Kameraga ruxsat berilmadi.'); $('vid').hidden = true; }); };
+  function stick(id, key){
+    var el = $(id), k = el.querySelector('i'), pid = null;
+    function mv(e){ var r = el.getBoundingClientRect(), dx = (e.clientX - r.left - r.width / 2) / (r.width / 2), dy = (e.clientY - r.top - r.height / 2) / (r.height / 2), l = Math.hypot(dx, dy); if(l > 1){ dx /= l; dy /= l; }
+      k.style.transform = 'translate(' + dx * r.width * .32 + 'px,' + dy * r.height * .32 + 'px)'; if(key === 'L'){ st.x = dx; st.y = dy; } else st.r = dx; }
+    function end(e){ if(e.pointerId !== pid) return; pid = null; k.style.transform = ''; if(key === 'L'){ st.x = st.y = 0; } else st.r = 0; }
+    el.addEventListener('pointerdown', function(e){ pid = e.pointerId; el.setPointerCapture(pid); mv(e); }); el.addEventListener('pointermove', function(e){ if(e.pointerId === pid) mv(e); });
+    el.addEventListener('pointerup', end); el.addEventListener('pointercancel', end);
+  }
+  stick('sL', 'L'); stick('sR', 'R');
+  setInterval(function(){ var d = st.x.toFixed(2) + st.y.toFixed(2) + st.r.toFixed(2); if(d !== last || d !== '0.000.000.00'){ last = d; send({ t: 'c', x: +st.x.toFixed(2), y: +st.y.toFixed(2), r: +st.r.toFixed(2) }); } }, 50);
+})();
+</script>
+</body></html>

@@ -14,7 +14,7 @@
   canvas{ display:block; width:100%; height:100%; }
   #gl{ position:fixed; inset:0; }
   .ui{ position:fixed; z-index:5; }
-  .top{ left:0; right:0; top:0; padding:max(10px,env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) 0 max(12px,env(safe-area-inset-left)); display:flex; gap:8px; align-items:center; pointer-events:none; }
+  .top{ left:0; right:0; top:0; padding:max(10px,env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) 0 max(12px,env(safe-area-inset-left)); display:flex; flex-wrap:wrap; gap:8px; align-items:center; pointer-events:none; }
   .top>*{ pointer-events:auto; }
   .pill{ background:rgba(20,33,58,.82); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); color:var(--ivory); border:1px solid rgba(227,199,126,.35); border-radius:999px; font:600 13px/1 Inter,system-ui,sans-serif; padding:11px 15px; min-height:42px; display:inline-flex; align-items:center; gap:6px; text-decoration:none; cursor:pointer; }
   .pill.on{ background:linear-gradient(150deg,var(--brass-l),var(--brass)); color:#14213A; border-color:transparent; }
@@ -29,7 +29,7 @@
   .info small{ display:block; margin-top:8px; font-size:11.5px; color:#9AA6BC; }
   .pad{ position:fixed; z-index:5; left:max(14px,env(safe-area-inset-left)); bottom:calc(150px + env(safe-area-inset-bottom)); width:132px; height:132px; border-radius:50%; background:rgba(20,33,58,.45); border:1px solid rgba(227,199,126,.35); touch-action:none; }
   .pad i{ position:absolute; left:50%; top:50%; width:52px; height:52px; margin:-26px 0 0 -26px; border-radius:50%; background:linear-gradient(150deg,var(--brass-l),var(--brass)); opacity:.9; }
-  .hint{ left:50%; top:62px; transform:translateX(-50%); background:rgba(20,33,58,.8); border-radius:999px; padding:8px 14px; font-size:12.5px; color:#D7DCE8; white-space:nowrap; pointer-events:none; transition:opacity .6s; }
+  .hint{ left:50%; top:calc(62px + 48px); transform:translateX(-50%); background:rgba(20,33,58,.8); border-radius:999px; padding:8px 14px; font-size:12.5px; color:#D7DCE8; white-space:nowrap; pointer-events:none; transition:opacity .6s; }
   body.vr .ui,body.vr .pad,body.vr .panel{ display:none; }
   body.vr .vrexit{ display:flex; }
   .vrexit{ display:none; position:fixed; z-index:9; left:50%; top:max(8px,env(safe-area-inset-top)); transform:translateX(-50%); gap:4px; }
@@ -55,6 +55,7 @@
   <button class="pill" id="vrBtn" type="button">🥽 VR</button>
   <button class="pill on" id="qBtn" type="button">✨ Sifat: yuqori</button>
   <button class="pill" id="vrSet" type="button">⚙ VR sozlama</button>
+  <button class="pill" id="pultBtn" type="button">🎮 Pult</button>
   <div class="title">Registon maydoni</div>
 </div>
 <div class="ui hint" id="hint">Ekranni suring — atrofga qarang. Chapdagi doira bilan yuring</div>
@@ -74,8 +75,21 @@
   <label for="sIpd"><span>Ko'zlar orasi (mm)</span><b id="oipd"></b></label><input type="range" id="sIpd" min="50" max="75" step="1">
   <div class="row"><button class="pill" id="vrReset" type="button">Boshlang'ich</button><button class="pill on" id="vrPanelClose" type="button">Tayyor</button></div>
 </div>
+<div class="panel" id="pultPanel" hidden>
+  <h3>Ikkinchi telefon — pult</h3>
+  <p>Internet serversiz, to'g'ridan-to'g'ri ulanadi. Ikkala telefon bir Wi‑Fi'da bo'lsa eng yaxshi (hotspot ham bo'ladi). Ulangach VR'ga kiring.</p>
+  <button class="pill on" id="pMake" type="button">1. QR yaratish</button>
+  <div id="pStep1" hidden><p style="margin-top:10px">Ikkinchi telefon <b>kamerasi</b> bilan shu QR'ni skanerlang — pult sahifasi ochiladi.</p><canvas id="pQR" style="width:100%;max-width:300px;display:block;margin:0 auto;border-radius:10px;background:#fff"></canvas>
+  <button class="pill on" id="pScan" type="button" style="margin-top:12px">2. Pult javobini skanerlash</button></div>
+  <video id="pVid" muted playsinline hidden style="width:100%;margin-top:10px;border-radius:12px"></video>
+  <p id="pStat" style="margin-top:10px"></p>
+  <div class="row"><button class="pill" id="pClose" type="button">Yopish</button></div>
+</div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="muzey-registon.js"></script>
 <script src="muzey-app.js"></script>
+<script src="lib/qrcode.js"></script>
+<script src="pultlink.js"></script>
+<script src="muzey-pult-host.js"></script>
 </body>
 </html>

@@ -54,6 +54,7 @@
   pad.addEventListener('pointermove', function(e){ if(e.pointerId === padId) padMove(e); });
   function padEnd(e){ if(e.pointerId !== padId) return; padId = null; pv.x = pv.y = 0; knob.style.transform = ''; }
   pad.addEventListener('pointerup', padEnd); pad.addEventListener('pointercancel', padEnd);
+  var ext = { x: 0, y: 0, turn: 0, t: 0 }; // tashqi pultdan
   var keys = {};
   window.addEventListener('keydown', function(e){ keys[e.code] = true; }); window.addEventListener('keyup', function(e){ keys[e.code] = false; });
 
@@ -172,8 +173,10 @@
       if(tween.t >= 1) tween = null;
     }
     // yurish
-    var fx = pv.x, fy = -pv.y; if(keys.KeyW || keys.ArrowUp) fy += 1; if(keys.KeyS || keys.ArrowDown) fy -= 1; if(keys.KeyD) fx += 1; if(keys.KeyA) fx -= 1;
+    if(ext.t && performance.now() - ext.t > 1500){ ext.x = ext.y = ext.turn = 0; }
+    var fx = pv.x + ext.x, fy = -(pv.y + ext.y); if(keys.KeyW || keys.ArrowUp) fy += 1; if(keys.KeyS || keys.ArrowDown) fy -= 1; if(keys.KeyD) fx += 1; if(keys.KeyA) fx -= 1;
     if(keys.ArrowLeft) yaw += dt * 1.6; if(keys.ArrowRight) yaw -= dt * 1.6;
+    if(ext.turn){ yaw += ext.turn * dt * 1.8; if(gyro.on) gyro.offset += ext.turn * dt * 1.8; }
     if(fx || fy){
       tween = null;
       var head = gyro.on ? (function(){ var q = gyroQuat(); if(!q) return yaw; var e3 = new THREE.Euler().setFromQuaternion(q, 'YXZ'); return e3.y + gyro.offset; })() : yaw;
@@ -211,5 +214,5 @@
     }
   }
   $('load').style.display = 'none'; frame();
-  window.__muzey = { setVR: setVR, VS: VS, goto: function(i){ goto(spots[i], true); }, scene: scene };
+  window.__muzey = { ext: ext, go: function(i){ if(spots[i]) goto(spots[i]); }, spots: spots, setVR: setVR, VS: VS, goto: function(i){ goto(spots[i], true); }, scene: scene };
 })();

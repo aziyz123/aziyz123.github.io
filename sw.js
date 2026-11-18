@@ -1,9 +1,9 @@
-const CACHE_NAME = 'oquv-vositalari-v19';
+const CACHE_NAME = 'oquv-vositalari-v20';
 
 // Sayt fayllari (oflayn ochilishi uchun oldindan saqlanadi).
 const LOCAL_ASSETS = [
   '/', '/index.html', '/manifest.json',
-  '/slayd-yaratuvchi.html', '/sinf-musobaqasi.html', '/imtihon.html', '/jang-xaritasi.html', '/muzey.html', '/muzey-app.js', '/muzey-registon.js', '/temur-janglari.js', '/theme.css', '/theme.js', '/fayl-uzatish.html',
+  '/slayd-yaratuvchi.html', '/sinf-musobaqasi.html', '/imtihon.html', '/jang-xaritasi.html', '/muzey.html', '/muzey-app.js', '/muzey-registon.js', '/muzey-pult.html', '/muzey-pult-host.js', '/pultlink.js', '/lib/qrcode.js', '/temur-janglari.js', '/theme.css', '/theme.js', '/fayl-uzatish.html',
   '/dars-jadvali.html', '/aqlli-takrorlash.html', '/yurishlar-xaritasi.html', '/amir-temur-kengayishi.html',
   '/fayl-core.js', '/fayl-ui.js', '/fayl-telegram.js', '/fayl-stash.js', '/fayl-stash-api.js', '/fayl-storage.js',
   '/aqlli-c1a.js', '/aqlli-c1b.js', '/aqlli-core2.js', '/aqlli-import.js', '/aqlli-prompt.js',
