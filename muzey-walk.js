@@ -91,12 +91,23 @@ function buildHall(){
     const mat = new THREE.MeshStandardMaterial({ color: 0x333333, roughness: 0.55, metalness: 0.05 });
     const canvas = new THREE.Mesh(new THREE.PlaneGeometry(1.45, 1.75), mat);
     canvas.position.set(0, 2.2, 0.09); group.add(canvas);
-    const imgKey = ({temur:"temur",registon:"registon",qala:"qala",book:"book",tile:"tiles"})[ex.theme] || ex.theme;
-    const dataUrl = window.EXHIBIT_IMAGES && (window.EXHIBIT_IMAGES[imgKey] || window.EXHIBIT_IMAGES[ex.theme]);
-    if (dataUrl) {
-      new THREE.TextureLoader().load(dataUrl, function(tex){
+    const urls = {
+      temur: "https://commons.wikimedia.org/wiki/Special:FilePath/Amir_Temur_shajarasi.jpg?width=800",
+      registon: "https://commons.wikimedia.org/wiki/Special:FilePath/Registan_01.jpg?width=900",
+      qala: "https://commons.wikimedia.org/wiki/Special:FilePath/Kalyan_Minaret.jpg?width=800",
+      book: "https://commons.wikimedia.org/wiki/Special:FilePath/Amir_Timur_The_Mongol_Conquer_And_Emperor.jpg?width=800",
+      tile: "https://commons.wikimedia.org/wiki/Special:FilePath/Decorated_walls_of_Registan_Square_in_Samarkand,_Uzbekistan_-_01.jpg?width=800"
+    };
+    const url = urls[ex.theme];
+    if (url) {
+      const loader = new THREE.TextureLoader();
+      loader.setCrossOrigin("anonymous");
+      loader.load(url, function(tex){
         tex.colorSpace = THREE.SRGBColorSpace;
         mat.map = tex; mat.color.setHex(0xffffff); mat.needsUpdate = true;
+      }, undefined, function(){
+        const t = paintExhibit(ex.theme, ex.title);
+        mat.map = t; mat.color.setHex(0xffffff); mat.needsUpdate = true;
       });
     } else {
       const t = paintExhibit(ex.theme, ex.title);
