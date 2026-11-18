@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2400" height="1200" viewBox="0 0 2400 1200">
+<defs>
+ <linearGradient id="sky" x2="0" y2="1"><stop stop-color="#223d5b"/><stop offset=".55" stop-color="#a9b9bd"/><stop offset="1" stop-color="#d7c49b"/></linearGradient>
+ <linearGradient id="floor" x2="0" y2="1"><stop stop-color="#b99b69"/><stop offset="1" stop-color="#59452f"/></linearGradient>
+ <linearGradient id="wall" x2="0" y2="1"><stop stop-color="#d5b987"/><stop offset="1" stop-color="#8f6844"/></linearGradient>
+ <pattern id="tiles" width="90" height="90" patternUnits="userSpaceOnUse"><rect width="90" height="90" fill="#174b79"/><path d="M45 5 85 45 45 85 5 45Z" fill="none" stroke="#e3c77e" stroke-width="5"/><circle cx="45" cy="45" r="12" fill="#1ca1a1"/></pattern>
+</defs>
+<rect width="2400" height="1200" fill="url(#sky)"/>
+<rect y="690" width="2400" height="510" fill="url(#floor)"/>
+<path d="M0 720 Q1200 620 2400 720" fill="none" stroke="#e5d1a7" stroke-width="18"/>
+<!-- stylized museum gallery walls -->
+<g fill="url(#wall)" stroke="#6e4c32" stroke-width="12">
+ <path d="M0 330 L350 220 650 350 650 800 0 800Z"/>
+ <path d="M1750 350 L2050 220 2400 330 2400 800 1750 800Z"/>
+ <path d="M650 350 L1200 240 1750 350 1750 800 650 800Z"/>
+</g>
+<g fill="url(#tiles)" stroke="#e0c17a" stroke-width="12">
+ <path d="M750 360 L1200 270 1650 360 1650 650 750 650Z"/>
+ <path d="M90 410 L320 330 540 415 540 690 90 690Z"/>
+ <path d="M1860 415 L2080 330 2310 410 2310 690 1860 690Z"/>
+</g>
+<!-- arches / pillars suggestion -->
+<g fill="none" stroke="#e3c77e" stroke-width="8" opacity=".85">
+ <path d="M820 360 Q980 300 1140 360"/>
+ <path d="M1260 360 Q1420 300 1580 360"/>
+ <path d="M180 420 Q300 360 420 420"/>
+ <path d="M1980 420 Q2100 360 2220 420"/>
+</g>
+<!-- soft light shafts -->
+<g opacity=".18" fill="#fff">
+ <path d="M900 0 L1100 0 1250 700 750 700Z"/>
+ <path d="M1500 0 L1700 0 1850 700 1350 700Z"/>
+</g>
+<!-- center label for orientation -->
+<text x="1200" y="520" text-anchor="middle" fill="#f3f0e8" font-family="Georgia, serif" font-size="42" opacity=".55">REGISTON · BETA DEMO</text>
+<text x="1200" y="570" text-anchor="middle" fill="#e3c77e" font-family="system-ui,sans-serif" font-size="22" opacity=".7">360° panorama placeholder</text>
+</svg>
