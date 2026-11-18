@@ -2,120 +2,77 @@
 <html lang="uz">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#F3F0E8">
 <meta name="msapplication-TileColor" content="#F3F0E8">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="O'quv Vositalari">
-<link rel="apple-touch-icon" href="/icons/icon-192.png">
-<link rel="manifest" href="/manifest.json">
-<link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">
-<link rel="icon" type="image/png" sizes="512x512" href="/icons/icon-512.png">
 <title>O'quv Vositalari — Slayd, Test, Imtihon va Sinf O'yinlari | @byaziyz</title>
-<meta name="description" content="O'qituvchilar va o'quvchilar uchun bepul onlayn vositalar: matndan avtomatik slayd (PowerPoint) yaratish, sinf uchun QR-o'yin (Bilim Kechasi), jonli onlayn imtihon, fayl uzatish va dars jadvali. Ro'yxatdan o'tish shart emas.">
-<meta name="keywords" content="slayd yaratish, powerpoint yaratish, onlayn test, imtihon tuzish, sinf o'yini, dars jadvali, o'qituvchi uchun vositalar, bilim kechasi, QR test, bepul ta'lim vositalari">
-<meta name="author" content="@byaziyz">
-<link rel="canonical" href="https://aziyz123.github.io/">
-
-<meta property="og:type" content="website">
-<meta property="og:title" content="O'quv Vositalari — Spayd, Test, Imtihon va Sinf O'yinlari">
-<meta property="og:description" content="O'qituvchilar va o'quvchilar uchun bepul onlayn vositalar: slayd yaratish, sinf o'yini, onlayn imtihon, fayl uzatish va dars jadvali.">
-<meta property="og:url" content="https://aziyz123.github.io/">
-<meta property="og:locale" content="uz_UZ">
-
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="O'quv Vositalari — Slayd, Test, Imtihon va Sinf O'yinlari">
-<meta name="twitter:description" content="O'qituvchilar va o'quvchilar uchun bepul onlayn vositalar — ro'yxatdan o'tish shart emas.">
-
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,500;0,600;1,400&family=Inter:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,500;0,600;1,400&family=Inter:wght@400;500;600;700&display=swap"></noscript>
+<meta name="description" content="Slayd, musobaqa, imtihon, fayl almashish va dars rejasi — barchasi bepul, internet orqali, hech qanday o'rnatishsiz.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap" rel="stylesheet">
 <style>
-  :root{ --ivory:#F3F0E8; --ivory-2:#E7E3D9; --ink:#14213A; --ink-2:#3C4A66; --navy:#1F3354; --blue:#2E4A78; --brass:#B8903E; --brass-l:#E3C77E; --line:rgba(20,33,58,.12); }
-  *{ box-sizing:border-box; }
-  html{ scroll-behavior:smooth; }
-  body{ margin:0; background:var(--ivory); color:var(--ink); font-family:'Inter',system-ui,sans-serif; -webkit-font-smoothing:antialiased; }
-  a{ color:inherit; }
-  .wrap{ max-width:1120px; margin:0 auto; padding:0 20px; }
-  .topbar{ display:flex; align-items:center; justify-content:space-between; padding:22px 0; gap:12px; flex-wrap:wrap; }
-  .brand{ display:flex; align-items:center; gap:12px; font-family:'Newsreader',serif; font-weight:600; font-size:23px; }
-  .brand-mark{ width:38px; height:38px; border-radius:12px; background:linear-gradient(150deg,var(--navy),#0C1528); color:var(--brass-l); display:flex; align-items:center; justify-content:center; font-size:17px; font-weight:600; box-shadow:0 6px 14px rgba(20,33,58,.25); }
-  .pills{ display:flex; gap:6px; background:var(--ivory-2); border-radius:999px; padding:4px; font-size:13px; font-weight:500; }
-  .pills a, .pills button{ text-decoration:none; color:var(--ink-2); padding:8px 16px; border-radius:999px; border:0; background:none; font:inherit; cursor:pointer; white-space:nowrap; }
-  .pills a.on{ background:var(--ink); color:var(--ivory); }
-  .pills a:hover, .pills button:hover{ color:var(--ink); background:rgba(20,33,58,.07); }
-  .pills a.on:hover{ background:var(--ink); color:var(--ivory); }
-  .eyebrow{ font-size:11px; letter-spacing:.2em; font-weight:600; color:#8A6A2A; text-transform:uppercase; }
-  h1{ font-family:'Newsreader',serif; font-weight:600; font-size:clamp(40px,6.2vw,68px); line-height:1.04; margin:6px 0 0; letter-spacing:-.01em; }
-  .sub{ font-family:'Newsreader',serif; font-style:italic; font-size:clamp(18px,2.4vw,24px); color:var(--ink-2); margin:8px 0 0; }
-  .facts{ display:flex; gap:8px; flex-wrap:wrap; margin:22px 0 26px; }
-  .fact{ font-size:12.5px; font-weight:500; padding:7px 14px; border-radius:999px; background:#fff; border:1px solid var(--line); color:var(--ink-2); }
-  .bento{ display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); grid-auto-rows:168px; gap:14px; }
-  .tile{ position:relative; overflow:hidden; border-radius:26px; padding:20px; text-decoration:none; display:flex; flex-direction:column; justify-content:space-between; box-shadow:0 10px 24px rgba(20,33,58,.10), inset 0 0 0 1px rgba(255,255,255,.14); transition:transform .25s ease, box-shadow .25s ease; opacity:0; transform:translateY(14px); }
-  .tile.in-view{ opacity:1; transform:none; }
-  .tile.in-view:hover{ transform:translateY(-4px); box-shadow:0 18px 34px rgba(20,33,58,.18), inset 0 0 0 1px rgba(255,255,255,.2); }
-  .tile .ltr{ font-family:'Newsreader',serif; font-size:34px; font-weight:600; line-height:1; opacity:.92; }
-  .tile h3{ font-family:'Newsreader',serif; font-size:21px; font-weight:600; margin:0; line-height:1.15; }
-  .tile p{ font-size:12.5px; line-height:1.5; margin:6px 0 0; opacity:.88; }
-  .tile .go{ position:absolute; right:18px; top:18px; width:30px; height:30px; border-radius:50%; background:rgba(255,255,255,.16); display:flex; align-items:center; justify-content:center; font-size:15px; }
-  .t-navy{ background:radial-gradient(120% 100% at 100% 0%, #2B4572 0%, #14213A 60%, #0C1528 100%); color:#F3F0E8; }
-  .t-blue{ background:linear-gradient(150deg,#365489,#2E4A78 60%,#243B63); color:#F3F0E8; }
-  .t-brass{ background:linear-gradient(150deg,#E3C77E,#B8903E); color:#14213A; }
-  .t-light{ background:#FBF9F3; color:var(--ink); box-shadow:0 10px 24px rgba(20,33,58,.07), inset 0 0 0 1px var(--line); }
-  .t-light .go{ background:rgba(20,33,58,.07); }
-  .t-sand{ background:var(--ivory-2); color:var(--ink); box-shadow:inset 0 0 0 1px var(--line); }
-  .t-topo{ background:repeating-radial-gradient(circle at 82% 18%, #6A5420 0 2px, #5A451A 2px 15px); color:#F6EBCB; }
-  .c2{ grid-column:span 2; } .r2{ grid-row:span 2; }
-  .big h3{ font-size:34px; } .big p{ font-size:14.5px; max-width:34ch; }
-  .ring{ position:absolute; border-radius:50%; border:1px solid rgba(227,199,126,.45); pointer-events:none; }
-  .tg{ display:inline-flex; align-items:center; gap:8px; margin-top:10px; background:var(--navy); color:var(--brass-l); font-size:13px; font-weight:600; padding:9px 16px; border-radius:999px; align-self:flex-start; }
-  .foot{ display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; padding:34px 0 40px; margin-top:34px; border-top:1px solid var(--line); font-size:13px; color:var(--ink-2); }
-  .foot a{ color:#7A5A1E; font-weight:600; text-decoration:none; } .foot a:hover{ text-decoration:underline; }
-  .foot .b{ font-family:'Newsreader',serif; font-size:18px; color:var(--ink); font-weight:600; }
-  @media (max-width:880px){ .bento{ grid-template-columns:repeat(2,minmax(0,1fr)); grid-auto-rows:158px; } .big{ grid-column:span 2; } .big h3{ font-size:28px; } }
-  @media (max-width:520px){ .wrap{ padding:0 16px; } .tile{ border-radius:22px; padding:16px; } .tile h3{ font-size:18px; } .c2{ grid-column:span 2; } .tile .ltr{ font-size:28px; } }
-  @media (prefers-reduced-motion:reduce){ .tile{ opacity:1; transform:none; transition:none; } }
-  /* ILOVA REJIMI (o'rnatilgan ilova / APK): telefon ko'rinishi */
-  .appnav{display:none}
-  html.app .pills,html.app .facts,html.app .foot,html.app [data-install]{display:none !important}
-  html.app .topbar{padding-top:max(14px,env(safe-area-inset-top))}
-  html.app .wrap{padding-bottom:110px}
-  html.app .bento{grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:132px;gap:12px}
-  html.app .big{grid-column:span 2;grid-row:span 1}
-  html.app .big p{display:none}
-  html.app .big h3{font-size:24px}
-  html.app h1{font-size:38px}
-  html.app .appnav{display:flex;position:fixed;left:14px;right:14px;bottom:max(14px,env(safe-area-inset-bottom));z-index:50;background:rgba(20,33,58,.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-radius:28px;padding:10px 6px;justify-content:space-around;box-shadow:0 14px 30px rgba(20,33,58,.35)}
-  html.app .appnav a{flex:1;text-align:center;color:#C3CCDD;text-decoration:none;font-size:11px;line-height:1.5;font-weight:500}
-  html.app .appnav a b{display:block;font-size:16px;font-weight:400}
-  html.app .appnav a.on{color:#E6CF98;font-weight:600}
+:root{
+  --bg:#F3F0E8; --ink:#14213A; --muted:#5A6475; --line:rgba(20,33,58,.10);
+  --navy:#14213A; --blue:#2F5DA8; --sand:#E8D9B5; --light:#FFFFFF; --brass:#B8903E; --topo:#1C2E24;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,sans-serif;line-height:1.45}
+a{color:inherit}
+.wrap{max-width:1100px;margin:0 auto;padding:0 22px}
+header{padding:18px 0 8px;display:flex;justify-content:space-between;align-items:center}
+.logo{font-family:'Newsreader',serif;font-weight:600;font-size:20px;letter-spacing:.02em}
+.logo span{opacity:.55;font-size:13px;font-family:Inter,sans-serif;font-weight:500;margin-left:8px}
+.hero{padding:28px 0 18px}
+.hero h1{font-family:'Newsreader',serif;font-size:clamp(28px,5vw,44px);font-weight:600;line-height:1.12;margin:0 0 12px;max-width:16ch}
+.hero p{max-width:52ch;color:var(--muted);margin:0 0 18px;font-size:15px}
+.stats{display:flex;gap:18px;flex-wrap:wrap;margin:18px 0 8px;font-size:13px;color:var(--muted)}
+.stats strong{color:var(--ink);font-weight:700}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;padding:10px 0 40px}
+.tile{ position:relative; overflow:hidden; border-radius:26px; padding:20px; text-decoration:none; display:flex; flex-direction:column; justify-content:space-between; box-shadow:0 10px 24px rgba(20,33,58,.10), inset 0 0 0 1px rgba(255,255,255,.14); transition:transform .25s ease, box-shadow .25s ease; opacity:0; transform:translateY(14px); }
+.tile.in-view{ opacity:1; transform:none; }
+.tile.in-view:hover{ transform:translateY(-4px); box-shadow:0 18px 34px rgba(20,33,58,.18), inset 0 0 0 1px rgba(255,255,255,.2); }
+.tile .ltr{ font-family:'Newsreader',serif; font-size:34px; font-weight:600; line-height:1; opacity:.92; }
+.tile h3{ font-family:'Newsreader',serif; font-size:21px; font-weight:600; margin:0; line-height:1.15; }
+.tile p{ font-size:12.5px; line-height:1.5; margin:6px 0 0; opacity:.88; }
+.tile .go{ position:absolute; right:18px; top:18px; width:30px; height:30px; border-radius:50%; background:rgba(255,255,255,.16); display:flex; align-items:center; justify-content:center; font-size:15px; }
+.t-navy{background:linear-gradient(145deg,#1a2b4a,#14213A);color:#F3F0E8}
+.t-blue{background:linear-gradient(145deg,#3a6fc4,#2F5DA8);color:#fff}
+.t-sand{background:linear-gradient(145deg,#f0e4c4,#E8D9B5);color:#14213A}
+.t-light{background:#fff;color:#14213A;box-shadow:0 10px 24px rgba(20,33,58,.08), inset 0 0 0 1px rgba(20,33,58,.06)}
+.t-brass{background:linear-gradient(145deg,#d4b56a,#B8903E);color:#14213A}
+.t-topo{background:linear-gradient(145deg,#243a30,#1C2E24);color:#E8F0EA}
+.c2{grid-column:span 2}
+.r2{grid-row:span 2}
+.big{min-height:220px}
+.ring{position:absolute;border-radius:50%;border:1px solid rgba(255,255,255,.12);pointer-events:none}
+.tg{display:inline-block;margin-top:10px;font-weight:700;font-size:13px}
+footer{padding:24px 0 40px;color:var(--muted);font-size:13px;border-top:1px solid var(--line)}
+@media (max-width:860px){ .grid{ grid-template-columns:repeat(2,1fr); } .c2{ grid-column:span 2; } }
+@media (max-width:520px){ .wrap{ padding:0 16px; } .tile{ border-radius:22px; padding:16px; } .tile h3{ font-size:18px; } .c2{ grid-column:span 2; } .tile .ltr{ font-size:28px; } }
+@media (prefers-reduced-motion:reduce){ .tile{ opacity:1; transform:none; transition:none; } }
 </style>
-<script>try{var ua=navigator.userAgent;if(matchMedia('(display-mode: standalone)').matches||navigator.standalone||/; wv\)/.test(ua)||window.Android)document.documentElement.classList.add('app')}catch(e){}</script>
 </head>
 <body>
 <div class="wrap">
-  <div class="topbar">
-    <div class="brand"><div class="brand-mark">OV</div>O'quv Vositalari</div>
-    <nav class="pills" aria-label="Asosiy">
-      <a class="on" href="#tools">Vositalar</a>
-      <a href="https://t.me/byaziyz" target="_blank" rel="noopener">Telegram</a>
-      <a href="https://t.me/abuubaydah_bot" target="_blank" rel="noopener">Admin</a>
-      <button data-install type="button">Ilova</button>
-    </nav>
-  </div>
-
-  <header style="padding:18px 0 0;">
-    <div class="eyebrow" id="today">O'QITUVCHI UCHUN</div>
-    <h1>Xush kelibsiz</h1>
-    <p class="sub">Bugun dars uchun nima kerak?</p>
-    <div class="facts"><span class="fact">9 ta vosita</span><span class="fact">Doim bepul</span><span class="fact">O'rnatish shart emas</span><span class="fact">QR bilan bir bosishda</span></div>
+  <header>
+    <div class="logo">O'quv Vositalari <span>@byaziyz</span></div>
   </header>
-
-  <section id="tools" aria-label="Vositalar">
-    <div class="bento">
+  <section class="hero">
+    <h1>Darsni <em>jonlantiradigan</em> vositalar.</h1>
+    <p>Slayd, musobaqa, imtihon, fayl almashish va dars rejasi — barchasi bepul, internet orqali, hech qanday o'rnatishsiz. Proyektorda oching, QR ko'rsating, boshlang.</p>
+    <div class="stats">
+      <div><strong>7+</strong> vosita</div>
+      <div><strong>0 so'm</strong> doim bepul</div>
+      <div><strong>0</strong> o'rnatish kerak</div>
+      <div><strong>QR</strong> bir bosishda kirish</div>
+    </div>
+  </section>
+  <div class="grid">
       <a class="tile t-navy big c2 r2" href="slayd-yaratuvchi.html">
-        <div class="ring" style="right:-70px;top:-70px;width:260px;height:260px"></div><div class="ring" style="right:-30px;top:-30px;width:180px;height:180px"></div>
-        <div class="ltr" style="color:#E3C77E">S</div>
-        <div><h3>Slayd yaratuvchi</h3><p>Matn, PDF yoki Word — bir necha soniyada tayyor PowerPoint taqdimoti. Orqa fon, teglar, aqlli doskaga yuborish.</p></div>
+        <div class="ring" style="right:-50px;bottom:-70px;width:220px;height:220px"></div>
+        <div class="ltr">S</div>
+        <div><h3>Slayd Yaratuvchi</h3><p>Manba matningizni joylashtiring — bir necha soniyada tayyor taqdimot.</p></div>
         <div class="go">↗</div>
       </a>
       <a class="tile t-blue" href="sinf-musobaqasi.html"><div class="ltr">B</div><div><h3>Bilim kechasi</h3><p>Jamoa musobaqasi, jonli reyting</p></div><div class="go">↗</div></a>
@@ -123,6 +80,7 @@
       <a class="tile t-navy" href="fayl-uzatish.html"><div class="ltr" style="color:#E3C77E">F</div><div><h3>Fayl uzatish</h3><p>Kod orqali, 24 soatlik xona</p></div><div class="go">↗</div></a>
       <a class="tile t-light" href="dars-jadvali.html"><div class="ltr" style="color:#8A6A2A">D</div><div><h3>Dars jadvali</h3><p>Mavzular sanalarga taqsimlanadi</p></div><div class="go">↗</div></a>
       <a class="tile t-navy c2" href="muzey.html"><div class="ltr" style="color:#E3C77E">M</div><div><h3>Virtual muzey</h3><p>Registon maydoni 3D da: yurib ko'ring yoki telefonni VR ko'zoynakka qo'ying. Tez orada yana qasrlar.</p></div><div class="go">↗</div></a>
+      <a class="tile t-navy" href="muzey-beta.html"><div class="ltr" style="color:#E3C77E">β</div><div><h3>Virtual muzey — BETA</h3><p>360° panorama, giroskop, VR sinov, ikkinchi telefon bilan boshqaruv.</p></div><div class="go">↗</div></a>
       <a class="tile t-topo c2" href="jang-xaritasi.html"><div class="ltr" style="color:#E3C77E">J</div><div><h3>Jang xaritasi</h3><p>Tarixiy janglar animatsiyasi: qo'shinlar, to'p, miltiq, sarkardalar. Videoga yozib olinadi.</p></div><div class="go">↗</div></a>
       <a class="tile t-light" href="yurishlar-xaritasi.html"><div class="ltr" style="color:#8A6A2A">Y</div><div><h3>Yurishlar xaritasi</h3><p>Sarkarda yurishlari yil bo'yicha</p></div><div class="go">↗</div></a>
       <a class="tile t-blue" href="aqlli-takrorlash.html"><div class="ltr">A</div><div><h3>Aqlli takrorlash</h3><p>Xatolar bo'yicha mashq</p></div><div class="go">↗</div></a>
@@ -133,67 +91,13 @@
       </a>
       <a class="tile t-light c2" href="#" data-install><div class="ltr" style="color:#8A6A2A">↓</div><div><h3>Ilova va yorliq o'rnatish</h3><p>Aqlli doska, kompyuter yoki telefon uchun: Android ilova (APK), Windows yorlig'i va brauzer ilovasi.</p></div><div class="go">↗</div></a>
     </div>
-  </section>
-
-  <footer class="foot">
-    <div class="b">O'quv Vositalari</div>
-    <div>Yaratdi: <a href="https://t.me/byaziyz" target="_blank" rel="noopener">@byaziyz</a> · Telegram kanal · 2026</div>
-    <div>Admin bilan bog'lanish: <a href="https://t.me/abuubaydah_bot" target="_blank" rel="noopener">@abuubaydah_bot</a></div>
-  </footer>
+  <footer>@byaziyz tomonidan yaratilgan · Bepul ta'lim vositalari</footer>
 </div>
-
-<div id="installModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(20,33,58,.55);align-items:center;justify-content:center;padding:16px;">
-  <div style="background:#F3F0E8;color:#14213A;max-width:560px;width:100%;max-height:90vh;overflow:auto;border:1px solid #CFC8B6;border-radius:22px;padding:24px;font-family:'Inter',sans-serif;">
-    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
-      <b style="font-size:18px;">📲 Ilova / yorliq o'rnatish</b>
-      <button id="closeInstall" style="background:none;border:none;color:#14213A;font-size:26px;cursor:pointer;line-height:1;">×</button>
-    </div>
-    <p style="font-size:13px;opacity:.7;margin:8px 0 16px;">Qurilmangizga qarab birini tanlang.</p>
-    <button id="doInstall" style="display:none;width:100%;padding:14px;margin-bottom:10px;border:none;border-radius:10px;background:linear-gradient(150deg,#E3C77E,#B8903E);color:#14213A;font-weight:800;font-size:15px;cursor:pointer;">⚡ Brauzer orqali ilova qilib o'rnatish</button>
-    <button id="dlShortcut" style="width:100%;padding:14px;margin-bottom:10px;border:1px solid #B8903E;border-radius:10px;background:transparent;color:#7A5A1E;font-weight:700;font-size:14px;cursor:pointer;">🖥 Kompyuter / doska uchun yorliq (.url) yuklab olish</button>
-    <a href="https://github.com/aziyz123/aziyz123.github.io/releases/download/apk-latest/Oquv-Vositalari.apk" style="display:block;text-align:center;padding:14px;margin-bottom:16px;border:1px solid #B8903E;border-radius:10px;color:#C9A45C;font-weight:700;font-size:14px;text-decoration:none;">🤖 Android uchun APK yuklab olish</a>
-    <div style="font-size:13px;line-height:1.6;opacity:.9;">
-      <b>Yorliq (.url) qanday ishlatiladi:</b> yuklangan faylni <b>Ish stoli</b>ga ko'chiring. Ustiga ikki marta bossangiz, sayt brauzerda ochiladi.<br><br>
-      <b>Chrome (Windows doskasi):</b> o'ng yuqoridagi <b>⋮</b> → «Quyish, saqlash va ulashish» → <b>«Sahifani ilova sifatida o'rnatish»</b> yoki «Yorliq yaratish» («Ochilsin: alohida oynada» belgilang).<br>
-      <b>Microsoft Edge:</b> <b>⋯</b> → «Ilovalar» → <b>«Ushbu saytni ilova sifatida o'rnatish»</b>.<br>
-      <b>Android doska:</b> Chrome <b>⋮</b> → «Bosh ekranga qo'shish», yoki yuqoridagi APK.<br><br>
-      <span style="opacity:.7;">Menyuda bunday band yo'q bo'lsa, brauzer eski bo'lishi mumkin. Chrome yoki Edge'ni yangilang. O'rnatilmasa ham, yorliq (.url) har doim ishlaydi.</span>
-    </div>
-  </div>
-</div>
-
 <script>
-  (function(){
-    var io = new IntersectionObserver(function(es){ es.forEach(function(e, i){ if(e.isIntersecting){ setTimeout(function(){ e.target.classList.add('in-view'); }, i * 60); io.unobserve(e.target); } }); }, { threshold: .1 });
-    document.querySelectorAll('.tile').forEach(function(t){ io.observe(t); });
-    try{ var d = new Date(), M = ['YANVAR','FEVRAL','MART','APREL','MAY','IYUN','IYUL','AVGUST','SENTABR','OKTABR','NOYABR','DEKABR'], W = ['YAKSHANBA','DUSHANBA','SESHANBA','CHORSHANBA','PAYSHANBA','JUMA','SHANBA']; document.getElementById('today').textContent = W[d.getDay()] + ' · ' + d.getDate() + '-' + M[d.getMonth()]; }catch(e){}
-  })();
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('in-view'); });
+  },{threshold:.12});
+  document.querySelectorAll('.tile').forEach(function(t){ io.observe(t); });
 </script>
-
-<script>
-  (function(){
-    var modal=document.getElementById('installModal'), dp=null;
-    window.addEventListener('beforeinstallprompt', function(e){ e.preventDefault(); dp=e; document.getElementById('doInstall').style.display='block'; });
-    window.addEventListener('appinstalled', function(){ dp=null; document.getElementById('doInstall').style.display='none'; });
-    document.querySelectorAll('[data-install]').forEach(function(b){ b.addEventListener('click', function(e){ e.preventDefault(); modal.style.display='flex'; }); });
-    document.getElementById('closeInstall').addEventListener('click', function(){ modal.style.display='none'; });
-    modal.addEventListener('click', function(e){ if(e.target===modal) modal.style.display='none'; });
-    document.getElementById('doInstall').addEventListener('click', function(){ if(dp){ dp.prompt(); dp.userChoice.finally(function(){ dp=null; document.getElementById('doInstall').style.display='none'; }); } });
-    document.getElementById('dlShortcut').addEventListener('click', function(){
-      var txt='[InternetShortcut]\r\nURL=https://aziyz123.github.io/\r\nIconIndex=0\r\n';
-      var a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([txt],{type:'application/octet-stream'}));
-      a.download="O'quv Vositalari.url"; document.body.appendChild(a); a.click(); document.body.removeChild(a);
-    });
-  })();
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/sw.js')
-        .then(reg => console.log('Service Worker muvaffaqiyatli:', reg.scope))
-        .catch(err => console.log('Service Worker xatosi:', err));
-    });
-  }
-</script>
-
-<nav class="appnav" aria-label="Ilova"><a class="on" href="#tools"><b>●</b>Vositalar</a><a href="fayl-uzatish.html"><b>○</b>Fayllar</a><a href="dars-jadvali.html"><b>○</b>Jadval</a><a href="https://t.me/byaziyz" target="_blank" rel="noopener"><b>○</b>Kanal</a><a href="https://t.me/abuubaydah_bot" target="_blank" rel="noopener"><b>○</b>Admin</a></nav>
 </body>
 </html>
