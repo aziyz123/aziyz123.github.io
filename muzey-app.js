@@ -99,18 +99,66 @@
   $('qBtn').addEventListener('click', function(){ setQuality(!hq); });
   if(/Android|iPhone|iPad|Mobile/i.test(navigator.userAgent) && (window.devicePixelRatio || 1) >= 3) setQuality(false); else setQuality(true);
 
-  // ---- VR rejimi
+  // ---- VR rejimi: har ko'z uchun linza markaziga moslangan tasvir + linza buzilishini to'g'rilash
+  var DEF = { shift: .07, k1: .30, k2: .08, zoom: 1.0, ipd: 64 };
+  var VS = (function(){ try{ var o = JSON.parse(localStorage.getItem('muzeyVR') || 'null'); if(o) return Object.assign({}, DEF, o); }catch(_){} return Object.assign({}, DEF); })();
+  function saveVS(){ try{ localStorage.setItem('muzeyVR', JSON.stringify(VS)); }catch(_){} }
+  var rt = null, post = null, postScene = new THREE.Scene(), postCam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1), postMat = null;
+  function makeRT(){
+    var pr = Math.min(window.devicePixelRatio || 1, 1.5), W = Math.round(window.innerWidth * pr), H = Math.round(window.innerHeight * pr);
+    if(rt) rt.dispose();
+    var half = renderer.capabilities.isWebGL2 && (renderer.extensions.has('EXT_color_buffer_float') || renderer.extensions.has('EXT_color_buffer_half_float'));
+    rt = new THREE.WebGLRenderTarget(W, H, { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat, type: half ? THREE.HalfFloatType : THREE.UnsignedByteType, depthBuffer: true });
+    if(!half) rt.texture.encoding = THREE.sRGBEncoding;
+    rt.scissorTest = true;
+    if(!postMat){
+      postMat = new THREE.ShaderMaterial({
+        uniforms: { t: { value: null }, res: { value: new THREE.Vector2(1, 1) }, cL: { value: new THREE.Vector2(.25, .5) }, cR: { value: new THREE.Vector2(.75, .5) }, k: { value: new THREE.Vector2(.3, .08) }, zoom: { value: 1 } },
+        vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0., 1.); }',
+        fragmentShader: 'uniform sampler2D t; uniform vec2 res, cL, cR, k; uniform float zoom; varying vec2 vUv;\n' +
+          'void main(){ bool left = vUv.x < .5; vec2 c = left ? cL : cR; vec2 d = vUv - c;\n' +
+          '  vec2 p = vec2(d.x * res.x, d.y * res.y) / (res.y * .5);\n' +
+          '  float r2 = dot(p, p); float f = (1. + k.x * r2 + k.y * r2 * r2) / zoom; vec2 q = p * f;\n' +
+          '  vec2 s = c + vec2(q.x * (res.y * .5) / res.x, q.y * (res.y * .5) / res.y);\n' +
+          '  float lo = left ? 0. : .5, hi = left ? .5 : 1.;\n' +
+          '  if(s.x < lo || s.x > hi || s.y < 0. || s.y > 1.){ gl_FragColor = vec4(0., 0., 0., 1.); }\n' +
+          '  else { gl_FragColor = vec4(texture2D(t, s).rgb, 1.); }\n' +
+          '  #if defined( TONE_MAPPING )\n gl_FragColor.rgb = toneMapping( gl_FragColor.rgb );\n #endif\n gl_FragColor = linearToOutputTexel( gl_FragColor ); }'
+      });
+      postMat.toneMapped = true;
+      post = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), postMat); postScene.add(post);
+    }
+    postMat.uniforms.t.value = rt.texture; postMat.uniforms.res.value.set(W, H);
+  }
+  function applyVS(){
+    if(!postMat) return;
+    postMat.uniforms.cL.value.set(.25 + .5 * VS.shift, .5); postMat.uniforms.cR.value.set(.75 - .5 * VS.shift, .5);
+    postMat.uniforms.k.value.set(VS.k1, VS.k2); postMat.uniforms.zoom.value = VS.zoom;
+  }
   function setVR(on){
     vr = on; document.body.classList.toggle('vr', on);
-    renderer.setScissorTest(on);
     if(on){
+      makeRT(); applyVS();
       if(!gyro.on) enableGyro();
       var el = document.documentElement; try{ (el.requestFullscreen || el.webkitRequestFullscreen).call(el); }catch(_){}
       try{ screen.orientation.lock('landscape'); }catch(_){}
     } else { try{ document.exitFullscreen && document.fullscreenElement && document.exitFullscreen(); }catch(_){} try{ screen.orientation.unlock(); }catch(_){} }
-    setTimeout(resize, 250);
+    setTimeout(function(){ resize(); if(vr){ makeRT(); applyVS(); } }, 300);
   }
   $('vrBtn').addEventListener('click', function(){ setVR(true); }); $('vrExit').addEventListener('click', function(){ setVR(false); });
+  // VR ichidagi tez sozlash tugmalari (ochiq old tomondan bosiladi)
+  function bump(key, d, lo, hi){ VS[key] = Math.max(lo, Math.min(hi, +(VS[key] + d).toFixed(3))); saveVS(); applyVS(); syncSliders(); }
+  $('vrShiftM').addEventListener('click', function(){ bump('shift', -.01, -.1, .3); }); $('vrShiftP').addEventListener('click', function(){ bump('shift', .01, -.1, .3); });
+  $('vrDistM').addEventListener('click', function(){ bump('k1', -.04, -.2, .8); }); $('vrDistP').addEventListener('click', function(){ bump('k1', .04, -.2, .8); });
+  $('vrZoomM').addEventListener('click', function(){ bump('zoom', -.05, .6, 1.6); }); $('vrZoomP').addEventListener('click', function(){ bump('zoom', .05, .6, 1.6); });
+  // sozlash oynasi
+  var sl = { shift: $('sShift'), k1: $('sK1'), zoom: $('sZoom'), ipd: $('sIpd') };
+  function syncSliders(){ Object.keys(sl).forEach(function(k){ sl[k].value = VS[k]; var o = $('o' + k); if(o) o.textContent = VS[k]; }); }
+  Object.keys(sl).forEach(function(k){ sl[k].addEventListener('input', function(){ VS[k] = parseFloat(sl[k].value); saveVS(); applyVS(); syncSliders(); }); });
+  $('vrSet').addEventListener('click', function(){ $('vrPanel').hidden = !$('vrPanel').hidden; syncSliders(); });
+  $('vrReset').addEventListener('click', function(){ Object.assign(VS, DEF); saveVS(); applyVS(); syncSliders(); });
+  $('vrPanelClose').addEventListener('click', function(){ $('vrPanel').hidden = true; });
+  syncSliders();
 
   // ---- Chizish sikli
   var clock = new THREE.Clock(), euler = new THREE.Euler(0, 0, 0, 'YXZ'), qCam = new THREE.Quaternion(), qYaw = new THREE.Quaternion(), up = new THREE.Vector3(0, 1, 0);
@@ -146,13 +194,22 @@
     if(!vr){
       cam.position.copy(pos); cam.quaternion.copy(qCam); renderer.setViewport(0, 0, w, h); renderer.render(scene, cam);
     } else {
-      right.set(1, 0, 0).applyQuaternion(qCam).multiplyScalar(.032);
+      if(!rt) { makeRT(); applyVS(); }
+      var ipd = VS.ipd / 1000 / 2; right.set(1, 0, 0).applyQuaternion(qCam).multiplyScalar(ipd);
       camL.quaternion.copy(qCam); camR.quaternion.copy(qCam);
       camL.position.copy(pos).sub(right); camR.position.copy(pos).add(right);
-      renderer.setScissor(0, 0, w / 2, h); renderer.setViewport(0, 0, w / 2, h); renderer.render(scene, camL);
-      renderer.setScissor(w / 2, 0, w / 2, h); renderer.setViewport(w / 2, 0, w / 2, h); renderer.render(scene, camR);
+      var RW = rt.width, RH = rt.height, ar = (RW / 2) / RH, tf = Math.tan(THREE.MathUtils.degToRad(80 / 2));
+      [camL, camR].forEach(function(c, i){
+        c.aspect = ar; c.updateProjectionMatrix();
+        c.projectionMatrix.elements[8] = (i === 0 ? -1 : 1) * 2 * VS.shift; // asosiy nuqtani linza markaziga surish
+        c.projectionMatrixInverse.copy(c.projectionMatrix).invert();
+      });
+      rt.viewport.set(0, 0, RW / 2, RH); rt.scissor.set(0, 0, RW / 2, RH); renderer.setRenderTarget(rt); renderer.clear(); renderer.render(scene, camL);
+      rt.viewport.set(RW / 2, 0, RW / 2, RH); rt.scissor.set(RW / 2, 0, RW / 2, RH); renderer.setRenderTarget(rt); renderer.render(scene, camR);
+      renderer.setRenderTarget(null); renderer.setScissorTest(false); renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
+      renderer.render(postScene, postCam);
     }
   }
   $('load').style.display = 'none'; frame();
-  window.__muzey = { setVR: setVR, goto: function(i){ goto(spots[i], true); }, scene: scene };
+  window.__muzey = { setVR: setVR, VS: VS, goto: function(i){ goto(spots[i], true); }, scene: scene };
 })();
