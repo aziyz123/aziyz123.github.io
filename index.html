@@ -2,66 +2,58 @@
 <html lang="uz">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#F3F0E8">
 <meta name="msapplication-TileColor" content="#F3F0E8">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="O'quv Vositalari">
-<link rel="apple-touch-icon" href="/icons/icon-192.png">
-<link rel="manifest" href="/manifest.json">
-<link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">
-<link rel="icon" type="image/png" sizes="512x512" href="/icons/icon-512.png">
 <title>O'quv Vositalari — Slayd, Test, Imtihon va Sinf O'yinlari | @byaziyz</title>
-<meta name="description" content="O'qituvchilar va o'quvchilar uchun bepul onlayn vositalar: matndan avtomatik slayd (PowerPoint) yaratish, sinf uchun QR-o'yin (Bilim Kechasi), jonli onlayn imtihon, fayl uzatish va dars jadvali. Ro'yxatdan o'tish shart emas.">
-<meta name="keywords" content="slayd yaratish, powerpoint yaratish, onlayn test, imtihon tuzish, sinf o'yini, dars jadvali, o'qituvchi uchun vositalar, bilim kechasi, QR test, bepul ta'lim vositalari">
-<meta name="author" content="@byaziyz">
-<link rel="canonical" href="https://aziyz123.github.io/">
-<meta property="og:type" content="website">
-<meta property="og:title" content="O'quv Vositalari — Slayd, Test, Imtihon va Sinf O'yinlari">
-<meta property="og:description" content="O'qituvchilar va o'quvchilar uchun bepul onlayn vositalar: slayd yaratish, sinf o'yini, onlayn imtihon, fayl uzatish va dars jadvali.">
-<meta property="og:url" content="https://aziyz123.github.io/">
-<meta property="og:locale" content="uz_UZ">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="O'quv Vositalari — Slayd, Test, Imtihon va Sinf O'yinlari">
-<meta name="twitter:description" content="O'qituvchilar va o'quvchilar uchun bepul onlayn vositalar — ro'yxatdan o'tish shart emas.">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,500;0,600;1,400&family=Inter:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,500;0,600;1,400&family=Inter:wght@400;500;600;700&display=swap"></noscript>
+<meta name="description" content="Slayd, musobaqa, imtihon, fayl almashish va dars rejasi — barchasi bepul, internet orqali, hech qanday o'rnatishsiz.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap" rel="stylesheet">
 <style>
-:root{ --ivory:#F3F0E8; --ivory-2:#E7E3D9; --ink:#14213A; --ink-2:#3C4A66; --navy:#1F3354; --blue:#2E4A78; --brass:#B8903E; --brass-l:#E3C77E; --line:rgba(20,33,58,.12); }
-*{box-sizing:border-box}html{scroll-behavior:smooth}
-body{margin:0;background:var(--ivory);color:var(--ink);font-family:Inter,system-ui,-apple-system,sans-serif;line-height:1.45}
-a{color:inherit;text-decoration:none}
+:root{
+  --bg:#F3F0E8; --ink:#14213A; --muted:#5A6475; --line:rgba(20,33,58,.10);
+  --navy:#14213A; --blue:#2F5DA8; --sand:#E8D9B5; --light:#FFFFFF; --brass:#B8903E; --topo:#1C2E24;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,sans-serif;line-height:1.45}
+a{color:inherit}
 .wrap{max-width:1100px;margin:0 auto;padding:0 22px}
 header{padding:18px 0 8px;display:flex;justify-content:space-between;align-items:center}
-.logo{font-family:Newsreader,serif;font-weight:600;font-size:20px;letter-spacing:.02em}
+.logo{font-family:'Newsreader',serif;font-weight:600;font-size:20px;letter-spacing:.02em}
 .logo span{opacity:.55;font-size:13px;font-family:Inter,sans-serif;font-weight:500;margin-left:8px}
 .hero{padding:28px 0 18px}
-.hero h1{font-family:Newsreader,serif;font-size:clamp(28px,5vw,44px);font-weight:600;line-height:1.12;margin:0 0 12px;max-width:16ch}
-.hero h1 em{font-style:italic;color:var(--blue)}
-.hero p{max-width:52ch;color:var(--ink-2);margin:0 0 18px;font-size:15px}
-.stats{display:flex;gap:18px;flex-wrap:wrap;margin:18px 0 8px;font-size:13px;color:var(--ink-2)}
+.hero h1{font-family:'Newsreader',serif;font-size:clamp(28px,5vw,44px);font-weight:600;line-height:1.12;margin:0 0 12px;max-width:16ch}
+.hero p{max-width:52ch;color:var(--muted);margin:0 0 18px;font-size:15px}
+.stats{display:flex;gap:18px;flex-wrap:wrap;margin:18px 0 8px;font-size:13px;color:var(--muted)}
 .stats strong{color:var(--ink);font-weight:700}
 .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;padding:10px 0 40px}
-.tile{position:relative;overflow:hidden;border-radius:26px;padding:20px;text-decoration:none;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 10px 24px rgba(20,33,58,.10),inset 0 0 0 1px rgba(255,255,255,.14);transition:transform .25s ease,box-shadow .25s ease;opacity:0;transform:translateY(14px);min-height:140px}
-.tile.in-view{opacity:1;transform:none}
-.tile.in-view:hover{transform:translateY(-4px);box-shadow:0 18px 34px rgba(20,33,58,.18),inset 0 0 0 1px rgba(255,255,255,.2)}
-.tile .ltr{font-family:Newsreader,serif;font-size:34px;font-weight:600;line-height:1;opacity:.92}
-.tile h3{font-family:Newsreader,serif;font-size:21px;font-weight:600;margin:0;line-height:1.15}
-.tile p{font-size:12.5px;line-height:1.5;margin:6px 0 0;opacity:.88}
-.tile .go{position:absolute;right:18px;top:18px;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center;font-size:15px}
+.tile{ position:relative; overflow:hidden; border-radius:26px; padding:20px; text-decoration:none; display:flex; flex-direction:column; justify-content:space-between; box-shadow:0 10px 24px rgba(20,33,58,.10), inset 0 0 0 1px rgba(255,255,255,.14); transition:transform .25s ease, box-shadow .25s ease; opacity:0; transform:translateY(14px); }
+.tile.in-view{ opacity:1; transform:none; }
+.tile.in-view:hover{ transform:translateY(-4px); box-shadow:0 18px 34px rgba(20,33,58,.18), inset 0 0 0 1px rgba(255,255,255,.2); }
+.tile .ltr{ font-family:'Newsreader',serif; font-size:34px; font-weight:600; line-height:1; opacity:.92; }
+.tile h3{ font-family:'Newsreader',serif; font-size:21px; font-weight:600; margin:0; line-height:1.15; }
+.tile p{ font-size:12.5px; line-height:1.5; margin:6px 0 0; opacity:.88; }
+.tile .go{ position:absolute; right:18px; top:18px; width:30px; height:30px; border-radius:50%; background:rgba(255,255,255,.16); display:flex; align-items:center; justify-content:center; font-size:15px; }
 .t-navy{background:linear-gradient(145deg,#1a2b4a,#14213A);color:#F3F0E8}
 .t-blue{background:linear-gradient(145deg,#3a6fc4,#2F5DA8);color:#fff}
 .t-sand{background:linear-gradient(145deg,#f0e4c4,#E8D9B5);color:#14213A}
-.t-light{background:#fff;color:#14213A;box-shadow:0 10px 24px rgba(20,33,58,.08),inset 0 0 0 1px rgba(20,33,58,.06)}
+.t-light{background:#fff;color:#14213A;box-shadow:0 10px 24px rgba(20,33,58,.08), inset 0 0 0 1px rgba(20,33,58,.06)}
 .t-brass{background:linear-gradient(145deg,#d4b56a,#B8903E);color:#14213A}
 .t-topo{background:linear-gradient(145deg,#243a30,#1C2E24);color:#E8F0EA}
-.c2{grid-column:span 2}.r2{grid-row:span 2}.big{min-height:220px}
+.c2{grid-column:span 2}
+.r2{grid-row:span 2}
+.big{min-height:220px}
 .ring{position:absolute;border-radius:50%;border:1px solid rgba(255,255,255,.12);pointer-events:none}
 .tg{display:inline-block;margin-top:10px;font-weight:700;font-size:13px}
-footer{padding:24px 0 40px;color:var(--ink-2);font-size:13px;border-top:1px solid var(--line)}
-@media (max-width:860px){.grid{grid-template-columns:repeat(2,1fr)}.c2{grid-column:span 2}}
-@media (max-width:520px){.wrap{padding:0 16px}.tile{border-radius:22px;padding:16px}.tile h3{font-size:18px}.tile .ltr{font-size:28px}}
-@media (prefers-reduced-motion:reduce){.tile{opacity:1;transform:none;transition:none}}
+footer{padding:24px 0 40px;color:var(--muted);font-size:13px;border-top:1px solid var(--line)}
+@media (max-width:860px){ .grid{ grid-template-columns:repeat(2,1fr); } .c2{ grid-column:span 2; } }
+@media (max-width:520px){ .wrap{ padding:0 16px; } .tile{ border-radius:22px; padding:16px; } .tile h3{ font-size:18px; } .c2{ grid-column:span 2; } .tile .ltr{ font-size:28px; } }
+@media (prefers-reduced-motion:reduce){ .tile{ opacity:1; transform:none; transition:none; } }
 </style>
 </head>
 <body>
