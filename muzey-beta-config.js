@@ -9,8 +9,8 @@
 window.MUZEY_BETA_CONFIG = {
   SUPABASE_URL: "",
   SUPABASE_ANON_KEY: "",
-  // Haqiqiy 2:1 equirectangular 360° panorama manzili. Bo'sh qoldirilsa demo panorama ishlatiladi.
-  PANORAMA_URL: "assets/demo-panorama.svg?v=2",
-  // Ishlatish uchun bitta maxsus sinov xonasi nomi
-  DEFAULT_HALL: "Registon — bosh zal"
+  // Haqiqiy 2:1 equirectangular 360° panorama (Wikimedia CC BY-SA).
+  // Keyinroq o'z 360° suratlaringizni qo'yishingiz mumkin.
+  PANORAMA_URL: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Rheingauer_Dom%2C_Geisenheim%2C_360_Panorama_%28Equirectangular_projection%29.jpg/1280px-Rheingauer_Dom%2C_Geisenheim%2C_360_Panorama_%28Equirectangular_projection%29.jpg",
+  DEFAULT_HALL: "Tarixiy zal — bosh ko'rinish"
 };
