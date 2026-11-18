@@ -7,60 +7,21 @@ const mode = params.get("mode") || "museum";
 const room = params.get("room") || Math.random().toString(36).slice(2,8).toUpperCase();
 
 const exhibits = [
-  {id:"e1",title:"Amir Temur",text:"Temuriylar saltanati asoschisi (1336–1405). Davlat boshqaruvi, harbiy san’at va me’morchilikda iz qoldirgan.",src:"Tarixiy portret asosida",x:-6,z:-8,theme:"temur"},
-  {id:"e2",title:"Registon ansambli",text:"Samarqanddagi Ulug‘bek, Sherdor va Tillakori madrasalari. UNESCO merosi.",src:"Registon maydoni",x:6,z:-8,theme:"registon"},
-  {id:"e3",title:"Qal’a mudofaasi",text:"Qadimgi qal’a devorlari, darvozalar va mudofaa tizimlari.",src:"Mudofaa me’morchiligi",x:-6,z:8,theme:"qala"},
-  {id:"e4",title:"Qo‘lyozmalar",text:"Ilm-fan, astronomiya va tarixiy matnlar merosi. Ulug‘bek madrasasi an’anasi.",src:"Qo‘lyozma merosi",x:6,z:8,theme:"book"},
-  {id:"e5",title:"Koshinkorlik",text:"Moviy koshin, naqqoshlik va an’anaviy hunarlar — Samarqand va Buxoro uslubi.",src:"Hunarmandchilik",x:0,z:-10,theme:"tile"}
+  {id:"e1",title:"Amir Temur",text:"Temuriylar saltanati asoschisi (1336–1405). Davlat boshqaruvi, harbiy san’at va me’morchilikda iz qoldirgan.",src:"Amir Temur muzeyi / tarixiy portret",x:-6,z:-8,theme:"temur"},
+  {id:"e2",title:"Registon ansambli",text:"Samarqanddagi Ulug‘bek, Sherdor va Tillakori madrasalari. UNESCO merosi.",src:"Registon maydoni, Samarqand",x:6,z:-8,theme:"registon"},
+  {id:"e3",title:"Qal’a va minoralar",text:"Qadimgi mudofaa va diniy me’morchilik — minoralar, devorlar, darvozalar.",src:"Poyi Kalon / Buxoro merosi",x:-6,z:8,theme:"qala"},
+  {id:"e4",title:"Qo‘lyozmalar",text:"Ilm-fan, astronomiya va tarixiy matnlar merosi. Temuriylar davri miniatyuralari.",src:"Tarixiy miniatyura",x:6,z:8,theme:"book"},
+  {id:"e5",title:"Koshinkorlik",text:"Moviy koshin, naqqoshlik — Samarqand va Buxoro uslubi.",src:"Registon koshinlari",x:0,z:-10,theme:"tile"}
 ];
 
 function paintExhibit(theme, title){
   const c = document.createElement("canvas");
   c.width = 512; c.height = 640;
   const g = c.getContext("2d");
-  const bg = g.createLinearGradient(0,0,0,640);
-  if(theme==="temur"){ bg.addColorStop(0,"#3a2a1a"); bg.addColorStop(1,"#1a120c"); }
-  else if(theme==="registon"){ bg.addColorStop(0,"#1a3a5c"); bg.addColorStop(1,"#0c1a28"); }
-  else if(theme==="qala"){ bg.addColorStop(0,"#4a4035"); bg.addColorStop(1,"#2a241c"); }
-  else if(theme==="book"){ bg.addColorStop(0,"#3a3020"); bg.addColorStop(1,"#1e1810"); }
-  else { bg.addColorStop(0,"#0e3a4a"); bg.addColorStop(1,"#061820"); }
-  g.fillStyle = bg; g.fillRect(0,0,512,640);
-  g.strokeStyle = "#c9a84c"; g.lineWidth = 10; g.strokeRect(18,18,476,604);
-  g.strokeStyle = "rgba(227,199,126,.45)"; g.lineWidth = 3; g.strokeRect(32,32,448,576);
-  if(theme==="temur"){
-    g.fillStyle = "#e8d5a0"; g.beginPath(); g.arc(256,200,55,0,Math.PI*2); g.fill();
-    g.fillStyle = "#2a4060"; g.fillRect(196,255,120,160);
-    g.fillStyle = "#b8903e"; g.fillRect(216,250,80,20);
-    g.fillStyle = "#e3c77e"; g.beginPath(); g.moveTo(220,150); g.lineTo(256,120); g.lineTo(292,150); g.closePath(); g.fill();
-  } else if(theme==="registon"){
-    [[90,180,100,220],[206,160,100,240],[322,180,100,220]].forEach(function(r){
-      var x=r[0],y=r[1],w=r[2],h=r[3];
-      g.fillStyle = "#2a6a9a"; g.fillRect(x,y,w,h);
-      g.fillStyle = "#0a2035";
-      g.beginPath(); g.moveTo(x+10,y+h*0.55); g.quadraticCurveTo(x+w/2,y+20,x+w-10,y+h*0.55);
-      g.lineTo(x+w-10,y+h-10); g.lineTo(x+10,y+h-10); g.closePath(); g.fill();
-    });
-    g.fillStyle = "#e3c77e"; g.font = "bold 18px Georgia"; g.textAlign="center"; g.fillText("REGISTON", 256, 430);
-  } else if(theme==="qala"){
-    g.fillStyle = "#6a5a45"; g.fillRect(80,200,352,240);
-    g.fillStyle = "#3a3025"; for(var i=0;i<8;i++) g.fillRect(90+i*42,180,28,30);
-    g.fillStyle = "#1a1510"; g.fillRect(220,320,70,120);
-  } else if(theme==="book"){
-    g.fillStyle = "#c9a84c"; g.fillRect(140,160,230,300);
-    g.fillStyle = "#f3e6c0"; g.fillRect(150,170,100,280);
-    g.fillStyle = "#d4c090"; g.fillRect(250,170,110,280);
-    g.strokeStyle = "#8a6a30"; g.lineWidth=2;
-    for(var y=190;y<430;y+=18){ g.beginPath(); g.moveTo(160,y); g.lineTo(240,y); g.stroke(); }
-  } else {
-    for(var y=60;y<520;y+=48) for(var x=50;x<460;x+=48){
-      g.fillStyle = ((x/48|0)+(y/48|0))%2 ? "#1a7a8a" : "#0e4a5a";
-      g.fillRect(x,y,44,44);
-      g.strokeStyle = "#e3c77e"; g.lineWidth=1.5; g.strokeRect(x+6,y+6,32,32);
-    }
-  }
-  g.fillStyle = "rgba(10,14,22,.82)"; g.fillRect(60,520,392,70);
-  g.fillStyle = "#e3c77e"; g.font = "bold 26px Georgia, serif"; g.textAlign = "center"; g.fillText(title, 256, 565);
-  var tex = new THREE.CanvasTexture(c);
+  g.fillStyle = "#1a2436"; g.fillRect(0,0,512,640);
+  g.fillStyle = "#e3c77e"; g.font = "bold 28px Georgia"; g.textAlign = "center";
+  g.fillText(title, 256, 320);
+  const tex = new THREE.CanvasTexture(c);
   tex.colorSpace = THREE.SRGBColorSpace;
   return tex;
 }
@@ -89,10 +50,9 @@ function buildHall(){
   scene = new THREE.Scene();
   scene.background = new THREE.Color(0x0a1018);
   scene.fog = new THREE.Fog(0x0a1018, 18, 42);
-  const hemi = new THREE.HemisphereLight(0xb8c8e0, 0x2a2218, 0.55);
-  scene.add(hemi);
+  scene.add(new THREE.HemisphereLight(0xb8c8e0, 0x2a2218, 0.55));
   const dir = new THREE.DirectionalLight(0xffe6b0, 0.9);
-  dir.position.set(6,12,4); dir.castShadow = true; dir.shadow.mapSize.set(1024,1024); scene.add(dir);
+  dir.position.set(6,12,4); dir.castShadow = true; scene.add(dir);
   scene.add(new THREE.PointLight(0xe3c77e, 0.4, 32).translateY(5));
   const floor = new THREE.Mesh(new THREE.PlaneGeometry(28,28), makeMat(0x2c241c, 0.9));
   floor.rotation.x = -Math.PI/2; floor.receiveShadow = true; scene.add(floor);
@@ -128,9 +88,20 @@ function buildHall(){
     rim.position.y = 0.96; group.add(rim);
     const frame = new THREE.Mesh(new THREE.BoxGeometry(1.75, 2.05, 0.14), goldMat);
     frame.position.y = 2.2; group.add(frame);
-    const tex = paintExhibit(ex.theme, ex.title);
-    const canvas = new THREE.Mesh(new THREE.PlaneGeometry(1.45, 1.75), new THREE.MeshStandardMaterial({ map: tex, roughness: 0.55, metalness: 0.05 }));
+    const mat = new THREE.MeshStandardMaterial({ color: 0x333333, roughness: 0.55, metalness: 0.05 });
+    const canvas = new THREE.Mesh(new THREE.PlaneGeometry(1.45, 1.75), mat);
     canvas.position.set(0, 2.2, 0.09); group.add(canvas);
+    const imgKey = ({temur:"temur",registon:"registon",qala:"qala",book:"book",tile:"tiles"})[ex.theme] || ex.theme;
+    const dataUrl = window.EXHIBIT_IMAGES && (window.EXHIBIT_IMAGES[imgKey] || window.EXHIBIT_IMAGES[ex.theme]);
+    if (dataUrl) {
+      new THREE.TextureLoader().load(dataUrl, function(tex){
+        tex.colorSpace = THREE.SRGBColorSpace;
+        mat.map = tex; mat.color.setHex(0xffffff); mat.needsUpdate = true;
+      });
+    } else {
+      const t = paintExhibit(ex.theme, ex.title);
+      mat.map = t; mat.color.setHex(0xffffff); mat.needsUpdate = true;
+    }
     const plate = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.32, 0.05), makeMat(0x101820));
     plate.position.set(0, 1.12, 0.3); group.add(plate);
     group.userData = {exhibit: ex};
