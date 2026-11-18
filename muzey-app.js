@@ -4,15 +4,24 @@
   var canvas = $('gl');
   var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.outputEncoding = THREE.sRGBEncoding; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = .72;
+  renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   var scene = new THREE.Scene();
-  scene.fog = new THREE.Fog(0xcfe0ee, 80, 260);
-  // osmon
-  var sky = new THREE.Mesh(new THREE.SphereGeometry(400, 24, 12), new THREE.MeshBasicMaterial({ side: THREE.BackSide, fog: false, map: (function(){
-    var c = document.createElement('canvas'); c.width = 8; c.height = 256; var g = c.getContext('2d'); var gr = g.createLinearGradient(0, 0, 0, 256);
-    gr.addColorStop(0, '#4A86C5'); gr.addColorStop(.55, '#A9CBE6'); gr.addColorStop(.75, '#E8E2CF'); gr.addColorStop(1, '#E8E2CF'); g.fillStyle = gr; g.fillRect(0, 0, 8, 256); return new THREE.CanvasTexture(c); })() }));
+  // osmon: gradient + quyosh + bulutlar; shu osmondan yaltiroq sirtlar uchun aks (env) olinadi
+  function skyTex(){ var c = document.createElement('canvas'); c.width = 1024; c.height = 512; var g = c.getContext('2d');
+    var gr = g.createLinearGradient(0, 0, 0, 512); gr.addColorStop(0, '#2F6DB3'); gr.addColorStop(.45, '#7FB2DE'); gr.addColorStop(.72, '#CFE1EE'); gr.addColorStop(.82, '#EFE6CF'); gr.addColorStop(1, '#D9CBA5'); g.fillStyle = gr; g.fillRect(0, 0, 1024, 512);
+    for(var i = 0; i < 38; i++){ var x = Math.random() * 1024, y = 90 + Math.random() * 190, r = 24 + Math.random() * 60; for(var k = 0; k < 7; k++){ var rg = g.createRadialGradient(x + k * r * .5, y + Math.random() * 14, 0, x + k * r * .5, y, r); rg.addColorStop(0, 'rgba(255,255,255,.34)'); rg.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = rg; g.fillRect(x - r, y - r, r * 3.8, r * 2); } }
+    var sg = g.createRadialGradient(330, 150, 0, 330, 150, 90); sg.addColorStop(0, 'rgba(255,250,225,1)'); sg.addColorStop(.12, 'rgba(255,244,200,.95)'); sg.addColorStop(1, 'rgba(255,230,170,0)'); g.fillStyle = sg; g.fillRect(200, 20, 260, 260);
+    var t = new THREE.CanvasTexture(c); t.encoding = THREE.sRGBEncoding; return t; }
+  var skyT = skyTex();
+  var sky = new THREE.Mesh(new THREE.SphereGeometry(400, 32, 16), new THREE.MeshBasicMaterial({ side: THREE.BackSide, fog: false, map: skyT, toneMapped: false }));
   scene.add(sky);
-  scene.add(new THREE.HemisphereLight(0xdfeeff, 0x8a7048, .7));
-  var sun = new THREE.DirectionalLight(0xfff0d0, .75); sun.position.set(-60, 90, 70); scene.add(sun);
+  try{ var pm = new THREE.PMREMGenerator(renderer); var envScene = new THREE.Scene(); envScene.add(new THREE.Mesh(new THREE.SphereGeometry(50, 32, 16), new THREE.MeshBasicMaterial({ side: THREE.BackSide, map: skyT }))); scene.environment = pm.fromScene(envScene, 0).texture; pm.dispose(); }catch(e){}
+  scene.fog = new THREE.Fog(0xcfc6ac, 140, 360);
+  scene.add(new THREE.HemisphereLight(0xcfe4ff, 0x8a6d44, .4));
+  var sun = new THREE.DirectionalLight(0xfff1d4, 1.7); sun.position.set(-70, 95, 60);
+  sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048); var sc = sun.shadow.camera; sc.left = -120; sc.right = 120; sc.top = 120; sc.bottom = -120; sc.near = 10; sc.far = 320; sun.shadow.bias = -.0006; sun.shadow.normalBias = .4;
+  scene.add(sun);
   scene.add(window.RegistonMuseum.build());
 
   var cam = new THREE.PerspectiveCamera(68, 1, .1, 700);
@@ -83,6 +92,12 @@
   }
   function disableGyro(){ window.removeEventListener('deviceorientation', oriHandler, true); gyro.on = false; $('gyroBtn').classList.remove('on'); var q = gyro.q; eul.setFromQuaternion(q, 'YXZ'); yaw = eul.y + gyro.offset; pitch = eul.x; }
   $('gyroBtn').addEventListener('click', function(){ gyro.on ? disableGyro() : enableGyro(); });
+
+  // ---- Sifat: soya va yuqori aniqlik (sekin telefonlar uchun o'chiriladi)
+  var hq = true;
+  function setQuality(on){ hq = on; sun.castShadow = on; renderer.setPixelRatio(on ? Math.min(window.devicePixelRatio || 1, 2) : 1); resize(); $('qBtn').classList.toggle('on', on); $('qBtn').textContent = on ? '✨ Sifat: yuqori' : '⚡ Sifat: oddiy'; }
+  $('qBtn').addEventListener('click', function(){ setQuality(!hq); });
+  if(/Android|iPhone|iPad|Mobile/i.test(navigator.userAgent) && (window.devicePixelRatio || 1) >= 3) setQuality(false); else setQuality(true);
 
   // ---- VR rejimi
   function setVR(on){

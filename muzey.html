@@ -18,7 +18,7 @@
   .top>*{ pointer-events:auto; }
   .pill{ background:rgba(20,33,58,.82); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); color:var(--ivory); border:1px solid rgba(227,199,126,.35); border-radius:999px; font:600 13px/1 Inter,system-ui,sans-serif; padding:11px 15px; min-height:42px; display:inline-flex; align-items:center; gap:6px; text-decoration:none; cursor:pointer; }
   .pill.on{ background:linear-gradient(150deg,var(--brass-l),var(--brass)); color:#14213A; border-color:transparent; }
-  .title{ margin-left:auto; font:600 17px Georgia,'Newsreader',serif; text-shadow:0 2px 8px rgba(0,0,0,.6); pointer-events:none; }
+  .title{ margin-left:auto; font:600 15px Georgia,'Newsreader',serif; background:rgba(20,33,58,.8); padding:9px 14px; border-radius:999px; pointer-events:none; white-space:nowrap; }
   .places{ left:0; right:0; bottom:0; padding:0 max(12px,env(safe-area-inset-right)) max(14px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left)); display:flex; flex-direction:column; gap:10px; }
   .chips{ display:flex; gap:8px; overflow-x:auto; padding-bottom:2px; scrollbar-width:none; }
   .chips::-webkit-scrollbar{ display:none; }
@@ -48,6 +48,7 @@
   <a class="pill" href="index.html" aria-label="Bosh sahifa">⌂ Bosh</a>
   <button class="pill" id="gyroBtn" type="button">🧭 Giroskop</button>
   <button class="pill" id="vrBtn" type="button">🥽 VR</button>
+  <button class="pill on" id="qBtn" type="button">✨ Sifat: yuqori</button>
   <div class="title">Registon maydoni</div>
 </div>
 <div class="ui hint" id="hint">Ekranni suring — atrofga qarang. Chapdagi doira bilan yuring</div>
