@@ -25,6 +25,8 @@
   var MU = /[?&]m=oqsaroy/.test(location.search) ? window.OqsaroyMuseum : window.RegistonMuseum;
   var tt = document.querySelector('.title'); if(tt) tt.textContent = MU.title; document.title = 'Virtual muzey — ' + MU.title;
   scene.add(MU.build());
+  if(MU.fog){ scene.fog.near = MU.fog[0]; scene.fog.far = MU.fog[1]; }
+  if(MU.shadowCenter){ var shc = MU.shadowCenter; sun.position.set(-70, 95, 60 + shc[0]); sun.target.position.set(0, 0, shc[0]); scene.add(sun.target); sc.left = -shc[1]; sc.right = shc[1]; sc.top = shc[1]; sc.bottom = -shc[1]; sc.far = 420; }
 
   var cam = new THREE.PerspectiveCamera(68, 1, .1, 700);
   var camL = new THREE.PerspectiveCamera(80, 1, .1, 700), camR = new THREE.PerspectiveCamera(80, 1, .1, 700);
@@ -183,9 +185,9 @@
     if(fx || fy){
       tween = null;
       var head = gyro.on ? (function(){ var q = gyroQuat(); if(!q) return yaw; var e3 = new THREE.Euler().setFromQuaternion(q, 'YXZ'); return e3.y + gyro.offset; })() : yaw;
-      var sp = 6 * dt, sx = Math.sin(head), cz = Math.cos(head);
+      var sp = (MU.speed || 6) * dt, sx = Math.sin(head), cz = Math.cos(head);
       pos.x += (-sx * fy + cz * fx) * sp * -1 * -1; pos.z += (-cz * fy - sx * fx) * sp;
-      pos.x = Math.max(-95, Math.min(95, pos.x)); pos.z = Math.max(-95, Math.min(95, pos.z));
+      var bd = MU.bounds || [-95, 95, -95, 95]; pos.x = Math.max(bd[0], Math.min(bd[1], pos.x)); pos.z = Math.max(bd[2], Math.min(bd[3], pos.z));
     }
     // yo'nalish
     if(gyro.on){ var q = gyroQuat(); if(q){ qYaw.setFromAxisAngle(up, gyro.offset); qCam.copy(qYaw).multiply(q); } }
