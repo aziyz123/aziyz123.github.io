@@ -33,6 +33,7 @@
 </div>
 <div id="ctl">
   <div id="spots"></div><div id="st"></div>
+  <button class="pill g" id="step" type="button" style="position:absolute;left:50%;bottom:max(24px,env(safe-area-inset-bottom));transform:translateX(-50%)">👣 Qadam bilan yurish: o'chiq</button>
   <div class="lbl" id="lL">YURISH</div><div class="stick" id="sL"><i></i></div>
   <div class="lbl" id="lR">BURILISH</div><div class="stick" id="sR"><i></i></div>
 </div>
@@ -65,7 +66,20 @@
     el.addEventListener('pointerup', end); el.addEventListener('pointercancel', end);
   }
   stick('sL', 'L'); stick('sR', 'R');
-  setInterval(function(){ var d = st.x.toFixed(2) + st.y.toFixed(2) + st.r.toFixed(2); if(d !== last || d !== '0.000.000.00'){ last = d; send({ t: 'c', x: +st.x.toFixed(2), y: +st.y.toFixed(2), r: +st.r.toFixed(2) }); } }, 50);
+  // Qadam bilan yurish: telefon tezlanishidan qadamni aniqlaydi (telefonni qo'lda yoki cho'ntakda ushlab, joyida yuring)
+  var walkOn = false, walkUntil = 0, lastStep = 0, base = 9.8;
+  function onMotion(e){
+    var a = e.accelerationIncludingGravity; if(!a) return; var m = Math.sqrt((a.x || 0) * (a.x || 0) + (a.y || 0) * (a.y || 0) + (a.z || 0) * (a.z || 0));
+    base += (m - base) * .08; var now = performance.now();
+    if(m - base > 2.0 && now - lastStep > 330){ lastStep = now; walkUntil = now + 650; }
+  }
+  $('step').onclick = function(){
+    if(walkOn){ walkOn = false; window.removeEventListener('devicemotion', onMotion); $('step').textContent = '👣 Qadam bilan yurish: o\'chiq'; return; }
+    var go = function(){ walkOn = true; window.addEventListener('devicemotion', onMotion); $('step').textContent = '👣 Qadam bilan yurish: yoniq'; };
+    if(window.DeviceMotionEvent && DeviceMotionEvent.requestPermission) DeviceMotionEvent.requestPermission().then(function(r){ if(r === 'granted') go(); else $('st').textContent = 'Harakat sensoriga ruxsat berilmadi'; }).catch(function(){ $('st').textContent = 'Sensor ishlamadi'; });
+    else go();
+  };
+  setInterval(function(){ var wy = (walkOn && performance.now() < walkUntil) ? -.9 : 0, ey = Math.abs(st.y) > .05 ? st.y : wy; var d = st.x.toFixed(2) + ey.toFixed(2) + st.r.toFixed(2); if(d !== last || d !== '0.000.000.00'){ last = d; send({ t: 'c', x: +st.x.toFixed(2), y: +ey.toFixed(2), r: +st.r.toFixed(2) }); } }, 50);
 })();
 </script>
 </body></html>

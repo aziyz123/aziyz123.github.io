@@ -63,8 +63,9 @@
   window.addEventListener('keydown', function(e){ keys[e.code] = true; }); window.addEventListener('keyup', function(e){ keys[e.code] = false; });
 
   // ---- Joylar (chips) va ma'lumot
+  $('info').addEventListener('click', function(){ var inf = $('info'); inf.classList.toggle('min'); clearTimeout(showInfo.t); if(!inf.classList.contains('min')) showInfo.t = setTimeout(function(){ inf.classList.add('min'); }, 12000); });
   var spots = MU.spots, tween = null;
-  function showInfo(s){ $('info').innerHTML = '<h3></h3><p></p><small></small>'; $('info').querySelector('h3').textContent = s.title; $('info').querySelector('p').textContent = s.text; $('info').querySelector('small').textContent = MU.note; }
+  function showInfo(s){ var inf = $('info'); inf.classList.remove('min'); clearTimeout(showInfo.t); showInfo.t = setTimeout(function(){ inf.classList.add('min'); }, 5000); $('info').innerHTML = '<h3></h3><p></p><small></small>'; $('info').querySelector('h3').textContent = s.title; $('info').querySelector('p').textContent = s.text; $('info').querySelector('small').textContent = MU.note; }
   function goto(s, instant){
     if(MU.onSpot) MU.onSpot(s);
     var target = new THREE.Vector3(s.pos[0], s.pos[1], s.pos[2]);
