@@ -164,7 +164,9 @@
     return root;
   }
 
+  window.MuzeyKit = { C: C, rnd: rnd, mk: mk, brickSet: brickSet, tileSet: tileSet, mat: mat, glaze: glaze, plain: plain, archShape: archShape, archSolid: archSolid, muqarnas: muqarnas, tree: tree };
   window.RegistonMuseum = {
+    title: 'Registon maydoni',
     build: buildRegistan,
     spots: [
       { id:'center', name:'Maydon markazi', pos:[0, 1.7, 30], yaw: 0,

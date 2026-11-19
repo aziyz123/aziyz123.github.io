@@ -22,7 +22,9 @@
   var sun = new THREE.DirectionalLight(0xfff1d4, 1.7); sun.position.set(-70, 95, 60);
   sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048); var sc = sun.shadow.camera; sc.left = -120; sc.right = 120; sc.top = 120; sc.bottom = -120; sc.near = 10; sc.far = 320; sun.shadow.bias = -.0006; sun.shadow.normalBias = .4;
   scene.add(sun);
-  scene.add(window.RegistonMuseum.build());
+  var MU = /[?&]m=oqsaroy/.test(location.search) ? window.OqsaroyMuseum : window.RegistonMuseum;
+  var tt = document.querySelector('.title'); if(tt) tt.textContent = MU.title; document.title = 'Virtual muzey — ' + MU.title;
+  scene.add(MU.build());
 
   var cam = new THREE.PerspectiveCamera(68, 1, .1, 700);
   var camL = new THREE.PerspectiveCamera(80, 1, .1, 700), camR = new THREE.PerspectiveCamera(80, 1, .1, 700);
@@ -59,9 +61,10 @@
   window.addEventListener('keydown', function(e){ keys[e.code] = true; }); window.addEventListener('keyup', function(e){ keys[e.code] = false; });
 
   // ---- Joylar (chips) va ma'lumot
-  var spots = window.RegistonMuseum.spots, tween = null;
-  function showInfo(s){ $('info').innerHTML = '<h3></h3><p></p><small></small>'; $('info').querySelector('h3').textContent = s.title; $('info').querySelector('p').textContent = s.text; $('info').querySelector('small').textContent = window.RegistonMuseum.note; }
+  var spots = MU.spots, tween = null;
+  function showInfo(s){ $('info').innerHTML = '<h3></h3><p></p><small></small>'; $('info').querySelector('h3').textContent = s.title; $('info').querySelector('p').textContent = s.text; $('info').querySelector('small').textContent = MU.note; }
   function goto(s, instant){
+    if(MU.onSpot) MU.onSpot(s);
     var target = new THREE.Vector3(s.pos[0], s.pos[1], s.pos[2]);
     if(instant){ pos.copy(target); yaw = s.yaw; pitch = 0; if(gyro.on) gyro.offset = s.yaw - gyro.baseYaw; showInfo(s); document.querySelectorAll('#chips .pill').forEach(function(b){ b.classList.toggle('on', b.dataset.id === s.id); }); return; }
     tween = { t: 0, from: pos.clone(), to: target, y0: yaw, y1: s.yaw, off0: gyro.offset };
@@ -216,3 +219,4 @@
   $('load').style.display = 'none'; frame();
   window.__muzey = { ext: ext, go: function(i){ if(spots[i]) goto(spots[i]); }, spots: spots, setVR: setVR, VS: VS, goto: function(i){ goto(spots[i], true); }, scene: scene };
 })();
+(function(){ var l = document.getElementById('swMu'); if(l && /[?&]m=oqsaroy/.test(location.search)){ l.href = 'muzey.html'; l.textContent = '🏛 Registon'; } })();
