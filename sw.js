@@ -1,4 +1,4 @@
-const CACHE_NAME = 'oquv-vositalari-v26';
+const CACHE_NAME = 'oquv-vositalari-v27';
 
 // Sayt fayllari (oflayn ochilishi uchun oldindan saqlanadi).
 const LOCAL_ASSETS = [
@@ -92,6 +92,16 @@ self.addEventListener('fetch', (event) => {
     if (cacheable) { const copy = res.clone(); caches.open(CACHE_NAME).then((c) => c.put(req, copy)); }
     return res;
   });
+  // Sahifalar (HTML): avval yangisini tarmoqdan (2,5 s), bo'lmasa keshdan — yangilanish darhol ko'rinadi.
+  if (req.mode === 'navigate') {
+    event.respondWith(
+      fetchWithTimeout(req, 2500).then((res) => {
+        if (res && res.status === 200 && res.type === 'basic' && !url.search) { const copy = res.clone(); caches.open(CACHE_NAME).then((c) => c.put(req, copy)); }
+        return res;
+      }).catch(() => caches.match(req, { ignoreSearch: true }).then((hit) => hit || caches.match('/index.html') || Response.error()))
+    );
+    return;
+  }
   event.respondWith(
     caches.match(req, { ignoreSearch: !!(url.search && req.mode === 'navigate') }).then((hit) => {
       if (hit && !(req.mode === 'navigate' && /[?&]exam=/.test(url.search))) { event.waitUntil(refresh().catch(() => {})); return hit; }
