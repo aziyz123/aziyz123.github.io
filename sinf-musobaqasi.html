@@ -634,22 +634,36 @@ function normalizeQA(raw){
   const A_RE = /^(?:to'g'ri\s+javob|togri\s+javob|tog'ri\s+javob|javobi|javob|correct\s+answer|answer)\s*[:\-–—=]?\s*(\S.*)$/i;
   const SKIP_RE = /^(?:izoh|tushuntirish|eslatma|manba|explanation|note)\s*[:\-–—]/i;
   const blocks = []; let cur = null;
-  const start = () => { cur = { q: '', opts: [], ans: null }; blocks.push(cur); };
+  const start = () => { cur = { q: '', opts: [], ans: null, mark: -1 }; blocks.push(cur); };
+  const KEY_HDR = /^(?:javoblar(?:\s+kaliti)?|to'g'ri\s+javoblar|kalit(?:lar)?|answers?|answer\s+key)\s*[:\-–—=]?\s*(.*)$/i;
+  const PAIR = /(\d+)\s*[-–—.)=:]?\s*\(?([A-Da-d])\)?(?![\p{L}])/gu;
+  const keyMap = {}; let keyMode = false;
+  const takePairs = s => { let m, n = 0; PAIR.lastIndex = 0; while((m = PAIR.exec(s))){ keyMap[parseInt(m[1])] = m[2].toUpperCase(); n++; } return n; };
+  const CYR = { 'А':'A','В':'B','С':'C','Д':'D','а':'a','в':'b','с':'c','д':'d' };
+  const MARK_TAIL = /\s*(?:✅|✔️?|☑️?|\(\s*(?:to'g'ri|togri|correct|\+)\s*\)|\+)\s*$/i;
   spread.forEach(l0 => {
-    const l = l0.replace(/^[^\p{L}\p{N}(\[]+/u, '').replace(/^\[|\]$/g,'').trim();
+    const marked = /^\s*(?:\*|\+|✅|✔️?|☑️?)\s*\(?[A-Da-d][).:]/.test(l0) || (/^\s*\(?[A-Da-d][).:]\s*\S/.test(l0) && MARK_TAIL.test(l0));
+    let l = l0.replace(/^[^\p{L}\p{N}(\[]+/u, '').replace(/^\[|\]$/g,'').trim();
     if(!l) return;                                   // bo'sh qatorlarga e'tibor bermaymiz
+    l = l.replace(/^\(?([АВСДавсд])(?=[).:]|\s+[-–—])/, (m, c) => m.replace(c, CYR[c]));
+    const kh = l.match(KEY_HDR);
+    if(kh && (takePairs(kh[1]) || !kh[1].trim())){ keyMode = true; return; }
+    if(keyMode){ if(takePairs(l)) return; keyMode = false; }
+    const nm = l.match(/^([1-4])\s*[).]\s*(\S.*)$/);
+    if(nm && cur && cur.ans === null && cur.q && +nm[1] === cur.opts.length + 1){ cur.opts.push(nm[2].trim()); return; }
     if(Q_RE.test(l)){ start(); cur.q = l.replace(Q_RE, '').trim(); return; }
     const am = l.match(A_RE);
-    if(am){ if(!cur) start(); if(cur.ans === null) cur.ans = am[1].trim().replace(/^[(\[]\s*/,''); return; }
+    if(am){ if(!cur) start(); if(cur.ans === null) cur.ans = am[1].trim().replace(/^[(\[]\s*/,'').replace(/^([АВСДавсд])(?![\p{L}])/u, (m, c) => CYR[c]); return; }
     if(SKIP_RE.test(l)) return;
-    const om = l.match(/^\(?([A-Da-d])(?:\)|\.|:)\s*(\S.*)$/);
-    if(om && cur && cur.ans === null){ cur.opts.push(om[2].trim()); return; }
+    const om = l.match(/^\(?([A-Da-d])(?:[).:]|\s+[-–—])\s*(\S.*)$/);
+    if(om && cur && cur.ans === null){ cur.opts.push(om[2].replace(MARK_TAIL, '').trim()); if(marked) cur.mark = cur.opts.length - 1; return; }
     // oddiy matn: yangi (tegsiz) savol yoki joriy savol/variantning davomi
     if(!cur || cur.ans !== null){ start(); cur.q = l; return; }
     if(cur.opts.length) cur.opts[cur.opts.length-1] += ' ' + l;
     else cur.q = (cur.q ? cur.q + ' ' : '') + l;
   });
-  return blocks.map(b => [b.q].concat(b.opts.map((o,i) => String.fromCharCode(65+i) + ') ' + o)).concat(b.ans !== null ? ['Javob: ' + b.ans] : []).join('\n')).join('\n\n');
+  Object.keys(keyMap).forEach(n => { const b = blocks[n - 1]; if(b && b.ans === null) b.ans = keyMap[n]; });
+  return blocks.map(b => [b.q].concat(b.opts.map((o,i) => String.fromCharCode(65+i) + ') ' + o)).concat(b.ans !== null ? ['Javob: ' + b.ans] : (b.mark >= 0 ? ['Javob: ' + String.fromCharCode(65 + b.mark)] : [])).join('\n')).join('\n\n');
 }
 
 function parseQA(rawText){
@@ -687,6 +701,7 @@ function parseQA(rawText){
           correctIndex = letterMatch[1].toUpperCase().charCodeAt(0) - 65;
         } else {
           correctIndex = options.findIndex(o => o.toLowerCase() === answerRaw.toLowerCase());
+          if(correctIndex === -1 && /^[1-4]\s*[).]?\s*$/.test(answerRaw)) correctIndex = parseInt(answerRaw) - 1;
           if(correctIndex === -1){
             correctIndex = options.findIndex(o => o.toLowerCase().includes(answerRaw.toLowerCase()));
           }
@@ -797,7 +812,7 @@ if(window.QuizPrompt) QuizPrompt.mount(document.getElementById('qpHost'));
       qaTextEl.value = r.quizzes.map(q => q.text).join('\n\n');
       window.__stashLoaded = { code: code, ids: r.quizzes.map(q => q.id) };
       updatePreview();
-      out.textContent = '✅ ' + r.quizzes.reduce((n,q)=>n+(q.count||0),0) + ' ta savol xonadan yuklandi. Quyida sozlamalarni tekshirib, «O\'yinni boshlash» ni bosing.';
+      out.textContent = '✅ ' + parseQA(qaTextEl.value).questions.length + ' ta savol xonadan yuklandi. Quyida sozlamalarni tekshirib, «O\'yinni boshlash» ni bosing.';
       return true;
     }catch(e){ out.textContent = '✗ ' + e.message; return false; }
   }
