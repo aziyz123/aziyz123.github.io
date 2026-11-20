@@ -1,4 +1,4 @@
-const CACHE_NAME = 'oquv-vositalari-v25';
+const CACHE_NAME = 'oquv-vositalari-v26';
 
 // Sayt fayllari (oflayn ochilishi uchun oldindan saqlanadi).
 const LOCAL_ASSETS = [

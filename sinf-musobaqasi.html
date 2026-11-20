@@ -626,9 +626,13 @@ function normalizeQA(raw){
     .replace(/[ʻʼ’‘`´ʹ′]/g,"'").split('\n');
   // variantlar bir qatorga yozilgan bo'lsa ("A) x B) y C) z D) w"), ajratamiz
   const spread = [];
-  lines.forEach(l => {
-    if(/^[^\p{L}\p{N}(]*\(?[Aa][).:]\s.+\s\(?[Bb][).:]\s/u.test(l)) l.split(/\s+(?=\(?[B-Db-d][).:]\s)/).forEach(x => spread.push(x));
-    else spread.push(l);
+  const ANS_TAIL = /\s+(?=(?:to'g'ri\s+javob|togri\s+javob|tog'ri\s+javob|javobi|javob|correct\s+answer|answer)\s*[:\-–—=]\s*\S)/i;
+  lines.forEach(l0 => {
+    l0.split(ANS_TAIL).forEach(l => {
+      // savol va variantlar bir qatorga yozilgan bo'lsa ("Savol? A) x B) y C) z D) w"), ajratamiz
+      if(/(?:^|\s)\(?[Aa][).:]\s\S.*\s\(?[Bb][).:]\s/.test(l)) l.split(/\s+(?=\(?[A-Da-d][).:]\s)/).forEach(x => spread.push(x));
+      else spread.push(l);
+    });
   });
   const Q_RE = /^(?:(?:savol|savoli|question|q)\s*\d*\s*[:.)\-–—]\s*|\d+\s*[.)\-–—]\s*(?:savol\s*[:.]?\s*)?)/i;
   const A_RE = /^(?:to'g'ri\s+javob|togri\s+javob|tog'ri\s+javob|javobi|javob|correct\s+answer|answer)\s*[:\-–—=]?\s*(\S.*)$/i;
