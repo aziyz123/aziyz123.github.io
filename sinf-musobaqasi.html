@@ -1134,16 +1134,16 @@ function openQuestionCard(q){
     document.getElementById('ctrlRow').style.display = 'none';
     document.getElementById('judgeRow2').style.display = 'flex';
   });
-  document.getElementById('skipBtn2').addEventListener('click', () => { stopQTimer(); closePlayCard(); });
+  document.getElementById('skipBtn2').addEventListener('click', () => { stopQTimer(); if(board.doublePointsForTeam === board.currentTeamIdx) board.doublePointsForTeam = -1; closePlayCard(); });
   document.getElementById('correctBtn2').addEventListener('click', () => {
     const pts = board.doublePointsForTeam === board.currentTeamIdx ? session.correctPoints * 2 : session.correctPoints;
     session.teams[board.currentTeamIdx].score += pts;
-    board.doublePointsForTeam = -1;
+    if(board.doublePointsForTeam === board.currentTeamIdx) board.doublePointsForTeam = -1;
     soundCorrect();
     closePlayCard();
   });
   document.getElementById('wrongBtn2').addEventListener('click', () => {
-    board.doublePointsForTeam = -1;
+    if(board.doublePointsForTeam === board.currentTeamIdx) board.doublePointsForTeam = -1;
     soundWrong();
     closePlayCard();
   });
