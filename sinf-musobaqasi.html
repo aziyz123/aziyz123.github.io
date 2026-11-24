@@ -1163,8 +1163,9 @@ function openSurpriseCard(type){
     icon='💥'; title='Jarima!'; desc = escapeHtml(team.name) + ' jamoasidan -' + Math.min(session.correctPoints, team.score) + ' ball ayirildi.';
     team.score = Math.max(0, team.score - session.correctPoints);
   } else if(type === 'double'){
-    icon='⚡'; title='2x ball imkoniyati!'; desc = escapeHtml(team.name) + ' jamoasi keyingi savolga to\'g\'ri javob bersa, 2 barobar ball oladi.';
+    icon='⚡'; title='2x ball imkoniyati!'; desc = escapeHtml(team.name) + ' jamoasi shu zahoti yana raqam tanlaydi: to\'g\'ri javob bersa 2 barobar ball oladi.';
     board.doublePointsForTeam = board.currentTeamIdx;
+    board.keepTurn = true; // navbat shu jamoada qoladi: darhol yana savol tanlaydi
   } else if(type === 'steal'){
     icon='🕵️'; title='Ball o\'g\'irlash!';
     if(session.teams.length < 2){
@@ -1213,6 +1214,7 @@ function closePlayCard(){
     showRoundEnd();
     return;
   }
+  if(board.keepTurn){ board.keepTurn = false; renderScoreboard(); renderTurnBanner(); return; }
   board.currentTeamIdx = (board.currentTeamIdx + 1) % session.teams.length;
   renderScoreboard();
   renderTurnBanner();
