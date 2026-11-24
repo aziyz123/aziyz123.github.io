@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="uz"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#14213A">
+<title>Bilim Kechasi pulti</title>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
+<style>
+  :root{ --navy:#14213A; --navy2:#1F3354; --brass:#B8903E; --brass-l:#E3C77E; --ivory:#F3F0E8; --ok:#3FBF7F; --bad:#E5584F; }
+  *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body{ margin:0; min-height:100%; background:#0E1730; color:var(--ivory); font-family:Inter,system-ui,-apple-system,sans-serif; overscroll-behavior:none; }
+  .wrap{ max-width:560px; margin:0 auto; padding:max(12px,env(safe-area-inset-top)) 14px max(24px,env(safe-area-inset-bottom)); }
+  h1{ font:700 18px Georgia,serif; margin:6px 0 2px; } .sub{ font-size:12.5px; color:#9AA6BC; }
+  .teams{ display:flex; gap:8px; margin:12px 0; flex-wrap:wrap; }
+  .team{ flex:1 1 90px; background:var(--navy2); border:1px solid rgba(227,199,126,.25); border-radius:14px; padding:8px 10px; text-align:center; }
+  .team.on{ border-color:var(--brass-l); box-shadow:0 0 0 2px rgba(227,199,126,.35); } .team b{ display:block; font-size:12px; color:#C9D1E0; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; } .team span{ font:800 24px Inter; }
+  .turn{ text-align:center; font-size:15px; margin:4px 0 12px; } .turn b{ color:var(--brass-l); }
+  .grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(64px,1fr)); gap:10px; }
+  .tile{ aspect-ratio:1; border-radius:16px; border:0; font:800 24px Inter,sans-serif; background:linear-gradient(150deg,var(--brass-l),var(--brass)); color:var(--navy); }
+  .tile:active{ transform:scale(.95); } .tile.u{ background:#1b2744; color:#5b6a8c; } .tile:disabled{ opacity:.55; }
+  .card{ background:var(--navy2); border:1px solid rgba(227,199,126,.3); border-radius:20px; padding:16px; }
+  .qt{ font:600 19px/1.4 Georgia,serif; margin:0 0 12px; }
+  .opt{ display:flex; gap:8px; padding:10px 12px; margin:6px 0; border-radius:12px; background:rgba(255,255,255,.06); font-size:15px; }
+  .opt.ok{ background:rgba(63,191,127,.22); outline:2px solid var(--ok); } .opt b{ color:var(--brass-l); }
+  .secret{ font-size:12px; color:var(--brass-l); margin:8px 0 2px; }
+  .ans{ font-weight:700; font-size:17px; background:rgba(63,191,127,.18); border-radius:12px; padding:10px 12px; margin:6px 0; }
+  .row{ display:flex; gap:10px; margin-top:14px; flex-wrap:wrap; }
+  .btn{ flex:1 1 140px; min-height:52px; border-radius:14px; border:0; font:700 15px Inter,sans-serif; background:linear-gradient(150deg,var(--brass-l),var(--brass)); color:var(--navy); }
+  .btn.ok{ background:var(--ok); color:#06210f; } .btn.bad{ background:var(--bad); color:#fff; } .btn.g{ background:rgba(255,255,255,.1); color:var(--ivory); }
+  .conn{ text-align:center; padding:30px 0; } input{ font:700 28px monospace; letter-spacing:6px; text-align:center; width:100%; padding:14px; border-radius:14px; border:1px solid var(--brass); background:#0E1730; color:var(--ivory); }
+  .msg{ text-align:center; color:#9AA6BC; font-size:13px; margin:10px 0; } .dot{ display:inline-block; width:9px; height:9px; border-radius:50%; background:#777; margin-right:6px; } .dot.on{ background:var(--ok); }
+</style></head>
+<body><div class="wrap" id="app"></div>
+<script>
+(function(){
+  var cfg = { apiKey: "AIzaSyBJfq4Kc6YZHpbV9WBg__im4bivBcZo1WU", authDomain: "osonvakerak.firebaseapp.com", databaseURL: "https://osonvakerak-default-rtdb.firebaseio.com", projectId: "osonvakerak", storageBucket: "osonvakerak.firebasestorage.app", messagingSenderId: "363556171064", appId: "1:363556171064:web:e21be98e50dff4d031e5cd" };
+  var app = document.getElementById('app'), code = new URLSearchParams(location.search).get('c'), ref = null, S = null, alive = false;
+  try{ if(!code) code = localStorage.getItem('bkPultCode'); }catch(_){}
+  function esc(s){ var d = document.createElement('div'); d.textContent = s == null ? '' : s; return d.innerHTML; }
+  function send(c, extra){ if(!ref) return; var o = { c: c, t: Date.now() }; if(extra) for(var k in extra) o[k] = extra[k]; ref.child('cmd').push(o).catch(function(e){ msg('✗ Yuborilmadi: ' + e.message); }); if(navigator.vibrate) navigator.vibrate(15); }
+  function msg(t){ var m = document.getElementById('m'); if(m) m.textContent = t; }
+  function askCode(err){
+    app.innerHTML = '<div class="conn"><h1>📱 Bilim Kechasi pulti</h1><p class="sub">Taxtadagi 6 xonali kodni kiriting</p><p><input id="ci" inputmode="numeric" maxlength="6" placeholder="••••••"></p><div class="row"><button class="btn" id="go">Ulanish</button></div><div class="msg">' + esc(err || '') + '</div></div>';
+    document.getElementById('go').onclick = function(){ var v = document.getElementById('ci').value.replace(/\D/g, ''); if(v.length === 6){ code = v; start(); } else askCode('Kod 6 ta raqam bo\'lishi kerak'); };
+  }
+  function start(){
+    if(typeof firebase === 'undefined'){ askCode('Internet yo\'q yoki Firebase yuklanmadi'); return; }
+    try{ localStorage.setItem('bkPultCode', code); }catch(_){}
+    if(!firebase.apps.length) firebase.initializeApp(cfg);
+    ref = firebase.database().ref('rooms/' + code + '/remote');
+    var ph = ref.child('phone'); ph.set(Date.now()).catch(function(e){ askCode('✗ Ulanmadi: ' + e.message); }); try{ ph.onDisconnect().remove(); }catch(_){}
+    ref.child('state').on('value', function(sn){ var v = sn.val(); if(v && v.j){ try{ S = JSON.parse(v.j); }catch(_){ return; } alive = true; draw(); if(navigator.vibrate && S.card) {} } else { alive = false; draw(); } }, function(e){ askCode('✗ ' + e.message); });
+    draw();
+  }
+  function draw(){
+    if(!S){ app.innerHTML = '<div class="conn"><h1>Ulandi</h1><p class="sub">Taxta ma\'lumotini kutmoqda…<br>Taxtada o\'yinni boshlang.</p><p class="sub">Kod: ' + esc(code) + '</p><div class="row"><button class="btn g" id="chg">Kodni o\'zgartirish</button></div><div class="msg" id="m"></div></div>'; document.getElementById('chg').onclick = function(){ try{ localStorage.removeItem('bkPultCode'); }catch(_){} askCode(); }; return; }
+    var h = '<h1>' + esc(S.rt) + '</h1><div class="sub"><span class="dot on"></span>Taxta bilan ulangan · kod ' + esc(code) + '</div><div class="teams">' +
+      S.teams.map(function(t, i){ return '<div class="team' + (i === S.turn ? ' on' : '') + '"><b>' + esc(t.n) + '</b><span>' + t.s + '</span></div>'; }).join('') + '</div>';
+    if(S.end){
+      h += '<div class="card"><div class="qt" style="text-align:center">' + esc(S.end.w || 'O\'yin tugadi') + '</div><div class="row">' + (S.end.last ? '' : '<button class="btn" id="nx">Keyingi o\'yin</button>') + '<button class="btn g" id="fn">' + (S.end.last ? 'Yakunlash' : 'To\'xtatish') + '</button></div></div>';
+    } else if(S.card && S.card.t === 'q'){
+      var c = S.card;
+      h += '<div class="turn"><b>' + esc(S.teams[S.turn].n) + '</b> javob beradi</div><div class="card"><p class="qt">' + esc(c.q) + '</p>';
+      if(c.mc){ h += c.o.map(function(o, i){ return '<div class="opt' + (i === c.c ? ' ok' : '') + '"><b>' + String.fromCharCode(65 + i) + ')</b> ' + esc(o) + '</div>'; }).join(''); h += '<div class="secret">🔒 Yashil — to\'g\'ri javob (faqat sizga ko\'rinadi)</div>'; }
+      else { h += '<div class="secret">🔒 To\'g\'ri javob (faqat sizga ko\'rinadi)</div><div class="ans">' + esc(c.a) + '</div>'; }
+      h += c.rev ? '<div class="row"><button class="btn ok" id="ok">✓ To\'g\'ri</button><button class="btn bad" id="bd">✗ Noto\'g\'ri</button></div>' : '<div class="row"><button class="btn" id="rv">Javobni taxtada ko\'rsatish</button><button class="btn g" id="sk">O\'tkazish</button></div>';
+      h += '</div>';
+    } else if(S.card){
+      var c2 = S.card;
+      h += '<div class="card"><div class="qt" style="text-align:center">' + esc(c2.title) + '</div><p class="sub" style="text-align:center;font-size:14px">' + esc(c2.desc) + '</p><div class="row">' +
+        (c2.targets.length ? c2.targets.map(function(n, i){ return '<button class="btn" data-st="' + i + '">' + esc(n) + '</button>'; }).join('') : '') + (c2.ack ? '<button class="btn" id="ak">Davom etish</button>' : '') + '</div></div>';
+    } else {
+      h += '<div class="turn"><b>' + esc(S.teams[S.turn].n) + '</b> — raqam tanlang</div><div class="grid">' + S.tiles.map(function(t){ return '<button class="tile' + (t.u ? ' u' : '') + '" data-n="' + t.n + '"' + (t.u ? ' disabled' : '') + '>' + (t.u ? (t.k === 's' ? '🎲' : '✓') : t.n) + '</button>'; }).join('') + '</div>';
+    }
+    h += '<div class="msg" id="m"></div>';
+    app.innerHTML = h;
+    var g = function(id, c){ var e = document.getElementById(id); if(e) e.onclick = function(){ send(c); }; };
+    g('rv', 'reveal'); g('sk', 'skip'); g('ok', 'correct'); g('bd', 'wrong'); g('ak', 'ack'); g('nx', 'next'); g('fn', 'finish');
+    Array.prototype.forEach.call(app.querySelectorAll('[data-n]'), function(b){ b.onclick = function(){ send('pick', { n: parseInt(b.dataset.n) }); }; });
+    Array.prototype.forEach.call(app.querySelectorAll('[data-st]'), function(b){ b.onclick = function(){ send('steal', { i: parseInt(b.dataset.st) }); }; });
+  }
+  if(code && /^\d{6}$/.test(code)) start(); else askCode();
+})();
+</script></body></html>
