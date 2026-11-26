@@ -1,30 +1,65 @@
 <!DOCTYPE html>
 <html lang="uz">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"/>
-<meta name="apple-mobile-web-app-capable" content="yes"/>
-<title>Virtual muzey — Oqsaroy & Registon</title>
-<link rel="stylesheet" href="muzey.css"/>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#14213A">
+<title>Virtual muzey — Registon</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<style>
+  :root{ --navy:#14213A; --navy2:#1F3354; --brass:#B8903E; --brass-l:#E3C77E; --ivory:#F3F0E8; }
+  *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body{ margin:0; height:100%; background:#0A1220; color:var(--ivory); font-family:Inter,system-ui,-apple-system,sans-serif; overflow:hidden; overscroll-behavior:none; touch-action:none; user-select:none; -webkit-user-select:none; }
+  canvas{ display:block; width:100%; height:100%; }
+  #gl{ position:fixed; inset:0; }
+  .ui{ position:fixed; z-index:5; }
+  .top{ left:0; right:0; top:0; padding:max(10px,env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) 0 max(12px,env(safe-area-inset-left)); display:flex; flex-wrap:wrap; gap:8px; align-items:center; pointer-events:none; }
+  .top>*{ pointer-events:auto; }
+  .pill{ background:rgba(20,33,58,.82); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); color:var(--ivory); border:1px solid rgba(227,199,126,.35); border-radius:999px; font:600 13px/1 Inter,system-ui,sans-serif; padding:11px 15px; min-height:42px; display:inline-flex; align-items:center; gap:6px; text-decoration:none; cursor:pointer; }
+  .pill.on{ background:linear-gradient(150deg,var(--brass-l),var(--brass)); color:#14213A; border-color:transparent; }
+  .title{ margin-left:auto; font:600 15px Georgia,'Newsreader',serif; background:rgba(20,33,58,.8); padding:9px 14px; border-radius:999px; pointer-events:none; white-space:nowrap; }
+  .places{ left:0; right:0; bottom:0; padding:0 max(12px,env(safe-area-inset-right)) max(14px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left)); display:flex; flex-direction:column; gap:10px; }
+  .chips{ display:flex; gap:8px; overflow-x:auto; padding-bottom:2px; scrollbar-width:none; }
+  .chips::-webkit-scrollbar{ display:none; }
+  .chips .pill{ flex:0 0 auto; }
+  .info{ background:rgba(20,33,58,.88); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); border:1px solid rgba(227,199,126,.35); border-radius:20px; padding:14px 16px; max-width:560px; }
+  .info h3{ margin:0 0 4px; font:600 20px Georgia,'Newsreader',serif; color:var(--brass-l); }
+  .info p{ margin:0; font-size:13.5px; line-height:1.55; color:#D7DCE8; }
+  .hint{ left:50%; top:calc(62px + 48px); transform:translateX(-50%); background:rgba(20,33,58,.8); border-radius:999px; padding:8px 14px; font-size:12.5px; color:#D7DCE8; white-space:nowrap; pointer-events:none; transition:opacity .6s; }
+  .pad{ position:fixed; z-index:6; right:max(14px,env(safe-area-inset-right)); bottom:max(110px,env(safe-area-inset-bottom)); width:130px; height:130px; border-radius:50%; background:rgba(20,33,58,.55); border:1px solid rgba(227,199,126,.3); touch-action:none; }
+  .pad i{ position:absolute; left:50%; top:50%; width:52px; height:52px; margin:-26px 0 0 -26px; border-radius:50%; background:linear-gradient(150deg,var(--brass-l),var(--brass)); opacity:.9; }
+  body.vr .ui,body.vr .pad,body.vr .panel{ display:none; }
+  body.vr .vrexit{ display:flex; }
+  .vrexit{ display:none; position:fixed; z-index:9; left:50%; top:max(8px,env(safe-area-inset-top)); transform:translateX(-50%); gap:4px; }
+  .vrexit .pill{ padding:8px 10px; min-height:36px; font-size:12px; }
+  .panel{ position:fixed; z-index:12; left:50%; top:60px; transform:translateX(-50%); width:min(92vw,420px); background:rgba(20,33,58,.95); border:1px solid rgba(227,199,126,.4); border-radius:20px; padding:16px; max-height:78vh; overflow:auto; }
+  .panel h3{ margin:0 0 6px; font:600 18px Georgia,serif; } .panel p{ margin:0 0 10px; font-size:12.5px; color:#C9D1E0; line-height:1.5; }
+  .panel label{ display:flex; justify-content:space-between; font-size:13px; margin-top:10px; } .panel input[type=range]{ width:100%; accent-color:#E3C77E; touch-action:pan-x; }
+  .hidden{ display:none !important; }
+  #note{ position:fixed; left:12px; bottom:max(90px,env(safe-area-inset-bottom)); max-width:min(70vw,280px); font-size:11px; color:#9AA6BC; background:rgba(10,18,32,.7); padding:6px 10px; border-radius:10px; z-index:4; }
+</style>
 </head>
 <body>
-<div id="app">
-  <canvas id="c"></canvas>
-  <div id="ui">
-    <div id="top">
-      <a class="pill" href="index.html">← Bosh sahifa</a>
-      <span class="pill" id="title">Virtual muzey</span>
-      <a class="pill" id="swMu" href="muzey.html?m=oqsaroy">🏛 Oqsaroy</a>
-    </div>
-    <div id="info" class="hidden">
-      <h2 id="infoTitle"></h2>
-      <p id="infoText"></p>
-      <button id="infoClose">Yopish</button>
-    </div>
-    <div id="spots"></div>
-    <div id="note"></div>
+<canvas id="gl"></canvas>
+<div class="ui top">
+  <a class="pill" href="index.html">← Bosh</a>
+  <button class="pill" id="btnMode" type="button">Hozirgi</button>
+  <button class="pill" id="btnVR" type="button">VR</button>
+  <button class="pill" id="btnHelp" type="button">?</button>
+  <span class="title" id="muTitle">Virtual muzey</span>
+</div>
+<div class="ui places">
+  <div class="chips" id="chips"></div>
+  <div class="info hidden" id="infoBox">
+    <h3 id="infoTitle"></h3>
+    <p id="infoText"></p>
   </div>
 </div>
+<div class="hint" id="hint">Barmoq bilan aylantiring · pastki tugmalar — joylar</div>
+<div class="pad" id="pad"><i></i></div>
+<div class="vrexit"><button class="pill" id="btnExitVR" type="button">VR dan chiqish</button></div>
+<div id="note"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="muzey-registon.js"></script>
 <script src="muzey-oqsaroy.js?v=3"></script>
