@@ -1,12 +1,11 @@
 // Oqsaroy (Shahrisabz) — hozirgi holat va manbalarga asoslangan tiklangan holat.
-// Manbalar: Klavixo (1404, "Narrative of the Embassy", XI bob), Archnet "Aq Saray Palace", Wikipedia "Ak-Saray Palace", society.uz (qurilish sanalari).
+// Manbalar: Klavixo (1404), Archnet, Wikipedia, Gilmanova, silkadv, Qomus.
 (function(){
   var K = window.MuzeyKit, C = K.C, rnd = K.rnd, mk = K.mk, plain = K.plain;
-  var Zp = 110; // portal old yuzi (shimolga, Samarqand tomonga qaragan) z koordinatasi
+  var Zp = 110;
   var ochre = '#C8A25A', gold = '#D9B24C', dblue = '#1E4F9C', lblue = '#4FB3C8';
   var ruin = null, recon = null, hallLight = null;
 
-  // Yuqori sifatli Temuriy koshin naqshi (girih yulduz + sakkizburchak)
   function tex(rx, ry, main){
     main = main || ochre;
     var N = 512;
@@ -99,12 +98,27 @@
     var hole = new THREE.Path(), r = openW / 2; hole.moveTo(-r, 0); hole.lineTo(-r, openH - r); hole.absarc(0, openH - r, r, Math.PI, 0, true); hole.lineTo(r, 0); hole.lineTo(-r, 0); sh.holes.push(hole);
     return new THREE.Mesh(new THREE.ExtrudeGeometry(sh, { depth: depth, bevelEnabled: false, curveSegments: 28 }), [front, side]);
   }
+  // 2 qavatli arkada (manbalar: hovli atrofi ikki qavatli boy xonalar bilan o'ralgan)
   function arcade(L, H, bay, depth){
     var sh = new THREE.Shape(); sh.moveTo(0, 0); sh.lineTo(L, 0); sh.lineTo(L, H); sh.lineTo(0, H); sh.lineTo(0, 0);
-    var n = Math.floor(L / bay), aw = bay * .72, ah = H * .72, r = aw / 2;
-    for(var i = 0; i < n; i++){ var cx = (i + .5) * bay, p = new THREE.Path(); p.moveTo(cx - r, 0); p.lineTo(cx - r, ah - r); p.absarc(cx, ah - r, r, Math.PI, 0, true); p.lineTo(cx + r, 0); p.lineTo(cx - r, 0); sh.holes.push(p); }
-    var g = new THREE.ExtrudeGeometry(sh, { depth: depth, bevelEnabled: false, curveSegments: 8 });
-    return new THREE.Mesh(g, [glz(tex(1 / 4, 1 / 4)), brick(1 / 6, 1 / 6)]);
+    var n = Math.floor(L / bay), aw = bay * .68;
+    var ah1 = H * .42, r1 = aw / 2;
+    for(var i = 0; i < n; i++){
+      var cx = (i + .5) * bay, p = new THREE.Path();
+      p.moveTo(cx - r1, 0); p.lineTo(cx - r1, ah1 - r1); p.absarc(cx, ah1 - r1, r1, Math.PI, 0, true); p.lineTo(cx + r1, 0); p.lineTo(cx - r1, 0);
+      sh.holes.push(p);
+    }
+    var base2 = H * .52, ah2 = H * .38, r2 = aw * .42;
+    for(var i = 0; i < n; i++){
+      var cx = (i + .5) * bay, p = new THREE.Path();
+      p.moveTo(cx - r2, base2); p.lineTo(cx - r2, base2 + ah2 - r2); p.absarc(cx, base2 + ah2 - r2, r2, Math.PI, 0, true); p.lineTo(cx + r2, base2); p.lineTo(cx - r2, base2);
+      sh.holes.push(p);
+    }
+    var g = new THREE.ExtrudeGeometry(sh, { depth: depth, bevelEnabled: false, curveSegments: 10 });
+    var mesh = new THREE.Mesh(g, [glz(tex(1 / 4, 1 / 3)), brick(1 / 6, 1 / 5)]);
+    var band = new THREE.Mesh(new THREE.BoxGeometry(L, .55, depth + .3), plain(0xD4C49A, .55));
+    band.position.set(L / 2, H * .48, depth / 2); mesh.add(band);
+    return mesh;
   }
 
   function pylon(x, z){
@@ -164,7 +178,6 @@
     var pf = new THREE.Mesh(new THREE.PlaneGeometry(22, 52), new THREE.MeshStandardMaterial({ map: K.tileSet(C.blue, C.white, 4, 9).map, roughness: .35, envMapIntensity: .8 })); pf.rotation.x = -Math.PI / 2; pf.position.set(0, .06, Zp - 24); recon.add(pf);
     var z0 = Zp - 50, L = 250, zc = z0 - L / 2;
     var court = new THREE.Mesh(new THREE.PlaneGeometry(120, L), new THREE.MeshStandardMaterial({ map: flag(10, 20), roughness: .9 })); court.rotation.x = -Math.PI / 2; court.position.set(0, .05, zc); court.receiveShadow = true; recon.add(court);
-    // Katta hovuz (Klavixo: «hovli o'rtasida katta hovuz»; Wikipedia/Archnet: asosiy hovli 120×250 m)
     (function(){
       var pw = 36, pd = 72, wallH = 1.1, waterY = .35;
       var stoneRim = plain(0xE8E2D4, .55, .15, .4);
@@ -181,13 +194,13 @@
       var fwater = new THREE.Mesh(new THREE.CircleGeometry(1.3, 24), waterMat.clone()); fwater.rotation.x = -Math.PI / 2; fwater.position.set(0, 3.4, zc); recon.add(fwater);
     })();
     [-1, 1].forEach(function(s){
-      var a = arcade(L, 10, 5, 7); a.rotation.y = s > 0 ? Math.PI / 2 : -Math.PI / 2; a.position.set(s * 60, 0, s > 0 ? z0 : z0 - L); recon.add(a);
-      var back = new THREE.Mesh(new THREE.BoxGeometry(5, 12, L), brick(1, 1)); back.position.set(s * 65.5, 6, zc); recon.add(back);
-      for(var i = 0; i < 12; i++){ var p = sunPlaque(1.5); p.position.set(s * 59.9, 10.6, z0 - 10 - i * 20.5); p.rotation.y = -s * Math.PI / 2; recon.add(p); }
+      var a = arcade(L, 18, 5, 8); a.rotation.y = s > 0 ? Math.PI / 2 : -Math.PI / 2; a.position.set(s * 60, 0, s > 0 ? z0 : z0 - L); recon.add(a);
+      var back = new THREE.Mesh(new THREE.BoxGeometry(5, 20, L), brick(1, 1)); back.position.set(s * 65.5, 10, zc); recon.add(back);
+      for(var i = 0; i < 12; i++){ var p = sunPlaque(1.5); p.position.set(s * 59.9, 18.8, z0 - 10 - i * 20.5); p.rotation.y = -s * Math.PI / 2; recon.add(p); }
     });
-    [-14, 14].forEach(function(x0){ var a = arcade(46, 10, 5, 6); a.position.set(x0 > 0 ? 14 : -60, 0, z0); recon.add(a); });
+    [-14, 14].forEach(function(x0){ var a = arcade(46, 18, 5, 7); a.position.set(x0 > 0 ? 14 : -60, 0, z0); recon.add(a); });
     var zs = z0 - L;
-    [-1, 1].forEach(function(s){ var a = arcade(45, 10, 5, 6); a.position.set(s > 0 ? 15 : -60, 0, zs); recon.add(a); });
+    [-1, 1].forEach(function(s){ var a = arcade(45, 18, 5, 7); a.position.set(s > 0 ? 15 : -60, 0, zs); recon.add(a); });
     var gate = screen(30, 34, 12, 24, 12, glz(TG), brick(1 / 8, 1 / 8)); gate.position.set(0, 0, zs - 12); recon.add(gate);
     var gp = sunPlaque(3.2); gp.position.set(0, 29.5, zs + .08); recon.add(gp);
     var hp = sunPlaque(1.9); hp.position.set(0, 53.6, Zp + .12); recon.add(hp);
@@ -201,7 +214,6 @@
     hallLight = new THREE.PointLight(0xFFE2A8, 1.4, 60); hallLight.position.set(0, 14, hz); recon.add(hallLight);
     [-1, 1].forEach(function(s){
       var lawn = new THREE.Mesh(new THREE.PlaneGeometry(60, 130), new THREE.MeshStandardMaterial({ color: 0x5E9438, roughness: 1, envMapIntensity: .3 })); lawn.rotation.x = -Math.PI / 2; lawn.position.set(s * 95, .03, zs - 40); recon.add(lawn);
-      // Bog' hovuzlari (Klavixo: mevali daraxtlar, suv havzalari)
       (function(sx){
         var tw = 12, td = 12;
         var rim = plain(0xE4DED0, .55);
@@ -213,6 +225,21 @@
       })(s);
       for(var r = 0; r < 5; r++) for(var c = 0; c < 3; c++){ if(c === 1 && r === 2) continue; recon.add(K.tree(s * (80 + c * 15), zs + 15 - r * 24, .8 + rnd() * .3)); }
     });
+    // Tomdagi hovuz / terrace (rivoyat: Taxtaqoracha; Gilmanova: 2-3 qavatda hovuzlar mumkin)
+    (function(){
+      var ry = 18.5;
+      var roof = new THREE.Mesh(new THREE.BoxGeometry(28, .4, 40), plain(0xC9B896, .7)); roof.position.set(0, ry, zs - 20); recon.add(roof);
+      [[-14, 0, .4, 40], [14, 0, .4, 40], [0, -20, 28, .4], [0, 20, 28, .4]].forEach(function(w){
+        var m = new THREE.Mesh(new THREE.BoxGeometry(w[2], 1.2, w[3]), plain(0xE4DED0, .5)); m.position.set(w[0], ry + .8, zs - 20 + w[1]); recon.add(m);
+      });
+      var tw = 10, td = 10;
+      [[0, (td+1.2)/2, tw+1.2, .6], [0, -(td+1.2)/2, tw+1.2, .6], [(tw+1.2)/2, 0, .6, td], [-(tw+1.2)/2, 0, .6, td]].forEach(function(w){
+        var m = new THREE.Mesh(new THREE.BoxGeometry(w[2], .7, w[3]), plain(0xE8E2D4, .5)); m.position.set(w[0], ry + .5, zs - 20 + w[1]); recon.add(m);
+      });
+      var wm = new THREE.MeshStandardMaterial({ color: 0x1A6B8A, roughness: .08, metalness: .5, envMapIntensity: 1.6, transparent: true, opacity: .9 });
+      var wt = new THREE.Mesh(new THREE.PlaneGeometry(tw - .3, td - .3), wm); wt.rotation.x = -Math.PI / 2; wt.position.set(0, ry + .4, zs - 20); recon.add(wt);
+      var fall = new THREE.Mesh(new THREE.BoxGeometry(.3, 8, .3), new THREE.MeshStandardMaterial({ color: 0x4FB3C8, transparent: true, opacity: .45, roughness: .1 })); fall.position.set(0, ry - 4, zs - 1); recon.add(fall);
+    })();
     recon.visible = false; root.add(recon);
 
     root.traverse(function(o){ if(o.isMesh && o !== grass){ o.castShadow = o.material && !o.material.transparent; o.receiveShadow = true; } });
@@ -230,22 +257,24 @@
       { id: 'statue', mode: 'ruin', name: 'Haykal', pos: [10, 1.7, Zp + 62], yaw: Math.PI / 4 * .55, title: 'Amir Temur haykali',
         text: "Saroyning asl joyida Amir Temur haykali o'rnatilgan. Maketda sodda shaklda berilgan." },
       { id: 'rfront', mode: 'recon', name: 'Tiklangan: old', pos: [0, 1.7, Zp + 112], yaw: 0, title: 'Tiklangan portal (taxminiy)',
-        text: "Portal shimolga, Samarqand tomonga qaragan. Ikki yon minora kesik silindr shaklida; manbalarga ko'ra ularning asl balandligi 60–70 m, ayvon gumbazi ~50 m (Archnet). Maketda minoralar 65 m, ayvon 46 m qilib olingan. Old yuzi to'q sariq, ko'k va havorang sirlangan g'isht naqshlari bilan qoplangan." },
+        text: "Portal shimolga, Samarqand tomonga qaragan. Ikki yon minora 60–70 m (Archnet). Maketda 65 m. Old yuzi Temuriy girih naqshlar bilan." },
       { id: 'riwan', mode: 'recon', name: 'Birinchi ayvon', pos: [0, 1.7, Zp + 6], yaw: 0, title: 'Birinchi ayvon (22 m)',
-        text: "Ayvon kengligi 22 m. Uning ortida ikkinchi, tor (13 m) ayvon va hovlining kirish yo'lagi bor. Klavixo uzun kirish yo'lagini va ikki yonida ko'k koshinli pol va ravoqli kichik xonalarni tasvirlagan." },
+        text: "Ayvon kengligi 22 m. Klavixo: uzun kirish yo'lagi, yonlarda ko'k koshinli pol va ravoqli kichik xonalar." },
       { id: 'rpass', mode: 'recon', name: "Kirish yo'lagi", pos: [0, 1.7, Zp - 30], yaw: Math.PI / 2, title: "Kirish yo'lagi va kichik xonalar",
-        text: "Klavixo (1404): yo'lakning ikki yonida kutish uchun kichik xonalar bo'lgan, ularning poli ko'k koshin bilan, ravoqlari ko'k koshinli g'ishtdan." },
+        text: "Klavixo (1404): yo'lakning ikki yonida kutish uchun kichik xonalar, poli ko'k koshin, ravoqlari koshinli g'isht." },
       { id: 'rcourt', mode: 'recon', name: 'Hovli', pos: [0, 1.7, Zp - 56], yaw: 0, title: 'Asosiy hovli',
-        text: "Klavixo: oq tosh plitali hovli, o'rtasida katta hovuz, atrofi bezakli arkadalar. Zamonaviy tadqiqotlar (Wikipedia/Archnet): ~120–125 × 240–250 m. Arkada ustida Sher va Quyosh belgilari." },
+        text: "Klavixo: oq tosh plitali hovli, o'rtasida katta hovuz. Manbalar: atrof 2 qavatli boy xonalar/arkadalar bilan o'ralgan (~120–125 × 240–250 m). Arkada ustida Sher va Quyosh." },
       { id: 'rpool', mode: 'recon', name: 'Havza', pos: [0, 1.7, -40], yaw: Math.PI, title: 'Asosiy hovuz',
-        text: "Klavixo (1404): hovli o'rtasida katta hovuz. Maketda ~36×72 m, oq tosh qirrali, markazda favvora. Manbalar: Wikipedia, Archnet, Klavixo." },
+        text: "Klavixo (1404): hovli o'rtasida katta hovuz. Maketda ~36×72 m, oq tosh qirrali, markazda favvora." },
       { id: 'rgate', mode: 'recon', name: 'Asosiy darvoza', pos: [0, 1.7, -120], yaw: 0, title: 'Asosiy darvoza',
-        text: "Klavixo: «juda baland va keng» darvoza, oltin va ko'k koshin bilan bezatilgan; tepasida Sher va Quyosh tasviri. U Samarqand avvalgi hukmdorining gerbi deb tushuntirilgan." },
+        text: "Klavixo: «juda baland va keng» darvoza, oltin va ko'k koshin; tepasida Sher va Quyosh." },
       { id: 'rhall', mode: 'recon', name: 'Qabul zali', pos: [0, 1.7, -196], yaw: 0, title: 'Kvadrat zal',
-        text: "Klavixo: darvozadan keyin kvadrat zal, devorlari oltin va ko'k koshin bilan qoplangan, shifti oltin ranglar bilan bezatilgan. Maketda ichki bezak taxminiy." },
+        text: "Klavixo: kvadrat zal, devorlari oltin va ko'k koshin, shifti oltin." },
+      { id: 'rroof', mode: 'recon', name: 'Tom hovuzi', pos: [0, 20, -170], yaw: 0, title: "Tomdagi hovuz (rivoyat)",
+        text: "Rivoyat: Oqsaroy tomida hovuz bo'lgan; suv Taxtaqoracha dovonidan qo'rg'oshin quvur orqali kelib, sharshara hosil qilgan. Ilmiy isbot yo'q (Gilmanova). Maketda taxminiy terrace + hovuz." },
       { id: 'rgarden', mode: 'recon', name: "Bog'", pos: [-80, 1.7, -170], yaw: Math.PI / 2 * -1 + Math.PI, title: "Saroy bog'i",
-        text: "Klavixo yozishicha, zal yonida katta bog' tashkil qilinayotgan edi: mevali va soyali daraxtlar, suv havzalari, maysazorlar. Maketda joylashuvi taxminiy." }
+        text: "Klavixo: zal yonida bog' — mevali daraxtlar, suv havzalari. Rivoyat: tomda ham hovuz (Taxtaqoracha suvi)." }
     ],
-    note: "Manbalar: Klavixo (1404), Archnet «Aq Saray Palace», Wikipedia, society.uz. Haqiqiy asl rejasi saqlanmagan, shuning uchun tiklangan holat — manbalarga asoslangan gipoteza; o'lchamlar o'rtacha qiymatlar. Darslik bilan solishtiring."
+    note: "Manbalar: Klavixo (1404), Archnet, Wikipedia, Gilmanova N.V., silkadv. Tiklangan holat — gipoteza; 2 qavatli arkada va tom hovuzi manbalarga asoslangan."
   };
 })();
