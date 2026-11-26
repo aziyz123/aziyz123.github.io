@@ -1,5 +1,4 @@
-// Oqsaroy (Shahrisabz) — hozirgi holat va manbalarga asoslangan tiklangan holat.
-// Manbalar: Klavixo (1404), Archnet, Wikipedia, society.uz.
+// Oqsaroy (Shahrisabz) — Klavixo, Archnet, Wikipedia asosida.
 (function(){
   var K = window.MuzeyKit, C = K.C, rnd = K.rnd, mk = K.mk, plain = K.plain;
   var Zp = 110;
@@ -7,14 +6,10 @@
   var ruin = null, recon = null, hallLight = null;
 
   function tex(rx, ry, main){
-    main = main || ochre;
-    var N = 512;
+    main = main || ochre; var N = 512;
     function star(c, cx, cy, R, n, col){
       c.fillStyle = col; c.beginPath();
-      for(var k = 0; k < n * 2; k++){
-        var a = k * Math.PI / n - Math.PI / 2, r = k % 2 ? R * .38 : R;
-        c[k ? 'lineTo' : 'moveTo'](cx + Math.cos(a) * r, cy + Math.sin(a) * r);
-      }
+      for(var k = 0; k < n * 2; k++){ var a = k * Math.PI / n - Math.PI / 2, r = k % 2 ? R * .38 : R; c[k ? 'lineTo' : 'moveTo'](cx + Math.cos(a) * r, cy + Math.sin(a) * r); }
       c.closePath(); c.fill();
     }
     function d(c, w, h, bump){
@@ -24,26 +19,16 @@
         var cx = i * cell + cell / 2, cy = j * cell + cell / 2;
         c.fillStyle = bump ? '#404040' : dblue;
         c.beginPath(); c.moveTo(cx, cy - cell * .48); c.lineTo(cx + cell * .48, cy); c.lineTo(cx, cy + cell * .48); c.lineTo(cx - cell * .48, cy); c.closePath(); c.fill();
-        c.fillStyle = bump ? '#a0a0a0' : lblue;
-        c.beginPath();
+        c.fillStyle = bump ? '#a0a0a0' : lblue; c.beginPath();
         for(var k = 0; k < 8; k++){ var a = k * Math.PI / 4 + Math.PI / 8, r = cell * .28; c[k ? 'lineTo' : 'moveTo'](cx + Math.cos(a) * r, cy + Math.sin(a) * r); }
         c.closePath(); c.fill();
         star(c, cx, cy, cell * .2, 8, bump ? '#606060' : main);
-        c.fillStyle = bump ? '#303030' : dblue;
-        c.beginPath(); c.arc(cx, cy, cell * .05, 0, 6.2832); c.fill();
-        for(var q = 0; q < 4; q++){
-          var a = q * Math.PI / 2 + Math.PI / 4, ox = cx + Math.cos(a) * cell * .42, oy = cy + Math.sin(a) * cell * .42;
-          star(c, ox, oy, cell * .09, 8, bump ? '#555' : (q % 2 ? gold : dblue));
-        }
+        c.fillStyle = bump ? '#303030' : dblue; c.beginPath(); c.arc(cx, cy, cell * .05, 0, 6.2832); c.fill();
+        for(var q = 0; q < 4; q++){ var a = q * Math.PI / 2 + Math.PI / 4; star(c, cx + Math.cos(a) * cell * .42, cy + Math.sin(a) * cell * .42, cell * .09, 8, bump ? '#555' : (q % 2 ? gold : dblue)); }
       }
       c.strokeStyle = bump ? '#2a2a2a' : 'rgba(255,255,255,.25)'; c.lineWidth = 2;
       for(var g = 0; g <= 4; g++){ c.beginPath(); c.moveTo(g * cell, 0); c.lineTo(g * cell, h); c.stroke(); c.beginPath(); c.moveTo(0, g * cell); c.lineTo(w, g * cell); c.stroke(); }
-      if(!bump){
-        for(var m = 0; m < 1800; m++){
-          c.fillStyle = 'rgba(' + (rnd() > .55 ? '255,245,210' : '40,30,15') + ',' + (rnd() * .07) + ')';
-          c.fillRect(rnd() * w, rnd() * h, 1 + rnd() * 2, 1 + rnd() * 2);
-        }
-      }
+      if(!bump) for(var m = 0; m < 1800; m++){ c.fillStyle = 'rgba(' + (rnd() > .55 ? '255,245,210' : '40,30,15') + ',' + (rnd() * .07) + ')'; c.fillRect(rnd() * w, rnd() * h, 1 + rnd() * 2, 1 + rnd() * 2); }
     }
     return { map: mk(N, N, function(c, w, h){ d(c, w, h, false); }, rx, ry), bump: mk(N, N, function(c, w, h){ d(c, w, h, true); }, rx, ry, false) };
   }
@@ -56,23 +41,13 @@
         var isGold = r % 2 === 0;
         c.fillStyle = bump ? (isGold ? '#c8c8c8' : '#404040') : (isGold ? ochre : lblue);
         c.beginPath();
-        for(var x = 0; x <= w; x += w / 12){
-          var yy = r * rh + rh / 2 + ((Math.round(x / (w / 12)) % 2) ? -rh * .32 : rh * .32);
-          if(x === 0) c.moveTo(x, yy); else c.lineTo(x, yy);
-        }
+        for(var x = 0; x <= w; x += w / 12){ var yy = r * rh + rh / 2 + ((Math.round(x / (w / 12)) % 2) ? -rh * .32 : rh * .32); if(x === 0) c.moveTo(x, yy); else c.lineTo(x, yy); }
         c.lineTo(w, (r + 1) * rh); c.lineTo(0, (r + 1) * rh); c.closePath(); c.fill();
-        c.strokeStyle = bump ? '#222' : (isGold ? dblue : gold);
-        c.lineWidth = Math.max(2, rh * .12);
-        c.beginPath();
-        for(var x2 = 0; x2 <= w; x2 += w / 12){
-          var yy2 = r * rh + rh / 2 + ((Math.round(x2 / (w / 12)) % 2) ? -rh * .32 : rh * .32);
-          if(x2 === 0) c.moveTo(x2, yy2); else c.lineTo(x2, yy2);
-        }
+        c.strokeStyle = bump ? '#222' : (isGold ? dblue : gold); c.lineWidth = Math.max(2, rh * .12); c.beginPath();
+        for(var x2 = 0; x2 <= w; x2 += w / 12){ var yy2 = r * rh + rh / 2 + ((Math.round(x2 / (w / 12)) % 2) ? -rh * .32 : rh * .32); if(x2 === 0) c.moveTo(x2, yy2); else c.lineTo(x2, yy2); }
         c.stroke();
       }
-      if(!bump){
-        for(var m = 0; m < 600; m++){ c.fillStyle = 'rgba(255,255,255,' + rnd() * .06 + ')'; c.fillRect(rnd() * w, rnd() * h, 2, 2); }
-      }
+      if(!bump) for(var m = 0; m < 600; m++){ c.fillStyle = 'rgba(255,255,255,' + rnd() * .06 + ')'; c.fillRect(rnd() * w, rnd() * h, 2, 2); }
     }
     return { map: mk(N, N, function(c, w, h){ d(c, w, h, false); }, rx, ry), bump: mk(N, N, function(c, w, h){ d(c, w, h, true); }, rx, ry, false) };
   }
@@ -102,21 +77,12 @@
     var sh = new THREE.Shape(); sh.moveTo(0, 0); sh.lineTo(L, 0); sh.lineTo(L, H); sh.lineTo(0, H); sh.lineTo(0, 0);
     var n = Math.floor(L / bay), aw = bay * .68;
     var ah1 = H * .42, r1 = aw / 2;
-    for(var i = 0; i < n; i++){
-      var cx = (i + .5) * bay, p = new THREE.Path();
-      p.moveTo(cx - r1, 0); p.lineTo(cx - r1, ah1 - r1); p.absarc(cx, ah1 - r1, r1, Math.PI, 0, true); p.lineTo(cx + r1, 0); p.lineTo(cx - r1, 0);
-      sh.holes.push(p);
-    }
+    for(var i = 0; i < n; i++){ var cx = (i + .5) * bay, p = new THREE.Path(); p.moveTo(cx - r1, 0); p.lineTo(cx - r1, ah1 - r1); p.absarc(cx, ah1 - r1, r1, Math.PI, 0, true); p.lineTo(cx + r1, 0); p.lineTo(cx - r1, 0); sh.holes.push(p); }
     var base2 = H * .52, ah2 = H * .38, r2 = aw * .42;
-    for(var i = 0; i < n; i++){
-      var cx = (i + .5) * bay, p = new THREE.Path();
-      p.moveTo(cx - r2, base2); p.lineTo(cx - r2, base2 + ah2 - r2); p.absarc(cx, base2 + ah2 - r2, r2, Math.PI, 0, true); p.lineTo(cx + r2, base2); p.lineTo(cx - r2, base2);
-      sh.holes.push(p);
-    }
+    for(var i = 0; i < n; i++){ var cx = (i + .5) * bay, p = new THREE.Path(); p.moveTo(cx - r2, base2); p.lineTo(cx - r2, base2 + ah2 - r2); p.absarc(cx, base2 + ah2 - r2, r2, Math.PI, 0, true); p.lineTo(cx + r2, base2); p.lineTo(cx - r2, base2); sh.holes.push(p); }
     var g = new THREE.ExtrudeGeometry(sh, { depth: depth, bevelEnabled: false, curveSegments: 10 });
     var mesh = new THREE.Mesh(g, [glz(tex(1 / 4, 1 / 3)), brick(1 / 6, 1 / 5)]);
-    var band = new THREE.Mesh(new THREE.BoxGeometry(L, .55, depth + .3), plain(0xD4C49A, .55));
-    band.position.set(L / 2, H * .48, depth / 2); mesh.add(band);
+    var band = new THREE.Mesh(new THREE.BoxGeometry(L, .55, depth + .3), plain(0xD4C49A, .55)); band.position.set(L / 2, H * .48, depth / 2); mesh.add(band);
     return mesh;
   }
 
@@ -124,11 +90,7 @@
     var g = new THREE.Group(), W = 17, H = 38, D = 13;
     var face = glz(tex(2, 4), 1.2), side = brick(2, 5);
     var box = new THREE.Mesh(new THREE.BoxGeometry(W, H, D), [side, side, side, side, face, brick(3, 5)]); box.position.y = H / 2; g.add(box);
-    for(var i = 0; i < 9; i++){
-      var w = 1.6 + rnd() * 1.6, h = .8 + rnd() * 3.2, d = D * (.45 + rnd() * .5);
-      var m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), i % 3 ? brick(1, 1) : glz(tex(1, 1)));
-      m.position.set(-W / 2 + w / 2 + i * (W - 1.6) / 8.2, H + h / 2, (rnd() - .5) * 2); g.add(m);
-    }
+    for(var i = 0; i < 9; i++){ var w = 1.6 + rnd() * 1.6, h = .8 + rnd() * 3.2, d = D * (.45 + rnd() * .5); var m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), i % 3 ? brick(1, 1) : glz(tex(1, 1))); m.position.set(-W / 2 + w / 2 + i * (W - 1.6) / 8.2, H + h / 2, (rnd() - .5) * 2); g.add(m); }
     g.position.set(x, 0, z); return g;
   }
 
@@ -169,15 +131,14 @@
     var vault = new THREE.Mesh(new THREE.CylinderGeometry(11, 11, 22, 40, 1, true, Math.PI / 2, Math.PI), glz(tex(1 / 4, 1 / 4, '#B8923F'))); vault.rotation.x = Math.PI / 2; vault.position.set(0, 35, Zp - 25); recon.add(vault);
     [-1, 1].forEach(function(s){
       var w = new THREE.Mesh(new THREE.BoxGeometry(6, 35, 22), brick(1, 3)); w.position.set(s * 14, 17.5, Zp - 25); recon.add(w);
-      for(var k = 0; k < 3; k++){ var niche = new THREE.Mesh(new THREE.ShapeGeometry((function(){ var sh = new THREE.Shape(), r = 2.2; sh.moveTo(-r, 0); sh.lineTo(r, 0); sh.lineTo(r, 6); sh.absarc(0, 6, r, 0, Math.PI, false); sh.lineTo(-r, 0); return sh; })(), 16), glz(tex(1 / 3, 1 / 3)));
-        niche.position.set(s * 10.95, .1, Zp - 18 - k * 7); niche.rotation.y = -s * Math.PI / 2; recon.add(niche); }
+      for(var k = 0; k < 3; k++){ var niche = new THREE.Mesh(new THREE.ShapeGeometry((function(){ var sh = new THREE.Shape(), r = 2.2; sh.moveTo(-r, 0); sh.lineTo(r, 0); sh.lineTo(r, 6); sh.absarc(0, 6, r, 0, Math.PI, false); sh.lineTo(-r, 0); return sh; })(), 16), glz(tex(1 / 3, 1 / 3))); niche.position.set(s * 10.95, .1, Zp - 18 - k * 7); niche.rotation.y = -s * Math.PI / 2; recon.add(niche); }
     });
     var scr2 = screen(30, 26, 13, 21, 6, glz(T), brick(1 / 8, 1 / 8)); scr2.position.set(0, 0, Zp - 40); recon.add(scr2);
     [-1, 1].forEach(function(s){ var w = new THREE.Mesh(new THREE.BoxGeometry(8, 16, 12), brick(1, 2)); w.position.set(s * 10.5, 8, Zp - 44); recon.add(w); });
     var pf = new THREE.Mesh(new THREE.PlaneGeometry(22, 52), new THREE.MeshStandardMaterial({ map: K.tileSet(C.blue, C.white, 4, 9).map, roughness: .35, envMapIntensity: .8 })); pf.rotation.x = -Math.PI / 2; pf.position.set(0, .06, Zp - 24); recon.add(pf);
     var z0 = Zp - 50, L = 250, zc = z0 - L / 2;
     var court = new THREE.Mesh(new THREE.PlaneGeometry(120, L), new THREE.MeshStandardMaterial({ map: flag(10, 20), roughness: .9 })); court.rotation.x = -Math.PI / 2; court.position.set(0, .05, zc); court.receiveShadow = true; recon.add(court);
-    // Asosiy hovuz — faqat hovlida, yer sathida (Klavixo)
+    // Asosiy hovuz — yer sathida, KO'K SUV
     (function(){
       var pw = 36, pd = 72, wallH = 1.15, waterY = .42;
       var stoneRim = plain(0xE8E2D4, .55, .15, .4);
@@ -185,15 +146,14 @@
         var m = new THREE.Mesh(new THREE.BoxGeometry(w[2], wallH, w[3]), stoneRim); m.position.set(w[0], wallH / 2, zc + w[1]); recon.add(m);
       });
       var inner = new THREE.Mesh(new THREE.BoxGeometry(pw + .4, .45, pd + .4), plain(0xD4CFC0, .5)); inner.position.set(0, .22, zc); recon.add(inner);
-      // Suv yuzasi — aniq ko'rinadigan
-      var depth = new THREE.Mesh(new THREE.PlaneGeometry(pw - .8, pd - .8), new THREE.MeshStandardMaterial({ color: 0x0A3040, roughness: .95 })); depth.rotation.x = -Math.PI / 2; depth.position.set(0, .08, zc); recon.add(depth);
-      var waterMat = new THREE.MeshStandardMaterial({ color: 0x2A9BB8, roughness: .05, metalness: .45, envMapIntensity: 2.0, transparent: true, opacity: .92 });
+      var depth = new THREE.Mesh(new THREE.PlaneGeometry(pw - .8, pd - .8), new THREE.MeshStandardMaterial({ color: 0x0B3D5C, roughness: .95 })); depth.rotation.x = -Math.PI / 2; depth.position.set(0, .08, zc); recon.add(depth);
+      var waterMat = new THREE.MeshStandardMaterial({ color: 0x1E90FF, roughness: .05, metalness: .45, envMapIntensity: 2.0, transparent: true, opacity: .95 });
       var water = new THREE.Mesh(new THREE.PlaneGeometry(pw - .5, pd - .5), waterMat); water.rotation.x = -Math.PI / 2; water.position.set(0, waterY, zc); recon.add(water);
-      var shine = new THREE.Mesh(new THREE.PlaneGeometry(pw - 1.2, pd - 1.2), new THREE.MeshBasicMaterial({ color: 0xA8E8F5, transparent: true, opacity: .22 })); shine.rotation.x = -Math.PI / 2; shine.position.set(0, waterY + .03, zc); recon.add(shine);
+      var shine = new THREE.Mesh(new THREE.PlaneGeometry(pw - 1.2, pd - 1.2), new THREE.MeshBasicMaterial({ color: 0x87CEEB, transparent: true, opacity: .25 })); shine.rotation.x = -Math.PI / 2; shine.position.set(0, waterY + .03, zc); recon.add(shine);
       var fbase = new THREE.Mesh(new THREE.CylinderGeometry(2.2, 2.6, .8, 24), plain(0xE4DED0, .5)); fbase.position.set(0, .5, zc); recon.add(fbase);
       var fcol = new THREE.Mesh(new THREE.CylinderGeometry(.45, .55, 2.4, 16), plain(0xC9B896, .4, .2)); fcol.position.set(0, 1.9, zc); recon.add(fcol);
       var fbowl = new THREE.Mesh(new THREE.CylinderGeometry(1.6, 1.2, .5, 24), plain(0xE8E2D4, .45)); fbowl.position.set(0, 3.2, zc); recon.add(fbowl);
-      var fwater = new THREE.Mesh(new THREE.CircleGeometry(1.3, 24), new THREE.MeshStandardMaterial({ color: 0x2A9BB8, roughness: .06, metalness: .4, envMapIntensity: 1.8, transparent: true, opacity: .95 })); fwater.rotation.x = -Math.PI / 2; fwater.position.set(0, 3.4, zc); recon.add(fwater);
+      var fwater = new THREE.Mesh(new THREE.CircleGeometry(1.3, 24), new THREE.MeshStandardMaterial({ color: 0x1E90FF, roughness: .06, metalness: .4, envMapIntensity: 1.8, transparent: true, opacity: .95 })); fwater.rotation.x = -Math.PI / 2; fwater.position.set(0, 3.4, zc); recon.add(fwater);
     })();
     [-1, 1].forEach(function(s){
       var a = arcade(L, 18, 5, 8); a.rotation.y = s > 0 ? Math.PI / 2 : -Math.PI / 2; a.position.set(s * 60, 0, s > 0 ? z0 : z0 - L); recon.add(a);
@@ -217,18 +177,16 @@
     [-1, 1].forEach(function(s){
       var lawn = new THREE.Mesh(new THREE.PlaneGeometry(60, 130), new THREE.MeshStandardMaterial({ color: 0x5E9438, roughness: 1, envMapIntensity: .3 })); lawn.rotation.x = -Math.PI / 2; lawn.position.set(s * 95, .03, zs - 40); recon.add(lawn);
       (function(sx){
-        var tw = 12, td = 12;
-        var rim = plain(0xE4DED0, .55);
+        var tw = 12, td = 12, rim = plain(0xE4DED0, .55);
         [[0, (td+1.6)/2, tw+1.6, .8], [0, -(td+1.6)/2, tw+1.6, .8], [(tw+1.6)/2, 0, .8, td], [-(tw+1.6)/2, 0, .8, td]].forEach(function(w){
           var m = new THREE.Mesh(new THREE.BoxGeometry(w[2], .9, w[3]), rim); m.position.set(sx * 95 + w[0], .45, zs - 40 + w[1]); recon.add(m);
         });
-        var wm = new THREE.MeshStandardMaterial({ color: 0x2A9BB8, roughness: .06, metalness: .4, envMapIntensity: 1.8, transparent: true, opacity: .95 });
+        var wm = new THREE.MeshStandardMaterial({ color: 0x1E90FF, roughness: .06, metalness: .4, envMapIntensity: 1.8, transparent: true, opacity: .95 });
         var wt = new THREE.Mesh(new THREE.PlaneGeometry(tw - .4, td - .4), wm); wt.rotation.x = -Math.PI / 2; wt.position.set(sx * 95, .35, zs - 40); recon.add(wt);
       })(s);
       for(var r = 0; r < 5; r++) for(var c = 0; c < 3; c++){ if(c === 1 && r === 2) continue; recon.add(K.tree(s * (80 + c * 15), zs + 15 - r * 24, .8 + rnd() * .3)); }
     });
     recon.visible = false; root.add(recon);
-
     root.traverse(function(o){ if(o.isMesh && o !== grass){ o.castShadow = o.material && !o.material.transparent; o.receiveShadow = true; } });
     return root;
   }
@@ -240,26 +198,26 @@
     onSpot: function(s){ var m = s.mode || (ruin && ruin.visible ? 'ruin' : 'recon'); if(ruin) ruin.visible = m === 'ruin'; if(recon) recon.visible = m === 'recon'; },
     spots: [
       { id: 'now', mode: 'ruin', name: 'Hozirgi holat', pos: [0, 1.7, Zp + 70], yaw: 0, title: 'Oqsaroy — hozirgi holat',
-        text: "Amir Temur o'z vatani Kesh (Shahrisabz)da 1380-yilda qurdirishni boshlagan, qurilish 1404-yilgacha davom etgan. XVI asrda saroy buzilgan. " + ruinTexts + " Shahrisabz tarixiy markazi YUNESKO ro'yxatida (2000)." },
+        text: "Amir Temur o'z vatani Kesh (Shahrisabz)da 1380-yilda qurdirishni boshlagan, qurilish 1404-yilgacha davom etgan. XVI asrda saroy buzilgan. " + ruinTexts },
       { id: 'statue', mode: 'ruin', name: 'Haykal', pos: [10, 1.7, Zp + 62], yaw: Math.PI / 4 * .55, title: 'Amir Temur haykali',
-        text: "Saroyning asl joyida Amir Temur haykali o'rnatilgan. Maketda sodda shaklda berilgan." },
-      { id: 'rfront', mode: 'recon', name: 'Tiklangan: old', pos: [0, 1.7, Zp + 112], yaw: 0, title: 'Tiklangan portal (taxminiy)',
-        text: "Portal shimolga, Samarqand tomonga qaragan. Ikki yon minora 60–70 m (Archnet). Maketda 65 m. Old yuzi Temuriy girih naqshlar bilan." },
+        text: "Saroyning asl joyida Amir Temur haykali o'rnatilgan." },
+      { id: 'rfront', mode: 'recon', name: 'Tiklangan: old', pos: [0, 1.7, Zp + 112], yaw: 0, title: 'Tiklangan portal',
+        text: "Portal shimolga qaragan. Minoralar 60–70 m (Archnet). Maketda 65 m." },
       { id: 'riwan', mode: 'recon', name: 'Birinchi ayvon', pos: [0, 1.7, Zp + 6], yaw: 0, title: 'Birinchi ayvon (22 m)',
-        text: "Ayvon kengligi 22 m. Klavixo: uzun kirish yo'lagi, yonlarda ko'k koshinli pol va ravoqli kichik xonalar." },
-      { id: 'rpass', mode: 'recon', name: "Kirish yo'lagi", pos: [0, 1.7, Zp - 30], yaw: Math.PI / 2, title: "Kirish yo'lagi va kichik xonalar",
-        text: "Klavixo (1404): yo'lakning ikki yonida kutish uchun kichik xonalar, poli ko'k koshin, ravoqlari koshinli g'isht." },
+        text: "Ayvon kengligi 22 m. Klavixo: uzun kirish yo'lagi va yon xonalar." },
+      { id: 'rpass', mode: 'recon', name: "Kirish yo'lagi", pos: [0, 1.7, Zp - 30], yaw: Math.PI / 2, title: "Kirish yo'lagi",
+        text: "Klavixo: yo'lak yonida kichik xonalar, poli ko'k koshin." },
       { id: 'rcourt', mode: 'recon', name: 'Hovli', pos: [0, 1.7, Zp - 56], yaw: 0, title: 'Asosiy hovli',
-        text: "Klavixo: oq tosh plitali hovli, o'rtasida katta hovuz. Manbalar: atrof 2 qavatli boy xonalar/arkadalar bilan o'ralgan (~120–125 × 240–250 m). Arkada ustida Sher va Quyosh." },
+        text: "Klavixo: oq tosh plitali hovli, o'rtasida katta hovuz. Atrof 2 qavatli arkadalar (~120×250 m)." },
       { id: 'rpool', mode: 'recon', name: 'Havza', pos: [0, 1.7, -40], yaw: Math.PI, title: 'Asosiy hovuz',
-        text: "Klavixo (1404): hovli o'rtasida (yer sathida) katta hovuz — 2-qavatda emas. Maketda ~36×72 m, suvli, oq tosh qirrali, markazda favvora." },
+        text: "Klavixo: hovli o'rtasida (yer sathida) katta hovuz — 2-qavatda emas. Ko'k suv, favvora." },
       { id: 'rgate', mode: 'recon', name: 'Asosiy darvoza', pos: [0, 1.7, -120], yaw: 0, title: 'Asosiy darvoza',
-        text: "Klavixo: «juda baland va keng» darvoza, oltin va ko'k koshin; tepasida Sher va Quyosh." },
+        text: "Klavixo: oltin va ko'k koshinli darvoza; tepasida Sher va Quyosh." },
       { id: 'rhall', mode: 'recon', name: 'Qabul zali', pos: [0, 1.7, -196], yaw: 0, title: 'Kvadrat zal',
-        text: "Klavixo: kvadrat zal, devorlari oltin va ko'k koshin, shifti oltin." },
+        text: "Klavixo: oltin va ko'k koshinli zal, oltin shift." },
       { id: 'rgarden', mode: 'recon', name: "Bog'", pos: [-80, 1.7, -170], yaw: Math.PI / 2 * -1 + Math.PI, title: "Saroy bog'i",
-        text: "Klavixo: zal yonida bog' — mevali daraxtlar va suv havzalari (yer sathida)." }
+        text: "Klavixo: bog' — mevali daraxtlar va suv havzalari (yer sathida)." }
     ],
-    note: "Manbalar: Klavixo (1404), Archnet, Wikipedia. Asosiy hovuz hovlida (yer sathi). 2 qavatli arkada — manbalarga asoslangan. Tom hovuzi rivoyat, maketdan olib tashlangan."
+    note: "Manbalar: Klavixo (1404), Archnet, Wikipedia. Asosiy hovuz hovlida, ko'k suv bilan."
   };
 })();
