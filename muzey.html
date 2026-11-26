@@ -24,7 +24,7 @@
   .chips::-webkit-scrollbar{ display:none; }
   .chips .pill{ flex:0 0 auto; }
   .info{ background:rgba(20,33,58,.88); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); border:1px solid rgba(227,199,126,.35); border-radius:20px; padding:14px 16px; max-width:560px; }
-  .info h3{ margin:0 0 4px; font:600 20px Georgia,'Newsreader',serif; color:var(--brass-l); }
+  .info h3{ margin:0 0 4px; font:600 20px Georgia,'Newsreader',serif; }
   .info p{ margin:0; font-size:13.5px; line-height:1.55; color:#D7DCE8; }
   .hint{ left:50%; top:calc(62px + 48px); transform:translateX(-50%); background:rgba(20,33,58,.8); border-radius:999px; padding:8px 14px; font-size:12.5px; color:#D7DCE8; white-space:nowrap; pointer-events:none; transition:opacity .6s; }
   .pad{ position:fixed; z-index:6; right:max(14px,env(safe-area-inset-right)); bottom:max(110px,env(safe-area-inset-bottom)); width:130px; height:130px; border-radius:50%; background:rgba(20,33,58,.55); border:1px solid rgba(227,199,126,.3); touch-action:none; }
@@ -36,6 +36,7 @@
   .panel{ position:fixed; z-index:12; left:50%; top:60px; transform:translateX(-50%); width:min(92vw,420px); background:rgba(20,33,58,.95); border:1px solid rgba(227,199,126,.4); border-radius:20px; padding:16px; max-height:78vh; overflow:auto; }
   .panel h3{ margin:0 0 6px; font:600 18px Georgia,serif; } .panel p{ margin:0 0 10px; font-size:12.5px; color:#C9D1E0; line-height:1.5; }
   .panel label{ display:flex; justify-content:space-between; font-size:13px; margin-top:10px; } .panel input[type=range]{ width:100%; accent-color:#E3C77E; touch-action:pan-x; }
+  .panel .row{ display:flex; gap:8px; margin-top:12px; flex-wrap:wrap; }
   .hidden{ display:none !important; }
   #note{ position:fixed; left:12px; bottom:max(90px,env(safe-area-inset-bottom)); max-width:min(70vw,280px); font-size:11px; color:#9AA6BC; background:rgba(10,18,32,.7); padding:6px 10px; border-radius:10px; z-index:4; }
   #load{ position:fixed; inset:0; z-index:20; display:flex; align-items:center; justify-content:center; background:#0A1220; font:600 16px Inter,system-ui,sans-serif; color:var(--brass-l); }
@@ -46,21 +47,42 @@
 <canvas id="gl"></canvas>
 <div class="vrdiv"></div>
 <div class="vrexit" id="vrbar"><button class="pill" id="vrShiftM" type="button">◀</button><button class="pill" id="vrShiftP" type="button">▶</button><button class="pill" id="vrExit" type="button">✕ Chiqish</button><button class="pill" id="vrDistM" type="button">◜</button><button class="pill" id="vrDistP" type="button">◝</button><button class="pill" id="vrZoomM" type="button">−</button><button class="pill" id="vrZoomP" type="button">+</button></div>
+
 <div class="ui top">
   <a class="pill" href="index.html">← Bosh</a>
   <button class="pill" id="btnHelp" type="button">?</button>
+  <button class="pill" id="btnVR" type="button">VR</button>
+  <button class="pill" id="btnPult" type="button">Pult</button>
   <span class="title" id="muTitle">Virtual muzey</span>
 </div>
+
+<div class="hint" id="hint">Barmoq bilan aylantiring · pastki tugmalar — joylar. Chapdagi doira bilan yuring</div>
+<div class="pad" id="pad"><i id="knob"></i></div>
+
 <div class="ui places">
+  <div class="info" id="info"></div>
   <div class="chips" id="chips"></div>
-  <div class="info hidden" id="infoBox">
-    <h3 id="infoTitle"></h3>
-    <p id="infoText"></p>
-  </div>
 </div>
-<div class="hint" id="hint">Barmoq bilan aylantiring · pastki tugmalar — joylar</div>
-<div class="pad" id="pad"><i></i></div>
-<div id="note"></div>
+
+<div class="panel" id="vrPanel" hidden>
+  <h3>VR ko'zoynak sozlamasi</h3>
+  <p>Chap va o'ng tasvir ikkiga ajralib ko'rinsa, avval «Markazga surish»ni oshiring. Chekkalari egilgan ko'rinsa, «Linza tuzatish»ni o'zgartiring. Sozlamalar saqlanadi. VR ichida yuqoridagi ◀ ▶ ◜ ◝ − + tugmalari ham shuni qiladi.</p>
+  <label for="sShift"><span>Markazga surish</span><b id="oshift"></b></label><input type="range" id="sShift" min="-0.1" max="0.3" step="0.01">
+  <label for="sK1"><span>Linza tuzatish</span><b id="ok1"></b></label><input type="range" id="sK1" min="-0.2" max="0.8" step="0.02">
+  <label for="sZoom"><span>Kattalik</span><b id="ozoom"></b></label><input type="range" id="sZoom" min="0.6" max="1.6" step="0.05">
+  <label for="sIpd"><span>Ko'zlar orasi (mm)</span><b id="oipd"></b></label><input type="range" id="sIpd" min="50" max="75" step="1">
+  <div class="row"><button class="pill" id="vrReset" type="button">Boshlang'ich</button><button class="pill on" id="vrPanelClose" type="button">Tayyor</button></div>
+</div>
+<div class="panel" id="pultPanel" hidden>
+  <h3>Ikkinchi telefon — pult</h3>
+  <p>Internet serversiz, to'g'ridan-to'g'ri ulanadi. Ikkala telefon bir Wi‑Fi'da bo'lsa eng yaxshi (hotspot ham bo'ladi). Ulangach VR'ga kiring.</p>
+  <button class="pill on" id="pMake" type="button">1. QR yaratish</button>
+  <div id="pStep1" hidden><p style="margin-top:10px">Ikkinchi telefon <b>kamerasi</b> bilan shu QR'ni skanerlang — pult sahifasi ochiladi.</p><canvas id="pQR" style="width:100%;max-width:300px;display:block;margin:0 auto;border-radius:10px;background:#fff"></canvas>
+  <button class="pill on" id="pScan" type="button" style="margin-top:12px">2. Pult javobini skanerlash</button></div>
+  <video id="pVid" muted playsinline hidden style="width:100%;margin-top:10px;border-radius:12px"></video>
+  <p id="pStat" style="margin-top:10px"></p>
+  <div class="row"><button class="pill" id="pClose" type="button">Yopish</button></div>
+</div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="muzey-registon.js"></script>
 <script src="muzey-oqsaroy.js?v=3"></script>
