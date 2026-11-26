@@ -48,7 +48,6 @@
     }
     return { map: mk(N, N, function(c, w, h){ d(c, w, h, false); }, rx, ry), bump: mk(N, N, function(c, w, h){ d(c, w, h, true); }, rx, ry, false) };
   }
-  // Minoralar: zigzag + o'ramli koshin (tarixiy Aq-Saray)
   function zig(rx, ry){
     var N = 512;
     function d(c, w, h, bump){
@@ -83,7 +82,6 @@
   function flag(rx, ry){
     return mk(256, 256, function(g, w, h){ g.fillStyle = '#E4DED0'; g.fillRect(0, 0, w, h); for(var i = 0; i < 8; i++) for(var j = 0; j < 8; j++){ var v = rnd(); g.fillStyle = 'rgba(' + (v > .5 ? '255,255,250,' : '90,80,60,') + Math.abs(v - .5) * .25 + ')'; g.fillRect(i * 32 + 1, j * 32 + 1, 30, 30); } }, rx, ry);
   }
-  // Sher va Quyosh belgisi (Klavixo: kirish tepasida va hovli arkalari ustida)
   function sunTex(){
     return mk(256, 256, function(c, w, h){
       c.clearRect(0, 0, w, h); var cx = w / 2, cy = h / 2;
@@ -166,8 +164,22 @@
     var pf = new THREE.Mesh(new THREE.PlaneGeometry(22, 52), new THREE.MeshStandardMaterial({ map: K.tileSet(C.blue, C.white, 4, 9).map, roughness: .35, envMapIntensity: .8 })); pf.rotation.x = -Math.PI / 2; pf.position.set(0, .06, Zp - 24); recon.add(pf);
     var z0 = Zp - 50, L = 250, zc = z0 - L / 2;
     var court = new THREE.Mesh(new THREE.PlaneGeometry(120, L), new THREE.MeshStandardMaterial({ map: flag(10, 20), roughness: .9 })); court.rotation.x = -Math.PI / 2; court.position.set(0, .05, zc); court.receiveShadow = true; recon.add(court);
-    var pool = new THREE.Mesh(new THREE.PlaneGeometry(30, 60), new THREE.MeshStandardMaterial({ color: 0x2F7F9F, roughness: .04, metalness: .45, envMapIntensity: 1.6 })); pool.rotation.x = -Math.PI / 2; pool.position.set(0, .5, zc); recon.add(pool);
-    var cop = new THREE.Mesh(new THREE.BoxGeometry(33, .7, 63), plain(0xE4DED0, .6)); cop.position.set(0, .3, zc); recon.add(cop);
+    // Katta hovuz (Klavixo: «hovli o'rtasida katta hovuz»; Wikipedia/Archnet: asosiy hovli 120×250 m)
+    (function(){
+      var pw = 36, pd = 72, wallH = 1.1, waterY = .35;
+      var stoneRim = plain(0xE8E2D4, .55, .15, .4);
+      [[0, (pd + 2.4) / 2, pw + 2.4, 1.2], [0, -(pd + 2.4) / 2, pw + 2.4, 1.2], [(pw + 2.4) / 2, 0, 1.2, pd], [-(pw + 2.4) / 2, 0, 1.2, pd]].forEach(function(w){
+        var m = new THREE.Mesh(new THREE.BoxGeometry(w[2], wallH, w[3]), stoneRim); m.position.set(w[0], wallH / 2, zc + w[1]); recon.add(m);
+      });
+      var inner = new THREE.Mesh(new THREE.BoxGeometry(pw + .4, .45, pd + .4), plain(0xD4CFC0, .5)); inner.position.set(0, .22, zc); recon.add(inner);
+      var waterMat = new THREE.MeshStandardMaterial({ color: 0x1A6B8A, roughness: .08, metalness: .55, envMapIntensity: 1.8, transparent: true, opacity: .88 });
+      var water = new THREE.Mesh(new THREE.PlaneGeometry(pw - .6, pd - .6), waterMat); water.rotation.x = -Math.PI / 2; water.position.set(0, waterY, zc); recon.add(water);
+      var depth = new THREE.Mesh(new THREE.PlaneGeometry(pw - .8, pd - .8), new THREE.MeshStandardMaterial({ color: 0x0E3A4A, roughness: .9 })); depth.rotation.x = -Math.PI / 2; depth.position.set(0, .05, zc); recon.add(depth);
+      var fbase = new THREE.Mesh(new THREE.CylinderGeometry(2.2, 2.6, .8, 24), plain(0xE4DED0, .5)); fbase.position.set(0, .5, zc); recon.add(fbase);
+      var fcol = new THREE.Mesh(new THREE.CylinderGeometry(.45, .55, 2.4, 16), plain(0xC9B896, .4, .2)); fcol.position.set(0, 1.9, zc); recon.add(fcol);
+      var fbowl = new THREE.Mesh(new THREE.CylinderGeometry(1.6, 1.2, .5, 24), plain(0xE8E2D4, .45)); fbowl.position.set(0, 3.2, zc); recon.add(fbowl);
+      var fwater = new THREE.Mesh(new THREE.CircleGeometry(1.3, 24), waterMat.clone()); fwater.rotation.x = -Math.PI / 2; fwater.position.set(0, 3.4, zc); recon.add(fwater);
+    })();
     [-1, 1].forEach(function(s){
       var a = arcade(L, 10, 5, 7); a.rotation.y = s > 0 ? Math.PI / 2 : -Math.PI / 2; a.position.set(s * 60, 0, s > 0 ? z0 : z0 - L); recon.add(a);
       var back = new THREE.Mesh(new THREE.BoxGeometry(5, 12, L), brick(1, 1)); back.position.set(s * 65.5, 6, zc); recon.add(back);
@@ -189,7 +201,16 @@
     hallLight = new THREE.PointLight(0xFFE2A8, 1.4, 60); hallLight.position.set(0, 14, hz); recon.add(hallLight);
     [-1, 1].forEach(function(s){
       var lawn = new THREE.Mesh(new THREE.PlaneGeometry(60, 130), new THREE.MeshStandardMaterial({ color: 0x5E9438, roughness: 1, envMapIntensity: .3 })); lawn.rotation.x = -Math.PI / 2; lawn.position.set(s * 95, .03, zs - 40); recon.add(lawn);
-      var tank = new THREE.Mesh(new THREE.PlaneGeometry(10, 10), new THREE.MeshStandardMaterial({ color: 0x2F7F9F, roughness: .04, metalness: .45 })); tank.rotation.x = -Math.PI / 2; tank.position.set(s * 95, .12, zs - 40); recon.add(tank);
+      // Bog' hovuzlari (Klavixo: mevali daraxtlar, suv havzalari)
+      (function(sx){
+        var tw = 12, td = 12;
+        var rim = plain(0xE4DED0, .55);
+        [[0, (td+1.6)/2, tw+1.6, .8], [0, -(td+1.6)/2, tw+1.6, .8], [(tw+1.6)/2, 0, .8, td], [-(tw+1.6)/2, 0, .8, td]].forEach(function(w){
+          var m = new THREE.Mesh(new THREE.BoxGeometry(w[2], .9, w[3]), rim); m.position.set(sx * 95 + w[0], .45, zs - 40 + w[1]); recon.add(m);
+        });
+        var wm = new THREE.MeshStandardMaterial({ color: 0x1A6B8A, roughness: .08, metalness: .5, envMapIntensity: 1.6, transparent: true, opacity: .9 });
+        var wt = new THREE.Mesh(new THREE.PlaneGeometry(tw - .4, td - .4), wm); wt.rotation.x = -Math.PI / 2; wt.position.set(sx * 95, .35, zs - 40); recon.add(wt);
+      })(s);
       for(var r = 0; r < 5; r++) for(var c = 0; c < 3; c++){ if(c === 1 && r === 2) continue; recon.add(K.tree(s * (80 + c * 15), zs + 15 - r * 24, .8 + rnd() * .3)); }
     });
     recon.visible = false; root.add(recon);
@@ -215,9 +236,9 @@
       { id: 'rpass', mode: 'recon', name: "Kirish yo'lagi", pos: [0, 1.7, Zp - 30], yaw: Math.PI / 2, title: "Kirish yo'lagi va kichik xonalar",
         text: "Klavixo (1404): yo'lakning ikki yonida kutish uchun kichik xonalar bo'lgan, ularning poli ko'k koshin bilan, ravoqlari ko'k koshinli g'ishtdan." },
       { id: 'rcourt', mode: 'recon', name: 'Hovli', pos: [0, 1.7, Zp - 56], yaw: 0, title: 'Asosiy hovli',
-        text: "Hovli oq tosh plitalar bilan yotqizilgan, to'rt tomoni nafis ravoqlar (arkada) bilan o'ralgan, o'rtasida katta suv havzasi bo'lgan (Klavixo). Zamonaviy tadqiqotlarda o'lchami taxminan 120×250 m. Arkada ustida Sher va Quyosh belgilari bo'lgan." },
-      { id: 'rpool', mode: 'recon', name: 'Havza', pos: [0, 1.7, -2], yaw: Math.PI, title: 'Orqaga qarash',
-        text: "Hovlining o'rtasidan portal va ikki minora ko'rinishi. Havza o'lchami manbalarda aniq berilmagan, maketda taxminiy." },
+        text: "Klavixo: oq tosh plitali hovli, o'rtasida katta hovuz, atrofi bezakli arkadalar. Zamonaviy tadqiqotlar (Wikipedia/Archnet): ~120–125 × 240–250 m. Arkada ustida Sher va Quyosh belgilari." },
+      { id: 'rpool', mode: 'recon', name: 'Havza', pos: [0, 1.7, -40], yaw: Math.PI, title: 'Asosiy hovuz',
+        text: "Klavixo (1404): hovli o'rtasida katta hovuz. Maketda ~36×72 m, oq tosh qirrali, markazda favvora. Manbalar: Wikipedia, Archnet, Klavixo." },
       { id: 'rgate', mode: 'recon', name: 'Asosiy darvoza', pos: [0, 1.7, -120], yaw: 0, title: 'Asosiy darvoza',
         text: "Klavixo: «juda baland va keng» darvoza, oltin va ko'k koshin bilan bezatilgan; tepasida Sher va Quyosh tasviri. U Samarqand avvalgi hukmdorining gerbi deb tushuntirilgan." },
       { id: 'rhall', mode: 'recon', name: 'Qabul zali', pos: [0, 1.7, -196], yaw: 0, title: 'Kvadrat zal',
